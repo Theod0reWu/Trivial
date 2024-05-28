@@ -1,0 +1,5 @@
+Come up with {num_questions:.0f} trivia questions and answers. All questions should be from the {category} category. Each question should come in increasing difficulty. Each question should be a description of something. Each answer should be exactly what the question is describing. Ensure to not state the answer directly in the question. The question should contain as many clues as many clues as possible.
+
+Your reply must only consist of two lines for every question and answer pair! Each pair should be separated by a single newline. Don't include the price each question is worth. You must only reply strictly using the following template of two lines for all {num_questions:.0f} question and answer pairs: 
+Question: <Your question> 
+Answer: <Your answer>
