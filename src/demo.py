@@ -3,7 +3,7 @@ import numpy as np
 
 import os
 
-from prompt import CluePromptGenerator
+from prompt import DemoPromptGenerator
 from clues import Clue, parse_content
 
 default_prompt_path = './prompts/clue_based.txt' 
@@ -13,7 +13,7 @@ genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
 model = genai.GenerativeModel('gemini-1.0-pro-latest')
 
-movies_gen = CluePromptGenerator(default_prompt_path, "movies")
+movies_gen = DemoPromptGenerator(default_prompt_path, "movies")
 prompt = movies_gen.generate_prompt(num_questions = 5, category = "movies")
 # print(prompt)
 

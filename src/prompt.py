@@ -15,7 +15,7 @@ class PromptGenerator(object):
     def generate_prompt(self, **kwargs):
         return self.prompt.format(**kwargs)
 
-class CluePromptGenerator(PromptGenerator):
+class DemoPromptGenerator(PromptGenerator):
     '''
         Basic prompt generation for clues
 
@@ -52,4 +52,18 @@ class AnswerPromptGenerator(PromptGenerator):
         super(AnswerPromptGenerator, self).__init__(prompt_path)
         self.prompt_path = prompt_path
         
+class CluePromptGenerator(PromptGenerator):
+    """
+        Prompt generates clues based on given information:
 
+        Clue: <your clue>
+
+        Needs:
+            num = number of clues
+            answers = string of all the answers (num answers)
+            information = num paragraphs of information, corresponding to the answers
+    """
+    def __init__(self, prompt_path = './prompts/clue.txt'):
+        super(CluePromptGenerator, self).__init__(prompt_path)
+        self.prompt_path = prompt_path
+        
