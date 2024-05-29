@@ -42,7 +42,14 @@ for i in range(5):
 		search = wikipedia.search(ans[i][7:] + " " + first[0][2:], results = 3)
 		print(search)
 	result = search[0]
-	page = wikipedia.page(result, auto_suggest = False)
+	print(result)
+	page = None
+	try:
+		page = wikipedia.page(result, auto_suggest = False)
+	except DisambiguationError as e:
+		print(e.options[0])
+		page = wikipedia.page(e.options[0], auto_suggest = False)
+
 	print(page)
 
 	information.append("\"" + page.summary + "\"")
