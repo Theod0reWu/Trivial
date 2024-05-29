@@ -3,7 +3,7 @@ import numpy as np
 
 class Clue(object):
 	"""
-		
+		Stores each clue and answer
 	"""
 	def __init__(self, clue, answer):
 		super(Clue, self).__init__()
@@ -25,6 +25,9 @@ class Clue(object):
 
 	def check_answer(self, guess, threshold = .95) -> bool:
 		return self.guess_distance(guess) >= threshold
+
+	def __str__(self):
+		return self.clue + "\n" + self.answer + "\n"
 
 def parse_content(content):
 	lines = content.split("\n")

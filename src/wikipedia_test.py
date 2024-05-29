@@ -80,11 +80,16 @@ def wikipedia_search(search_queries: list[str]) -> list[str]:
 
 # example = wikipedia_search(["What are LLMs?"])
 
-search = wikipedia.search("shakespeare", results = 20)
+search = wikipedia.search("Germany", results = 20)
 print(search)
-for result in search:
+page = None
+for result in search[:1]:
   if ("(disambiguation)" not in result):
     try:
-      print(wikipedia.page(result, auto_suggest = False))
+      page = wikipedia.page(result, auto_suggest = False)
     except wikipedia.exceptions.DisambiguationError as e:
       print (e.options)
+
+print(page.summary)
+print(page.sections)
+print(page.section(page.sections[-5]))

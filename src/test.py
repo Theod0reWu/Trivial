@@ -1,35 +1,41 @@
-from clues import Clue
+import google.generativeai as genai
+import numpy as np
 
-def parse_content(content):
-	lines = content.split("\n")
-	clues = []
-	
-	q_at = -1
-	x = 0
-	while (x < len(lines)):
-		if (lines[x][:9] == "Question:"):
-			q_at = x
-		if (lines[x][:7] == "Answer:" and q_at != -1):
-			clues.append(Clue(lines[q_at][9:], lines[x][7:]))
-			q_at = -1
-		x+=1
-	return clues
+import os
 
-clues = parse_content("""Question: A young boy with a lightning-shaped scar who is unknowingly a wizard on a quest to defeat an evil wizard.
-Answer: Harry Potter
+from prompt import CategoryPromptGenerator, AnswerPromptGenerator
+from clues import Clue, parse_content
 
-Question: A group of friends who go on an adventure to find a lost city of gold.
-Answer: The Goonies
+import wikipedia
+from wikipedia.exceptions import DisambiguationError, PageError
 
-Question: A young woman who is chosen to be the leader of a rebellion against an oppressive government.
-Answer: Katniss Everdeen
+genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
-Question: A group of soldiers who are sent on a mission to rescue hostages from a terrorist organization.
-Answer: The Avengers
+model = genai.GenerativeModel('gemini-1.0-pro-latest')
 
-Question: A woman who is falsely accused of murder and must clear her name while trying to stay one step ahead of the police.
-Answer: The Fugitive""")
+category_gen = CategoryPromptGenerator()
+prompt = category_gen.generate_prompt(num = 6)
 
-for i in clues:
-	print(i.clue)
-	print(i.answer)
+response = model.generate_content(prompt)
+print(response.text)
+
+categories = response.text.split("\n")
+print(categories[0].split(","))
+first = categories[0].split(",")
+
+answer_gen = AnswerPromptGenerator()
+prompt = answer_gen.generate_prompt(num = 5, singular = first[0][2:], plural = first[1])
+
+response = model.generate_content(prompt)
+print(response.text)
+
+for i in range(5):
+	ans = response.text.split("\n")
+	print(ans[i][7:] + " " + first[0][2:])
+	search = wikipedia.search(ans[i][7:], results = 3)
+	print(search)
+	search = wikipedia.search(ans[i][7:] + " " + first[0][2:], results = 3)
+	print(search)
+	result = search[0]
+	page = wikipedia.page(result, auto_suggest = False)
+	print(page)
