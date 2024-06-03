@@ -93,3 +93,4 @@ for result in search[:1]:
 print(page.summary)
 print(page.sections)
 print(page.section(page.sections[-5]))
+print(page.images)

@@ -1,5 +1,5 @@
 '''
-    Note: only the class PromptGenerator is needed, the other classes are only used to segment the comments of different prompt types.
+    Note: only the class PromptGenerator is actually needed, the other classes are only used to segment the comments of different prompt types.
 
 '''
 
@@ -23,7 +23,7 @@ class DemoPromptGenerator(PromptGenerator):
         Answer: <ans>
     '''
     def __init__(self, prompt_path, category):
-        super(CluePromptGenerator, self).__init__(prompt_path)
+        super(DemoPromptGenerator, self).__init__(prompt_path)
         self.cat_name = category
 
 class CategoryPromptGenerator(PromptGenerator):
@@ -66,4 +66,6 @@ class CluePromptGenerator(PromptGenerator):
     def __init__(self, prompt_path = './prompts/clue.txt'):
         super(CluePromptGenerator, self).__init__(prompt_path)
         self.prompt_path = prompt_path
+
+
         

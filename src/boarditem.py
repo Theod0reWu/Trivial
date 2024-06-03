@@ -1,12 +1,12 @@
 import google.generativeai as genai
 import numpy as np
 
-class Clue(object):
+class BoardItem(object):
 	"""
 		Stores each clue and answer
 	"""
 	def __init__(self, clue, answer):
-		super(Clue, self).__init__()
+		super(BoardItem, self).__init__()
 		self.clue = clue.strip()
 		self.answer = answer.strip()
 
@@ -28,18 +28,3 @@ class Clue(object):
 
 	def __str__(self):
 		return self.clue + "\n" + self.answer + "\n"
-
-def parse_content(content):
-	lines = content.split("\n")
-	clues = []
-	
-	q_at = -1
-	x = 0
-	while (x < len(lines)):
-		if (lines[x][:9] == "Question:"):
-			q_at = x
-		if (lines[x][:7] == "Answer:" and q_at != -1):
-			clues.append(Clue(lines[q_at][9:], lines[x][7:]))
-			q_at = -1
-		x+=1
-	return clues
