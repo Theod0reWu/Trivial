@@ -1,0 +1,32 @@
+main {
+  display: flex;
+  justify-content: center;
+}
+
+.logo {
+  width: 792px;
+  height: 700px;
+  position: relative;
+}
+
+.logo-item {
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+
+.logo-text {
+  width: 792px;
+  height: 196px;
+  position: absolute;
+  z-index: 1;
+}
+
+.logo-backdrop {
+  width: 700px;
+  height: 700px;
+  position: absolute;
+  z-index: 0;
+}
