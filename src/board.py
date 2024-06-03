@@ -30,7 +30,9 @@ class Board(object):
 		self.answer_gen = AnswerPromptGenerator()
 		self.clue_gen = CluePromptGenerator()
 	
-	def refresh(self, model):
+	def refresh(self, model, min_price = 200, max_price = 1000):
+		price_incr = round((max_price - min_price) / (self.clues_per_category - 1))
+
 		category_prompt = self.category_gen.generate_prompt(num = self.categories)
 		categories = get_and_parse_categories(model, category_prompt)
 		print(categories)
@@ -64,11 +66,11 @@ class Board(object):
 
 			# get clues based on info + answer
 			clue_prompt = self.clue_gen.generate_prompt(num = self.clues_per_category, answers = ", ".join(answers), information = "\n".join(information))
-			clues = get_and_parse_clues(clue_prompt)
+			clues = get_and_parse_clues(model, clue_prompt)
 
 			items = []
 			for i in range(len(answers)):
-				items.append(BoardItem(answers[i], clues[i]))
+				items.append(BoardItem(clues[i], answers[i], min_price + price_incr * i))
 
 			self.items[at] = items
 			at += 1
@@ -78,11 +80,11 @@ class Board(object):
 		output += '\n'
 		for row in range(self.clues_per_category):
 			for cat in range(self.categories):
-				output += self.clues[cat][row].clue + "\t\t"
+				output += self.items[cat][row].clue + "\t\t"
 		output += '\n'
 		for row in range(self.clues_per_category):
 			for cat in range(self.categories):
-				output += self.clues[cat][row].answer + "\t\t"
+				output += self.items[cat][row].answer + "\t\t"
 		return output
 
 	def __getitem__(self, category : int):

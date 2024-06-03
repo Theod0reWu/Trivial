@@ -5,10 +5,11 @@ class BoardItem(object):
 	"""
 		Stores each clue and answer
 	"""
-	def __init__(self, clue, answer):
+	def __init__(self, clue, answer, price):
 		super(BoardItem, self).__init__()
 		self.clue = clue.strip()
 		self.answer = answer.strip()
+		self.price = price
 
 		self.ans_embedding = genai.embed_content(
 		    model="models/embedding-001",

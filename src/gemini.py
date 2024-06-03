@@ -10,7 +10,7 @@ def get_response(model, prompt):
 	except e:
 		print(e)
 		print(response.promptFeedback)
-		
+
 '''
 	the response from the model, should be sentences separated by "\n". Sometimes extra ones are added.
 	removes the extra newlines and leading/trailing spaces
@@ -60,5 +60,5 @@ def get_and_parse_clues(model, prompt):
 
 	for line in lines:
 		if (line[:5] == "Clue:"):
-			clues.append(Clue(lines[x][5:], answers[a_at]))
+			clues.append(line[5:])
 	return clues
