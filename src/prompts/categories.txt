@@ -1,4 +1,4 @@
-suggest {num:.0f} plural trivia categories. Lastly create a title for the category. The title should be relevant to the category. If possible use an alliteration, rhyme or a pun to make the title. Singular is the singular form of the plural category. 
+suggest {num:.0f} plural trivia categories. Lastly create a title for the category the succinctly describes the category. If it is possible to do so without altering the meaning of the title, have the title an alliteration, rhyme or a pun. Singular is the singular form of the plural category. 
 
 Your reply must only consist of one line for every category! You must only reply strictly using the following template for all {num:.0f} categories and nothing else:
 - <singular>, <plural>, <title>
