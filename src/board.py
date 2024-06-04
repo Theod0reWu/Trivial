@@ -26,6 +26,7 @@ class Board(object):
 		self.category_titles = []
 		self.all_categories = []
 		self.items = [[None for i in range(clues_per_category)] for i in range(categories)]
+		self.picked = [[False for i in range(clues_per_category)] for i in range(categories)]
 		self.category_gen = CategoryPromptGenerator()
 		self.answer_gen = AnswerPromptGenerator()
 		self.clue_gen = CluePromptGenerator()
@@ -89,3 +90,10 @@ class Board(object):
 
 	def __getitem__(self, category : int):
 		return self.clues[category]
+
+	def clear(self):
+		for i in range(self.categories):
+			for e in range(self.clues_per_category):
+				if (not self.picked[i][e]):
+					return False
+		return True
