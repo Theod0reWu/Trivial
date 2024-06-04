@@ -1,0 +1,4 @@
+Come up with {num:.0f} trivia answers. All answers should be a  specific "{singular}" from the "{plural}" category. Order the answers in increasing difficulty, where answers further along are less common.
+
+Your reply must only consist of one line for every answer! You must only reply strictly using the following template for all {num:.0f} answers:
+Answer: <Your answer>
