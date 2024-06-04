@@ -1,11 +1,14 @@
 main {
   display: flex;
   justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100vw;
 }
 
 .logo {
   width: 792px;
-  height: 700px;
+  height: 675px;
   position: relative;
 }
 
@@ -25,8 +28,105 @@ main {
 }
 
 .logo-backdrop {
-  width: 700px;
-  height: 700px;
-  position: absolute;
+  width: 675px;
+  height: 675px;
+  position: relative;
   z-index: 0;
+}
+
+.control-panel {
+  transform: translate(0, -11.5rem);
+  max-width: 370px;
+  display: flex;
+  flex-direction: column;
+  padding: 0 4.75rem 0 4.75rem;
+  z-index: 2;
+  border-radius: 20px;
+  border: 3px solid var(--black);
+  background: var(--black-transparent-50);
+}
+
+input {
+  display: block;
+  outline: none;
+  border-radius: 8px;
+  background: var(--transparent);
+  font-weight: bolder;
+  font-size: 20px;
+  flex: 1 1 0%;
+  border: 3px solid var(--white);
+  color: white;
+  text-align: center;
+}
+
+input::placeholder,
+.icon-info:hover {
+  color: var(--white-transparent-50);
+}
+
+.username,
+.join-code {
+  margin-right: 0px;
+  flex-grow: 0;
+  box-sizing: border-box;
+  width: 100%;
+  font-family: var(--control-font);
+}
+
+.username {
+  margin: 40px 0 20px 0;
+  padding: 12px;
+}
+
+.control-button {
+  padding: 12px;
+  font-family: var(--control-font);
+  font-size: 20px;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  text-shadow: rgba(0, 0, 0, 0.5) 1px 1px 0px;
+  cursor: pointer;
+  transition: all 0.2s ease 0s;
+  font-weight: bolder;
+  text-transform: uppercase;
+  position: relative;
+  background: var(--purple);
+  margin-bottom: 20px;
+}
+
+.control-button:hover {
+  background: var(--dark-purple);
+}
+
+.info {
+  display: flex;
+  justify-content: center;
+}
+
+.icon-info {
+  color: var(--white);
+  font-size: 40px;
+  transition: all 0.2s ease 0s;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.join-input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.join-code {
+  margin-bottom: 20px;
+  padding: 8px;
+}
+
+.control-panel-container {
+  width: 370px;
+}
+
+.code-container {
+  margin-right: 13px;
 }

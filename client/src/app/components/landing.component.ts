@@ -11,4 +11,27 @@ import { NgOptimizedImage } from '@angular/common';
 export class LandingComponent {
   logoUrl = '/assets/img/trivial.png';
   logoBackdropUrl = '/assets/img/question.gif';
+  mainMusicUrl = '/assets/audio/trivial_music.mp3';
+
+  clickedJoinGame = false;
+
+  onClickJoinGame() {
+    this.clickedJoinGame = true;
+  }
+
+  // private ensureAudioPlays(): void {
+  //   const promise = this.audio.nativeElement.play();
+  //   if (promise !== undefined) {
+  //     promise
+  //       .then(() => {
+  //         // Autoplay started
+  //       })
+  //       .catch((error: any) => {
+  //         // Autoplay was prevented.
+  //         this.audio.nativeElement.muted = true;
+  //         this.audio.nativeElement.play();
+  //         console.error(error);
+  //       });
+  //   }
+  // }
 }
