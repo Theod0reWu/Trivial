@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { NgOptimizedImage } from '@angular/common';
+import { PageStates } from '../app.component';
 
 @Component({
   selector: 'landing-view',
@@ -9,6 +10,8 @@ import { NgOptimizedImage } from '@angular/common';
   styleUrl: '../components_css/landing.component.css',
 })
 export class LandingComponent {
+  @Output() hostGameEvent = new EventEmitter<PageStates>();
+
   logoUrl = '/assets/img/trivial.png';
   logoBackdropUrl = '/assets/img/question.gif';
   mainMusicUrl = '/assets/audio/trivial_music.mp3';
@@ -18,20 +21,7 @@ export class LandingComponent {
   onClickJoinGame() {
     this.clickedJoinGame = true;
   }
-
-  // private ensureAudioPlays(): void {
-  //   const promise = this.audio.nativeElement.play();
-  //   if (promise !== undefined) {
-  //     promise
-  //       .then(() => {
-  //         // Autoplay started
-  //       })
-  //       .catch((error: any) => {
-  //         // Autoplay was prevented.
-  //         this.audio.nativeElement.muted = true;
-  //         this.audio.nativeElement.play();
-  //         console.error(error);
-  //       });
-  //   }
-  // }
+  onClickHostGame() {
+    this.hostGameEvent.emit(PageStates.Waiting);
+  }
 }

@@ -1,3 +1,8 @@
-<landing-view />
+<div class="bg" #bg></div>
+@if (state == pageStates.Landing) {
+<landing-view (hostGameEvent)="handleChangeState($event)" />
+} @else if (state == pageStates.Waiting) {
+<waiting-view [bgOverlay]="bgOverlay" />
+}
 
 <router-outlet />

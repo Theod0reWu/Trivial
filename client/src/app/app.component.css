@@ -1,0 +1,11 @@
+.bg {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  background: radial-gradient(ellipse 69vw 69vh, #ce79f6, #030084, #000000);
+  opacity: 0;
+  transition: opacity 0.35s linear;
+}
+.bg-rendered {
+  opacity: 1;
+}

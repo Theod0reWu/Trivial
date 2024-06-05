@@ -12,7 +12,7 @@
       <div class="control-panel-container">
         <input placeholder="Username" class="username" value="" />
         <div class="controls">
-          <div class="control-button">
+          <div class="control-button" (click)="onClickHostGame()">
             <div class="host">HOST GAME</div>
           </div>
           @if (clickedJoinGame) {
