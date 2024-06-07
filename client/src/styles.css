@@ -1,5 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap");
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Grape+Nuts&display=swap");
 
 html {
   height: 100%;
@@ -12,11 +14,30 @@ body {
 
 :root {
   --transparent: rgba(0, 0, 0, 0);
+  --white-transparent-25: rgba(255, 255, 255, 0.25);
   --white-transparent-50: rgba(255, 255, 255, 0.5);
   --black-transparent-50: rgba(0, 0, 0, 0.5);
   --black: #141414;
   --white: #e0e0e0;
-  --control-font: "Inter", Helvetica, sans-serif;
   --purple: #3600d1;
   --dark-purple: #290296;
+  --red: #eb3838;
+  --dark-red: #972626;
+  --light-gray: #d9d9d9;
+  --gray: #828282;
+  --dark-gray: #505050;
+  --blue: #0057ff;
+
+  --control-font: "Inter", Helvetica, sans-serif;
+  --standard-font: "Archivo Black", Helvetica, sans-serif;
+  --hand-font: "Grape Nuts", cursive;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }

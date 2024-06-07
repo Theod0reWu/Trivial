@@ -10,7 +10,13 @@
   <div style="height: 200px">
     <div class="control-panel">
       <div class="control-panel-container">
-        <input placeholder="Username" class="username" value="" />
+        <input
+          placeholder="Username"
+          class="username"
+          id="username"
+          value=""
+          autocomplete="off"
+        />
         <div class="controls">
           <div class="control-button" (click)="onClickHostGame()">
             <div class="host">HOST GAME</div>

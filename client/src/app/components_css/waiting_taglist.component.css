@@ -1,0 +1,33 @@
+.category-chip-list {
+  width: 100%;
+}
+.mat-mdc-form-field-infix {
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+.mdc-text-field--filled:not(.mdc-text-field--disabled) {
+  background-color: var(--black-transparent-50) !important;
+  border: 3px solid black;
+  box-sizing: border-box;
+}
+.mdc-evolution-chip__text-label,
+.mat-icon {
+  color: var(--black) !important;
+}
+.mat-mdc-chip-input {
+  color: var(--white) !important;
+}
+.mat-mdc-chip-input::placeholder {
+  color: var(--light-gray) !important;
+}
+.mat-mdc-chip-focus-overlay {
+  background: var(--white) !important;
+}
+.mdc-evolution-chip__action--primary:before {
+  border-color: var(--white) !important;
+  background-color: var(--white) !important;
+}
+.mdc-evolution-chip__cell,
+.mdc-evolution-chip__cell--trailing {
+  z-index: 3;
+}

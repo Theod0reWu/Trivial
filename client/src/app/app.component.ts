@@ -28,16 +28,20 @@ export class AppComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.elementRef.nativeElement.ownerDocument.body.style.background =
       'radial-gradient(closest-side, #CE79F6, #030084)';
-    setTimeout(() => {
-      this.bgOverlay.nativeElement.classList.remove('bg-rendered');
-    }, 10);
-    console.log(this.bgOverlay);
   }
   handleChangeState(state: PageStates) {
-    if (state == PageStates.Waiting) {
-      this.state = this.pageStates.Waiting;
-      // this.elementRef.nativeElement.ownerDocument.body.style.background =
-      //   'radial-gradient(ellipse 70vw 70vh, #CE79F6, #030084, #000000)';
+    switch (state) {
+      case PageStates.Landing: {
+        this.state = this.pageStates.Landing;
+        setTimeout(() => {
+          this.bgOverlay.nativeElement.classList.remove('bg-rendered');
+        }, 10);
+        break;
+      }
+      case PageStates.Waiting: {
+        this.state = this.pageStates.Waiting;
+        break;
+      }
     }
   }
 }

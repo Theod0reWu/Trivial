@@ -1,0 +1,25 @@
+<mat-form-field class="category-chip-list">
+  <!-- <mat-label>Favorite Fruits</mat-label> -->
+  <mat-chip-grid #chipGrid aria-label="Enter categories">
+    @for (category of categories; track category) {
+    <mat-chip-row
+      (removed)="remove(category)"
+      [editable]="true"
+      (edited)="edit(category, $event)"
+      [aria-description]="'press enter to edit ' + category.name"
+    >
+      {{ category.name }}
+      <button matChipRemove [attr.aria-label]="'remove ' + category.name">
+        <mat-icon>cancel</mat-icon>
+      </button>
+    </mat-chip-row>
+    }
+    <input
+      placeholder="New category..."
+      [matChipInputFor]="chipGrid"
+      [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+      [matChipInputAddOnBlur]="addOnBlur"
+      (matChipInputTokenEnd)="add($event)"
+    />
+  </mat-chip-grid>
+</mat-form-field>
