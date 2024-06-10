@@ -3,9 +3,19 @@ main {
   /* justify-content: center; */
   align-items: center;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
-  position: relative;
+  /* width: 100vw; */
+  /* height: 75vh; */
+  /* position: fixed; */
+}
+
+.primary-view {
+  height: 75vh;
+  width: 100%;
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: opacity 0.5s;
 }
 
 .logo {
@@ -90,13 +100,13 @@ main {
 
 label,
 .slider-count {
-  font-family: var(--hand-font);
+  font-family: var(--label-font);
   font-weight: 400;
   font-style: normal;
 }
 
 label {
-  font-size: 20px;
+  font-size: 24px;
   text-align: center;
   margin-bottom: 8px;
 }
@@ -112,6 +122,9 @@ label {
 
 .slider-option {
   flex-direction: column;
+  align-self: stretch;
+  align-items: center;
+  padding-bottom: 20px;
 }
 
 .slider-container {
@@ -213,7 +226,7 @@ waiting-taglist {
 
 .room-code-banner {
   width: 230px;
-  position: absolute;
+  position: fixed;
   right: 60px;
   top: 60px;
   color: var(--white);
@@ -251,4 +264,55 @@ waiting-taglist {
 
 .room-code:active {
   background: var(--black-transparent-50);
+}
+
+.players {
+  z-index: 1;
+  position: relative;
+  margin-top: 75vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+}
+
+.players-text {
+  margin-top: 80px;
+  font-family: var(--standard-font);
+  font-size: 25px;
+  color: var(--white);
+  align-self: stretch;
+  text-align: center;
+  background: var(--black-transparent-50);
+  padding: 10px 0 10px 0;
+  box-sizing: border-box;
+  border-left: 3px solid black;
+  border-right: 3px solid black;
+  border-top: 3px solid black;
+}
+
+.players-container {
+  background: var(--black-transparent-50);
+  /* min-height: 150px; */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 20px 10px 20px 10px;
+  align-self: stretch;
+  box-sizing: border-box;
+  border: 3px solid black;
+}
+
+.player-card {
+  background-color: var(--dark-blue);
+  padding: 20px;
+  text-align: center;
+  /* border: 1px solid #333; */
+  height: 60px;
+  box-sizing: border-box;
+  font-family: var(--hand-font);
+  font-size: 40px;
+  color: var(--white);
 }

@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   EventEmitter,
+  HostListener,
   Input,
   Output,
   ViewChild,
@@ -25,6 +26,8 @@ export class WaitingComponent implements AfterViewInit {
   @Input() bgOverlay!: ElementRef;
   @Output() hostGameEvent = new EventEmitter<PageStates>();
   @ViewChild('tooltip') tooltip!: MatTooltip;
+  primaryViewOpacity = 1;
+  minPrimaryViewOpacity = 0.2;
 
   isHost = true; // temp isHost var
   roomCode = '1LOVML'; // temp roomCode var
@@ -47,6 +50,35 @@ export class WaitingComponent implements AfterViewInit {
 
   maxNumCategories = 12;
   maxNumQuestions = 10;
+
+  players = [
+    // temp players list
+    { username: 'Winxler' },
+    { username: 'niflac' },
+    { username: 'Teoz' },
+    { username: 'Dylan' },
+    // { username: 'how' },
+    // { username: 'Winxler' },
+    // { username: 'niflac' },
+    // { username: 'Teoz' },
+    // { username: 'Dylan' },
+    // { username: 'how' },
+    // { username: 'Winxler' },
+    // { username: 'niflac' },
+    // { username: 'Teoz' },
+    // { username: 'Dylan' },
+    // { username: 'how' },
+    // { username: 'Winxler' },
+    // { username: 'niflac' },
+    // { username: 'Teoz' },
+    // { username: 'Dylan' },
+    // { username: 'how' },
+    // { username: 'Winxler' },
+    // { username: 'niflac' },
+    // { username: 'Teoz' },
+    // { username: 'Dylan' },
+    // { username: 'how' },
+  ];
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -73,6 +105,21 @@ export class WaitingComponent implements AfterViewInit {
 
   updateRoomCodeTooltip(reset: boolean) {
     this.roomCodeTooltip = reset ? 'Copy to clipboard' : 'Copied!';
+  }
+
+  @HostListener('window:scroll', ['$event'])
+  onWindowScroll(event: Event): void {
+    const scrollTop =
+      window.pageYOffset ||
+      document.documentElement.scrollTop ||
+      document.body.scrollTop ||
+      0;
+    const maxScroll = 400; // The max scroll value at which opacity should be 0
+
+    this.primaryViewOpacity = 1 - scrollTop / maxScroll;
+    if (this.primaryViewOpacity < this.minPrimaryViewOpacity) {
+      this.primaryViewOpacity = this.minPrimaryViewOpacity;
+    }
   }
   //   mainMusicUrl = '/assets/audio/trivial_music.mp3';
 
