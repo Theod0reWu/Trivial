@@ -236,6 +236,7 @@ waiting-taglist {
   justify-content: center;
   font-family: var(--standard-font);
   font-size: 25px;
+  z-index: 1;
 }
 
 .room-code-title {

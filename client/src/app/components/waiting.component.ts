@@ -121,6 +121,11 @@ export class WaitingComponent implements AfterViewInit {
       this.primaryViewOpacity = this.minPrimaryViewOpacity;
     }
   }
+
+  onClickStartGame() {
+    this.hostGameEvent.emit(PageStates.InGame);
+  }
+
   //   mainMusicUrl = '/assets/audio/trivial_music.mp3';
 
   // private ensureAudioPlays(): void {

@@ -1,0 +1,50 @@
+main {
+  height: 100vh;
+  background: radial-gradient(circle 1000vh, #000000, #3957c3);
+}
+
+.board {
+  display: flex;
+  justify-content: center;
+}
+
+.grid-container,
+.categories,
+.clues {
+  display: grid;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 30px;
+  padding: 20px;
+  height: 675px;
+  width: 95%;
+}
+
+.categories {
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  font-size: 32px;
+  color: var(--snow);
+  min-height: 100px;
+}
+
+.clues {
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+  font-size: 40px;
+  color: var(--gold);
+}
+
+.category-title,
+.clue {
+  background-color: var(--dark-blue);
+  border-radius: 20px;
+  font-family: var(--standard-font);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}

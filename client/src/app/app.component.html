@@ -5,6 +5,8 @@
   (hostGameEvent)="handleChangeState($event)"
   [bgOverlay]="bgOverlay"
 />
+} @else if (state == pageStates.InGame) {
+<board-view />
 }
 <div class="bg" #bg></div>
 <router-outlet />

@@ -2,6 +2,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LandingComponent } from './components/landing.component';
 import { WaitingComponent } from './components/waiting.component';
+import { BoardComponent } from './components/board.component';
 
 export enum PageStates {
   Landing,
@@ -13,7 +14,7 @@ export enum PageStates {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, LandingComponent, WaitingComponent],
+  imports: [RouterOutlet, LandingComponent, WaitingComponent, BoardComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
@@ -40,6 +41,10 @@ export class AppComponent implements AfterViewInit {
       }
       case PageStates.Waiting: {
         this.state = this.pageStates.Waiting;
+        break;
+      }
+      case PageStates.InGame: {
+        this.state = this.pageStates.InGame;
         break;
       }
     }

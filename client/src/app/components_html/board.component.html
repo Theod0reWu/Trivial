@@ -1,0 +1,18 @@
+<main class="main">
+  <div class="board">
+    <div class="grid-container">
+      <div class="categories">
+        @for (category of categories; track category; let index = $index) {
+        <div class="category-title" id="{{ index }}">{{ category }}</div>
+        }
+      </div>
+      <div class="clues">
+        <ng-container
+          *ngFor="let item of generatePricesArray(numRows * numCols)"
+        >
+          <div class="clue">${{ item }}</div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</main>
