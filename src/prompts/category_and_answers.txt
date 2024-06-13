@@ -1,0 +1,7 @@
+suggest {num_categories:.0f} specific trivia categories. Ensure that the categories are not too broad. Also create a title that describes the category and/or the topic. If it is possible to do so without altering the meaning of the title, have the title be one of an alliteration, rhyme or pun. 
+
+Lastly, come up with {num_answers:.0f} trivia answers per category. Select the answers as randomly as possible, do not consider the popularity of the answers. All answers should be from the trivia category you've decided upon. Trivia answers should not contain any extra information (no parentheses). Ensure that all answers in a category are unique. Order the answers in increasing difficulty, where answers further along are less common. It should be possible to uniquely describe the answer in a clue.
+
+Your reply must only consist of two lines for all {num_categories:.0f} category! Ensure there are no commas in the title chosen. You must only reply strictly using the following template for all {num_categories:.0f} categories and nothing else:
+Category: <the category chosen>, <your chosen title>
+Answers: <list of semicolon-separated answers>

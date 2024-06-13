@@ -1,0 +1,36 @@
+acoustics
+astrophysics
+atomic physics
+biophysics
+classical mechanics
+condensed matter physics
+cosmology
+cryogenics
+electromagnetism
+electronics
+fluid mechanics
+geophysics
+high energy physics
+history of physics
+instrumentation
+lasers
+materials science
+mathematical physics
+medical physics
+meteorology
+modern physics
+molecular physics
+nanotechnology
+nuclear physics
+optics
+particle physics
+physical chemistry
+plasma physics
+quantum computing
+quantum field theory
+quantum mechanics
+relativity
+solid state physics
+statistical mechanics
+theoretical physics
+thermodynamics

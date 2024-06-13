@@ -11,6 +11,7 @@ class PromptGenerator(object):
         super(PromptGenerator, self).__init__()
         with open(prompt_path) as f:
             self.prompt = f.read()
+        self.prompt_path = prompt_path
 
     def generate_prompt(self, **kwargs):
         return self.prompt.format(**kwargs)
@@ -50,7 +51,6 @@ class AnswerPromptGenerator(PromptGenerator):
     """
     def __init__(self, prompt_path = './prompts/answer_prompt.txt'):
         super(AnswerPromptGenerator, self).__init__(prompt_path)
-        self.prompt_path = prompt_path
         
 class CluePromptGenerator(PromptGenerator):
     """
@@ -65,7 +65,29 @@ class CluePromptGenerator(PromptGenerator):
     """
     def __init__(self, prompt_path = './prompts/clue.txt'):
         super(CluePromptGenerator, self).__init__(prompt_path)
-        self.prompt_path = prompt_path
 
+class CategoryAndClueGenerator(PromptGenerator):
+    """
+        Prompt generates categories and answers based on given information:
 
+        Category: <category>, <title>
+        Answers: <list of comma-seperated answers>
+
+        Needs:
+            num_categories = number of categories
+            num_answers = number of answers
+    """
+    def __init__(self, prompt_path = './prompts/category_and_answers.txt'):
+        super(CategoryAndClueGenerator, self).__init__(prompt_path)
         
+class TopicGenerator(PromptGenerator):
+    """
+        Prompt generates topics
+
+        <number>.<topic>
+
+        Needs:
+            category: category for the topics to fall under
+    """
+    def __init__(self, prompt_path = './prompts/topics.txt'):
+        super(TopicGenerator, self).__init__(prompt_path)

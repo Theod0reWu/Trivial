@@ -11,9 +11,23 @@ from wikipedia.exceptions import DisambiguationError, PageError
 
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
-model = genai.GenerativeModel('gemini-1.0-pro-latest')
+config = genai.types.GenerationConfig(
+    candidate_count = 1,
+    temperature = 1,
+    # top_p = 1
+    top_k = 20,
+)
 
-board = Board(1, 5)
+fact_config = genai.types.GenerationConfig(
+    candidate_count = 1,
+    temperature = .2,
+)
+
+# model = genai.GenerativeModel('gemini-1.0-pro-latest')
+model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
+fact_model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
+
+board = Board(6, 5)
 board.refresh(model)
 print(board)
 

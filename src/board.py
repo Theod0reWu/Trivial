@@ -3,9 +3,9 @@ import numpy as np
 
 import os
 
-from prompt import CategoryPromptGenerator, AnswerPromptGenerator, CluePromptGenerator
+from prompt import CategoryPromptGenerator, AnswerPromptGenerator, CluePromptGenerator, CategoryAndClueGenerator
 from boarditem import BoardItem
-from gemini import get_and_parse_categories, get_and_parse_answers, get_and_parse_clues
+from gemini import get_and_parse_categories, get_and_parse_answers, get_and_parse_clues, get_and_parse_catans
 
 import wikipedia
 from wikipedia.exceptions import DisambiguationError, PageError
@@ -25,32 +25,48 @@ class Board(object):
 
 		self.category_titles = []
 		self.all_categories = []
+		# each item is one clue/answer on the jeopardy board
 		self.items = [[None for i in range(clues_per_category)] for i in range(categories)]
+		# picked represents if a board item has been picked already
 		self.picked = [[False for i in range(clues_per_category)] for i in range(categories)]
+
+		# old prompt system
 		self.category_gen = CategoryPromptGenerator()
 		self.answer_gen = AnswerPromptGenerator()
+		self.catans_gen = CategoryAndClueGenerator()
 		self.clue_gen = CluePromptGenerator()
+
+	def clear_picked(self):
+		self.picked = [[False for i in range(clues_per_category)] for i in range(categories)]
+
+	def refresh(self):
+		self.clear_picked()
 	
-	def refresh(self, model, min_price = 200, max_price = 1000):
+	def refresh_old(self, model, fact_model = None, min_price = 200, max_price = 1000):
+		self.clear_picked()
 		price_incr = round((max_price - min_price) / (self.clues_per_category - 1))
+		self.items = []
 
-		category_prompt = self.category_gen.generate_prompt(num = self.categories)
-		categories = get_and_parse_categories(model, category_prompt)
-		print(categories)
+		# category_prompt = self.category_gen.generate_prompt(num = self.categories)
+		# categories = get_and_parse_categories(model, category_prompt)
+		# print(categories)
+		catans_prompt = self.catans_gen.generate_prompt(num_categories = self.categories, num_answers = self.clues_per_category)
+		categories, all_answers = get_and_parse_catans(model, catans_prompt)
 
-		self.all_categories = [i[1] for i in categories]
+		self.all_categories = [i[0] for i in categories]
 		at = 0
 		for category in categories:
-			self.category_titles.append(category[2])
+			self.category_titles.append(category[1])
 
-			answer_prompt = self.answer_gen.generate_prompt(num = self.clues_per_category, singular = category[0], plural = category[1])
-			answers = get_and_parse_answers(model, answer_prompt)
-			print(answers)
+			# answer_prompt = self.answer_gen.generate_prompt(num = self.clues_per_category, singular = category[0], plural = category[1])
+			# answers = get_and_parse_answers(model, answer_prompt)
+			# print(answers)
+			answers = all_answers[at]
 
 			information = []
 			for i in range(self.clues_per_category):
 				# search wikipedia for a relevant page
-				search = wikipedia.search(answers[i], results = 1)
+				search = wikipedia.search(answers[i], results = 3)
 				if (len(search) == 0):
 					search = wikipedia.search(answers[i] + " " + category[0], results = 3)
 				result = search[0]
@@ -59,21 +75,27 @@ class Board(object):
 				page = None
 				try:
 					page = wikipedia.page(result, auto_suggest = False)
-				except DisambiguationError as e:
-					page = wikipedia.page(e.options[0], auto_suggest = False)
+				except wikipedia.exceptions.DisambiguationError as e:
+					# page = wikipedia.page(e.options[0], auto_suggest = False)
+					page = wikipedia.page(e.options[0])
 
 				# currently only uses the summary for information
-				information.append("\"" + page.summary + "\"")
+				information.append("Answer: " + answers[i] + "\n Information: " + "\"" + page.summary + "\"")
 
 			# get clues based on info + answer
-			clue_prompt = self.clue_gen.generate_prompt(num = self.clues_per_category, answers = ", ".join(answers), information = "\n".join(information))
-			clues = get_and_parse_clues(model, clue_prompt)
+			clue_prompt = self.clue_gen.generate_prompt(num = self.clues_per_category, answers = ", ".join(answers), information = "\n\n".join(information))
+			clues = []
+			if (fact_model is None):
+				clues = get_and_parse_clues(model, clue_prompt)
+			else:
+				clues = get_and_parse_clues(fact_model, clue_prompt)
+			print(clues)
 
 			items = []
 			for i in range(len(answers)):
 				items.append(BoardItem(clues[i], answers[i], min_price + price_incr * i))
 
-			self.items[at] = items
+			self.items.append(items)
 			at += 1
 
 	def __str__(self):

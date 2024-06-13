@@ -1,0 +1,5 @@
+suggest {num_categories:.0f} randomly selected specific trivia categories. Also create a title that describes the category and/or the topic. If it is possible to do so without altering the meaning of the title, have the title be one of an alliteration, rhyme or pun. 
+
+Lastly, come up with {num_answers:.0f} trivia answers per category. All answers should be from the trivia category you've decided upon. Trivia answers should not contain any extra information (no parentheses). Ensure that all answers in a category are unique. Order the answers in increasing difficulty, where answers further along are less common. It should be possible to uniquely describe the answer in a clue.
+
+Return your answer as a list of dictionary objects. Each object contains two keys: 'Title' and 'Answers', containing the title of a category and the associated answers respectively. 

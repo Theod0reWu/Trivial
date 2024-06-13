@@ -1,0 +1,20 @@
+actors
+actresses
+athletes
+authors
+celebrities
+chefs
+comedians
+dancers
+directors
+fashion designers
+historical figures
+inventors
+musicians
+philosophers
+politicians
+producers
+royalty
+singers
+songwriters
+youtubers

@@ -1,0 +1,3 @@
+Give a numbered, exhaustive list of trivia topics part of the {category} Category. Each topic should not be able to be combined with another topic. Do not include topics such as "General Knowledge", "Trivia", or "Miscellaneous". 
+
+Only include the topic name (no parentheses with extra information) for each line in the response. Each entry in the list should consists for the following format and nothing else: <number>.<topic>

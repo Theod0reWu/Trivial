@@ -1,0 +1,17 @@
+astronomy
+biology
+chemistry
+physics
+earth science
+computer science
+medicine
+psychology
+ecology
+botany
+zoology
+meteorology
+oceanography
+genetics
+neuroscience
+geology
+paleontology

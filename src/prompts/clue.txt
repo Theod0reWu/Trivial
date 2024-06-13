@@ -1,8 +1,8 @@
-Below are {num:.0f} pieces of information. In order, the pieces of information are about: {answers}
+Below are {num:.0f} pieces of information each about one of the answers: {answers}.
 
 {information}
 
-Use the information provided about each answer above to make {num:.0f} clues that describe the answers ({answers}). For each clue ensure that the corresponding answer can be deduced from the clue and that the clue uniquely identifies its answer. Ensure that the clues includes information about the nature of the answer. Ensure that the clues do not contain the answer or part of the answer. Keep the clues in the same order as the provided answers. For each clue provide as many hints about the answer as possible. For each clue increase the difficulty of the clue by using more obscure facts.
+Use the information provided about each answer above to make {num:.0f} clues that describe the associated answers ({answers}). For each clue ensure that the corresponding answer can be deduced from the clue and that the clue uniquely identifies its answer. Ensure that the clues includes information about the nature of the answer. Keep the clues in the same order as the provided answers. For each clue provide as many hints about the answer as possible. For each clue increase the difficulty of the clue by using more obscure facts. Make sure that the clue does not contain the answer or any part of the answer.
 
-Your reply must only consist of {num:.0f} lines! You must only reply strictly using the following template for each clue and nothing else:
+Your reply must only consist of {num:.0f} lines! Do not number each clue! You must only reply strictly using the following template for each clue and nothing else:
 Clue: <your clue>
