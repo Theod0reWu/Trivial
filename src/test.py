@@ -32,7 +32,7 @@ config = genai.types.GenerationConfig(
 model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
 fact_model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
 
-board = Board(1, 3)
+board = Board(3, 3)
 board.refresh(model)
 print(board)
 

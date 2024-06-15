@@ -113,5 +113,12 @@ def get_and_parse_topics(model, prompt):
 
 def get_and_parse_ast(model, prompt):
 	response = get_response(model, prompt)
-	var = ast.literal_eval(response)
+	# print(response)
+	var = None
+	try:
+		var = ast.literal_eval(response)
+	except ValueError as e:
+		print("AST error")
+		print(e)
+		print(response)
 	return var

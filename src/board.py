@@ -50,8 +50,7 @@ class Board(object):
 		price_incr = round((max_price - min_price) / (self.clues_per_category - 1))
 		self.items = []
 		
-		categories = [self.cat_tree.get_random_topic(model, 2) for i in range(self.num_categories)]
-		print(categories)
+		categories = [self.cat_tree.get_random_topic(model, 2)[0] for i in range(self.num_categories)]
 
 		self.all_categories = categories
 		at = 0
@@ -60,7 +59,6 @@ class Board(object):
 
 			answer_prompt = self.answer_json.generate_prompt(num = self.clues_per_category, category = category)
 			answers = get_and_parse_ast(model, answer_prompt)
-			print(answers)
 
 			information = []
 			for i in range(self.clues_per_category):
@@ -75,8 +73,13 @@ class Board(object):
 				try:
 					page = wikipedia.page(result, auto_suggest = False)
 				except wikipedia.exceptions.DisambiguationError as e:
-					# page = wikipedia.page(e.options[0], auto_suggest = False)
-					page = wikipedia.page(e.options[0])
+					try:
+						page = wikipedia.page(e.options[0])
+						answers[i] = e.options[0]
+					except wikipedia.exceptions.DisambiguationError:
+						print("Failed generation")
+						return None
+						# page = wikipedia.page(e.options[0], auto_suggest = False)
 
 				# currently only uses the summary for information
 				information.append("Answer: " + answers[i] + "\n Information: " + "\"" + page.summary + "\"")

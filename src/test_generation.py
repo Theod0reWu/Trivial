@@ -26,7 +26,9 @@ model = genai.GenerativeModel('gemini-1.5-pro', generation_config = config)
 
 cat_tree = CategoryTree()
 
-print(cat_tree.get_random_topic(model, 3))
+print(cat_tree.get_random_topic(model, 2))
+print(cat_tree.get_random_topic(model, 2))
+print(cat_tree.get_random_topic(model, 2))
 
 cat_tree.save_checkpoint()
 
