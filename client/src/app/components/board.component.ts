@@ -1,17 +1,45 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 // import { NgOptimizedImage } from '@angular/common';
 import { PageStates } from '../app.component';
-import { NgForOf } from '@angular/common';
+import { NgClass, NgForOf } from '@angular/common';
 
 @Component({
   selector: 'board-view',
   standalone: true,
-  imports: [NgForOf],
+  imports: [NgForOf, NgClass],
   templateUrl: '../components_html/board.component.html',
   styleUrl: '../components_css/board.component.css',
 })
-export class BoardComponent {
+export class BoardComponent implements AfterViewInit {
   //   @Output() hostGameEvent = new EventEmitter<PageStates>();
+
+  /* 
+  API get on init - who is currently choosing, board state, scores, players
+  On choice - which clue was chosen
+  */
+
+  isChoosing = true; // temp var for player currently choosing
+  players = [
+    // temp players list
+    { username: 'Winxler', score: 0 },
+    { username: 'niflac', score: 0 },
+    { username: 'Teoz', score: 0 },
+    { username: 'Dylan', score: 0 },
+    { username: 'Winxler', score: 0 },
+    { username: 'niflac', score: 0 },
+    { username: 'Teoz', score: 0 },
+    { username: 'Dylan', score: 0 },
+    { username: 'Winxler', score: 0 },
+    { username: 'niflac', score: 0 },
+    { username: 'Teoz', score: 0 },
+    { username: 'Dylan', score: 0 },
+  ];
 
   categories = [
     'Category 1',
@@ -35,11 +63,26 @@ export class BoardComponent {
     }
     return prices;
   }
-  //   clickedJoinGame = false;
-  //   onClickJoinGame() {
-  //     this.clickedJoinGame = true;
-  //   }
-  //   onClickHostGame() {
-  //     this.hostGameEvent.emit(PageStates.Waiting);
-  //   }
+
+  ngAfterViewInit() {
+    this.initScrollSync();
+  }
+
+  initScrollSync() {
+    const mainContainer = document.querySelector('.main') as HTMLElement;
+    const boardContainer = document.querySelector('.board') as HTMLElement;
+    const playerFogContainer = document.querySelector(
+      '.player-fog'
+    ) as HTMLElement;
+    mainContainer.addEventListener('scroll', () => {
+      boardContainer.scrollTop = mainContainer.scrollTop;
+      playerFogContainer.scrollTop = mainContainer.scrollTop;
+    });
+    boardContainer.addEventListener('wheel', (event) => {
+      mainContainer.scrollTop += event.deltaY;
+    });
+    playerFogContainer.addEventListener('wheel', (event) => {
+      mainContainer.scrollTop += event.deltaY;
+    });
+  }
 }

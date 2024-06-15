@@ -271,7 +271,6 @@ waiting-taglist {
   z-index: 1;
   position: relative;
   margin-top: 75vh;
-  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
