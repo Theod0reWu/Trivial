@@ -26,17 +26,21 @@ class CategoryTree(object):
 	'''
 		Level should start at 1
 	'''
-	def get_random_topic(self, model, level):
+	def get_random_topic(self, model, level, num = 1):
 		level_at = 0
 		node_at = self.root
+		prev_node = None
 		while (level_at < level):
 			new = node_at.make_children(model, self.prompt_gen)
 			self.total_topics += new
 			if (new > 0 and node_at.level + 1 > self.depth):
 				self.depth = node_at.level + 1
+
+			prev_node = node_at
 			node_at = random.choice(node_at.children)
 			level_at += 1
-		return node_at.topic
+		return [i.topic for i in random.choices(prev_node.children, k = num)]
+
 
 	def node_savename(self, topic : str):
 		return os.path.join(self.load_path, topic + ".txt").replace(" ", "_")	

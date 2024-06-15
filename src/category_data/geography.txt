@@ -1,0 +1,43 @@
+continents
+countries
+capitals
+cities
+oceans
+seas
+rivers
+lakes
+mountains
+deserts
+islands
+volcanoes
+waterfalls
+forests
+rainforests
+glaciers
+caves
+national parks
+world heritage sites
+flags
+maps
+languages
+time zones
+landmarks
+mountain ranges
+peninsulas
+archipelagos
+straits
+gulfs
+bays
+fjords
+canals
+dams
+bridges
+tunnels
+airports
+climate zones
+biomes
+ecoregions
+topography
+geology
+cartography
+geography terms

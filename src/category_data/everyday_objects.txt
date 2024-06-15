@@ -1,0 +1,66 @@
+pens
+pencils
+paper
+books
+chairs
+tables
+lamps
+clocks
+watches
+phones
+computers
+televisions
+remote controls
+keys
+locks
+doors
+windows
+mirrors
+glasses
+sunglasses
+shoes
+socks
+pants
+shirts
+jackets
+hats
+gloves
+belts
+wallets
+purses
+backpacks
+luggage
+umbrellas
+jewelry
+food
+drinks
+utensils
+plates
+bowls
+cups
+mugs
+pots
+pans
+knives
+forks
+spoons
+appliances
+furniture
+bedding
+towels
+soap
+shampoo
+toothpaste
+toiletries
+cleaning supplies
+tools
+vehicles
+bicycles
+sports equipment
+musical instruments
+art supplies
+toys
+games
+electronics
+cameras
+currency
