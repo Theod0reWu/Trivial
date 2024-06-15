@@ -93,7 +93,7 @@ class CategoryNode(object):
 		if (self.has_children()):
 			return 0
 		child_topics = None
-		if (model._generation_config["response_mime_type"] == 'application/json'):
+		if ("response_mime_type" in model._generation_config and model._generation_config["response_mime_type"] == 'application/json'):
 			child_topics = get_and_parse_ast(model, prompt_gen.generate_prompt(category = self.topic))
 		else:
 			child_topics = get_and_parse_topics(model, prompt_gen.generate_prompt(category = self.topic))

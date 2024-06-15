@@ -1,0 +1,3 @@
+Come up with {num:.0f} trivia answers. All answers should be a  specific topic from the "{category}" category. Order the answers in increasing difficulty, where answers further along are less common. Each answer should only name the topic from the category.
+
+Return your answer as a list of strings. Each string contains one answer.

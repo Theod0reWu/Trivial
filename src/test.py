@@ -23,11 +23,16 @@ fact_config = genai.types.GenerationConfig(
     temperature = .2,
 )
 
+config = genai.types.GenerationConfig(
+    candidate_count = 1,
+    response_mime_type = "application/json",
+)
+
 # model = genai.GenerativeModel('gemini-1.0-pro-latest')
 model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
 fact_model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
 
-board = Board(6, 5)
+board = Board(1, 3)
 board.refresh(model)
 print(board)
 
