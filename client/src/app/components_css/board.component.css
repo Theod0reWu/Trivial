@@ -11,7 +11,7 @@ main {
   overflow-y: scroll;
   scrollbar-color: var(--black) var(--black-transparent-50);
   scrollbar-width: thin;
-  z-index: 10;
+  /* z-index: 10; */
 }
 
 .board {
@@ -49,6 +49,7 @@ main {
   gap: 10px;
   font-size: 40px;
   color: var(--gold);
+  user-select: none;
 }
 
 .category-title,
@@ -60,10 +61,11 @@ main {
   justify-content: center;
   align-items: center;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .clue.active {
-  transition: all 0.2s ease 0s;
+  transition: background-color 0.2s ease 0s transform 0.2s ease 0s;
   cursor: pointer;
 }
 
@@ -108,6 +110,7 @@ main {
   box-sizing: border-box;
   font-size: 40px;
   color: var(--white);
+  user-select: none;
 }
 
 .player-score {
@@ -125,4 +128,16 @@ main {
   bottom: 0;
   background: linear-gradient(rgba(255, 255, 255, 0), black);
   z-index: 1;
+}
+
+.clue-bg {
+  transition: all 0.5s ease 0s;
+  position: fixed;
+  z-index: 3;
+  width: 0vw;
+  height: 0vh;
+  top: 0;
+  left: 0;
+  transform: translate(calc(50vw - 50%), calc(50vh - 50%));
+  background-color: var(--dark-blue);
 }

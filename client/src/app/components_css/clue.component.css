@@ -1,0 +1,80 @@
+.main {
+  background: radial-gradient(
+    ellipse 100% 100% at center top,
+    var(--dark-blue) 0%,
+    var(--dark-blue) 52%,
+    var(--dark-blue) 52%,
+    #000000 100%
+  );
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  /* justify-content: center; */
+  scrollbar-color: var(--black) var(--black-transparent-50);
+  scrollbar-width: thin;
+  overflow: scroll;
+}
+
+.players {
+  z-index: 1;
+  position: relative;
+  margin-top: 85vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 60%;
+}
+
+.players-container {
+  background: var(--black-transparent-50);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 20px 10px 20px 10px;
+  align-self: stretch;
+  box-sizing: border-box;
+  border: 3px solid black;
+}
+
+.player-card {
+  display: grid;
+  gap: 2.5px;
+}
+
+.player-score,
+.player-name {
+  background-color: var(--dark-blue);
+  padding: 20px;
+  text-align: center;
+  height: 30px;
+  box-sizing: border-box;
+  font-size: 25px;
+  color: var(--white);
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.player-score {
+  font-family: var(--standard-font);
+}
+
+.player-name {
+  font-family: var(--hand-font);
+}
+
+.player-fog {
+  width: 59.5%;
+  height: 80px;
+  position: fixed;
+  bottom: 0;
+  background: linear-gradient(rgba(255, 255, 255, 0), black);
+  z-index: 1;
+}

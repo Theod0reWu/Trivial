@@ -8,6 +8,7 @@ import {
 // import { NgOptimizedImage } from '@angular/common';
 import { PageStates } from '../app.component';
 import { NgClass, NgForOf } from '@angular/common';
+import { Player } from './game.component';
 
 @Component({
   selector: 'board-view',
@@ -18,28 +19,29 @@ import { NgClass, NgForOf } from '@angular/common';
 })
 export class BoardComponent implements AfterViewInit {
   //   @Output() hostGameEvent = new EventEmitter<PageStates>();
-
+  @Input() players!: Player[];
+  @Output() gameStateChange = new EventEmitter<boolean>();
   /* 
   API get on init - who is currently choosing, board state, scores, players
   On choice - which clue was chosen
   */
 
   isChoosing = true; // temp var for player currently choosing
-  players = [
-    // temp players list
-    { username: 'Winxler', score: 0 },
-    { username: 'niflac', score: 0 },
-    { username: 'Teoz', score: 0 },
-    { username: 'Dylan', score: 0 },
-    { username: 'Winxler', score: 0 },
-    { username: 'niflac', score: 0 },
-    { username: 'Teoz', score: 0 },
-    { username: 'Dylan', score: 0 },
-    { username: 'Winxler', score: 0 },
-    { username: 'niflac', score: 0 },
-    { username: 'Teoz', score: 0 },
-    { username: 'Dylan', score: 0 },
-  ];
+  // players = [
+  //   // temp players list
+  //   { username: 'Winxler', score: 0 },
+  //   { username: 'niflac', score: 0 },
+  //   { username: 'Teoz', score: 0 },
+  //   { username: 'Dylan', score: 0 },
+  //   { username: 'Winxler', score: 0 },
+  //   { username: 'niflac', score: 0 },
+  //   { username: 'Teoz', score: 0 },
+  //   { username: 'Dylan', score: 0 },
+  //   { username: 'Winxler', score: 0 },
+  //   { username: 'niflac', score: 0 },
+  //   { username: 'Teoz', score: 0 },
+  //   { username: 'Dylan', score: 0 },
+  // ];
 
   categories = [
     'Category 1',
@@ -84,5 +86,37 @@ export class BoardComponent implements AfterViewInit {
     playerFogContainer.addEventListener('wheel', (event) => {
       mainContainer.scrollTop += event.deltaY;
     });
+  }
+
+  onClickClue(event: MouseEvent) {
+    // TODO: confirm that it is the player's turn for who clicked first
+    const target = event.target as HTMLElement;
+    const clueBackground = document.querySelector('.clue-bg') as HTMLElement;
+
+    let isBorderVisible = false;
+    const flickerInterval = 200;
+    const flickerDuration = 2000;
+
+    const intervalId = setInterval(() => {
+      if (isBorderVisible) {
+        target.style.outline = 'none';
+      } else {
+        target.style.outline = '5px solid white';
+      }
+      isBorderVisible = !isBorderVisible;
+    }, flickerInterval);
+
+    setTimeout(() => {
+      clearInterval(intervalId);
+      target.style.outline = 'none';
+      clueBackground.style.width = '100vw';
+      clueBackground.style.height = '100vh';
+    }, flickerDuration);
+
+    setTimeout(() => {
+      this.gameStateChange.emit(false);
+      clueBackground.style.width = '0';
+      clueBackground.style.height = '0';
+    }, flickerDuration + 1000);
   }
 }

@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LandingComponent } from './components/landing.component';
 import { WaitingComponent } from './components/waiting.component';
-import { BoardComponent } from './components/board.component';
+import { GameComponent } from './components/game.component';
 
 export enum PageStates {
   Landing,
@@ -14,7 +14,7 @@ export enum PageStates {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, LandingComponent, WaitingComponent, BoardComponent],
+  imports: [RouterOutlet, LandingComponent, WaitingComponent, GameComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
