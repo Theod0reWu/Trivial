@@ -1,8 +1,12 @@
 <main class="main">
-  <div class="clue">
-    <div class="clue-text">{{ clue }}</div>
+  <div class="clue-ui">
+    <div class="clue">
+      <div class="clue-text">{{ clue }}</div>
+    </div>
+    <div class="button-panel">
+      <div class="button">Buzz In</div>
+    </div>
   </div>
-  <div class="button"></div>
   <div class="players">
     <div class="players-container">
       @for (player of players; track player) {
