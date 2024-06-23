@@ -16,7 +16,8 @@ main {
 
 .board {
   width: 100%;
-  position: fixed;
+  position: sticky;
+  top: 0;
   display: flex;
   justify-content: center;
 }
@@ -77,23 +78,23 @@ main {
 .players {
   z-index: 1;
   position: relative;
-  margin-top: 80vh;
+  margin-top: 80px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 60%;
+  background: var(--black-transparent-50);
+  border: 3px solid black;
 }
 
 .players-container {
-  background: var(--black-transparent-50);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   padding: 20px 10px 20px 10px;
   align-self: stretch;
   box-sizing: border-box;
-  border: 3px solid black;
 }
 
 .player-card {
@@ -121,14 +122,14 @@ main {
   font-family: var(--hand-font);
 }
 
-.player-fog {
-  width: 59.5%;
+/* .player-fog {
+  width: 100%;
   height: 80px;
-  position: fixed;
+  position: sticky;
   bottom: 0;
   background: linear-gradient(rgba(255, 255, 255, 0), black);
   z-index: 1;
-}
+} */
 
 .clue-bg {
   transition: all 0.5s ease 0s;

@@ -48,5 +48,7 @@ export class AppComponent implements AfterViewInit {
         break;
       }
     }
+    window.scrollTo(0, 0);
   }
+
 }

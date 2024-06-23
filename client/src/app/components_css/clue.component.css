@@ -23,7 +23,7 @@
 .players {
   z-index: 1;
   position: relative;
-  margin-top: 85vh;
+  margin-top: 80px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -70,17 +70,17 @@
   font-family: var(--hand-font);
 }
 
-.player-fog {
+/* .player-fog {
   width: 59.5%;
   height: 80px;
   position: fixed;
   bottom: 0;
   background: linear-gradient(rgba(255, 255, 255, 0), black);
   z-index: 1;
-}
+} */
 
 .clue {
-  padding: 100px;
+  padding: 10vh;
 }
 
 .clue-text {
@@ -93,7 +93,8 @@
 }
 
 .clue-ui {
-  position: fixed;
+  position: sticky;
+  top: 0;
 }
 
 .button-panel {
@@ -104,8 +105,12 @@
 .button {
   background-color: var(--danger);
   border: 5px solid var(--dangerer);
-  width: 240px;
-  height: 240px;
+  max-height: 240px;
+  max-width: 240px;
+  min-height: 160px;
+  min-width: 160px;
+  height: 20vh;
+  width: 20vh;
   border-radius: 50%;
   position: relative;
   text-align: center;
@@ -118,6 +123,7 @@
   transition: all 0.2s ease 0s;
   cursor: pointer;
   user-select: none;
+  line-height: 1;
 }
 
 .button::before {

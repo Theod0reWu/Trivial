@@ -107,20 +107,20 @@ export class WaitingComponent implements AfterViewInit {
     this.roomCodeTooltip = reset ? 'Copy to clipboard' : 'Copied!';
   }
 
-  @HostListener('window:scroll', ['$event'])
-  onWindowScroll(event: Event): void {
-    const scrollTop =
-      window.pageYOffset ||
-      document.documentElement.scrollTop ||
-      document.body.scrollTop ||
-      0;
-    const maxScroll = 400; // The max scroll value at which opacity should be 0
+  // @HostListener('window:scroll', ['$event'])
+  // onWindowScroll(event: Event): void {
+  //   const scrollTop =
+  //     window.pageYOffset ||
+  //     document.documentElement.scrollTop ||
+  //     document.body.scrollTop ||
+  //     0;
+  //   const maxScroll = 400; // The max scroll value at which opacity should be 0
 
-    this.primaryViewOpacity = 1 - scrollTop / maxScroll;
-    if (this.primaryViewOpacity < this.minPrimaryViewOpacity) {
-      this.primaryViewOpacity = this.minPrimaryViewOpacity;
-    }
-  }
+  //   this.primaryViewOpacity = 1 - scrollTop / maxScroll;
+  //   if (this.primaryViewOpacity < this.minPrimaryViewOpacity) {
+  //     this.primaryViewOpacity = this.minPrimaryViewOpacity;
+  //   }
+  // }
 
   onClickStartGame() {
     this.hostGameEvent.emit(PageStates.InGame);
