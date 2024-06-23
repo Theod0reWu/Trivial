@@ -120,5 +120,5 @@ def get_and_parse_ast(model, prompt):
 	except ValueError as e:
 		print("AST error")
 		print(e)
-		print(response)
+		print("Reponse:", response)
 	return var

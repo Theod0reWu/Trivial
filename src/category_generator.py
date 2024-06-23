@@ -25,8 +25,14 @@ class CategoryTree(object):
 
 	'''
 		Level should start at 1
+
+		returns a random topic for the specified level.
+		
+		level is the level used to determine the depth of the tree to return a topic.
+		Model is used to create more topics if the tree hasn't been created along the path yet.
+		num determines how many topics to return. (Randomly selected from a random node at level - 1)
 	'''
-	def get_random_topic(self, model, level, num = 1):
+	def get_random_topic(self, model, level, num = 1, node = False):
 		level_at = 0
 		node_at = self.root
 		prev_node = None
@@ -39,7 +45,10 @@ class CategoryTree(object):
 			prev_node = node_at
 			node_at = random.choice(node_at.children)
 			level_at += 1
-		return [i.topic for i in random.choices(prev_node.children, k = num)]
+		chosen = random.choices(prev_node.children, k = num)
+		if (node):
+			return chosen
+		return [i.topic for i in chosen]
 
 
 	def node_savename(self, topic : str):

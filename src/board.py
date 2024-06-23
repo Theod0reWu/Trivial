@@ -50,7 +50,11 @@ class Board(object):
 		price_incr = round((max_price - min_price) / (self.clues_per_category - 1))
 		self.items = []
 		
-		categories = [self.cat_tree.get_random_topic(model, 2)[0] for i in range(self.num_categories)]
+		# Two methods of getting the topics, one from the nodes or the other letting the method handle it
+		# categories = [self.cat_tree.get_random_topic(model, 2)[0] for i in range(self.num_categories)]
+		cat_nodes = [self.cat_tree.get_random_topic(model, 2, node = True)[0] for i in range(self.num_categories)]
+		categories = [i.topic for i in cat_nodes]
+		print(categories)
 
 		self.all_categories = categories
 		at = 0
@@ -59,6 +63,7 @@ class Board(object):
 
 			answer_prompt = self.answer_json.generate_prompt(num = self.clues_per_category, category = category)
 			answers = get_and_parse_ast(model, answer_prompt)
+			# answers = 
 
 			information = []
 			for i in range(self.clues_per_category):
@@ -91,7 +96,7 @@ class Board(object):
 				clues = get_and_parse_ast(model, clue_prompt)
 			else:
 				clues = get_and_parse_ast(fact_model, clue_prompt)
-			print(clues)
+			# print(clues)
 
 			items = []
 			for i in range(len(answers)):
