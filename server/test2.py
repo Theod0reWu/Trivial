@@ -18,6 +18,13 @@ html = """
     <br>
     <input type="text" id="message" placeholder="Type a message">
     <button onclick="sendMessage()">Send</button>
+    <div class="button-container">
+       <button onclick="clue1()">Clue 1</button>
+       <button onclick="clue2()">Clue 2</button>
+       <button onclick="clue3()">Clue 3</button>
+       <button onclick="clue4()">Clue 4</button>
+       <button onclick="clue5()">Clue 5</button>
+    </div>
     <ul id="messages"></ul>
     <script>
         let socket = null;
