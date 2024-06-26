@@ -3,6 +3,22 @@
     <div class="clue">
       <div class="clue-text">{{ clue }}</div>
     </div>
+    @if (banner === BannerType.Green || banner === BannerType.Red) {
+      <div class="banner" [style.background-color] = banner>
+        <div class="banner-text">{{ bannerText }} </div>
+      </div>
+    }
+    @else if (banner === BannerType.AltAnswering) {
+      <div class="answering-text">{{ answeringText }} </div>
+    }
+    @else {
+      <div class="banner" [style.opacity] = 0></div>
+    }
+
+    @if (banner === BannerType.AltAnswering) 
+    {
+      
+    }
     <div class="button-panel">
       <div class="button">Buzz In</div>
     </div>

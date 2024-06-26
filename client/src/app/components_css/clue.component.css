@@ -140,3 +140,30 @@
 .button:hover {
   background-color: var(--red);
 }
+
+.banner{
+    left: 0;
+    right: 0;
+    padding:15px;
+    height:60px;
+    margin-bottom: 50px;
+    /* background-size:100%;    */
+}
+
+.banner-text {
+  color: var(--snow);
+  font-family: var(--robot-font);
+  font-size: 40px;
+  text-align: center;
+  line-height: normal;
+}
+
+.answering-text{
+    padding:15px;
+    height:40px;
+    color: var(--snow);
+    font-family: var(--robot-font);
+    font-size: 40px;
+    text-align: center;
+    line-height: normal;
+}

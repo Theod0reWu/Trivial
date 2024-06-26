@@ -4,6 +4,14 @@ import { PageStates } from '../app.component';
 import { NgClass, NgForOf } from '@angular/common';
 import { Player } from './game.component';
 
+enum BannerStates {
+  Empty = "empty",
+  Green = "green",
+  Red = "red",
+  AltAnswering = "altanswering",
+  Answering = "answering"
+}
+
 @Component({
   selector: 'clue-view',
   standalone: true,
@@ -14,6 +22,12 @@ import { Player } from './game.component';
 export class ClueComponent {
   @Input() players!: Player[];
   @Output() gameStateChange = new EventEmitter<boolean>();
+
+  BannerType = BannerStates
+  banner = BannerStates.AltAnswering;
+
+  bannerText = "Who/What is Berlin?";
+  answeringText = "Team 1 is answering"
 
   // temp clue
   clue =
