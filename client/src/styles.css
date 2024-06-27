@@ -20,12 +20,15 @@ body {
   --white-transparent-50: rgba(255, 255, 255, 0.5);
   --black-transparent-25: rgba(0, 0, 0, 0.25);
   --black-transparent-50: rgba(0, 0, 0, 0.5);
+  --black-transparent-75: rgba(0, 0, 0, 0.75);
   --black: #141414;
   --white: #e0e0e0;
   --purple: #3600d1;
   --dark-purple: #290296;
   --red: #eb3838;
   --dark-red: #972626;
+/*  --darker-red: #7B0000;*/
+  --darker-red: rgba(123, 0, 0, 1);
   --light-gray: #d9d9d9;
   --gray: #828282;
   --dark-gray: #505050;

@@ -141,6 +141,8 @@
   background-color: var(--red);
 }
 
+/* banner is 60px tall with 50px botton margin */
+
 .banner{
     left: 0;
     right: 0;
@@ -158,6 +160,8 @@
   line-height: normal;
 }
 
+/* answering text is 40px tall, with timer 20px tall*/
+
 .answering-text{
     padding:15px;
     height:40px;
@@ -166,4 +170,9 @@
     font-size: 40px;
     text-align: center;
     line-height: normal;
+}
+
+.answering-outer {
+  background-color: var(--black-transparent-75);
+  margin-bottom: 50px;
 }

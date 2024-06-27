@@ -1,0 +1,26 @@
+.outer-timer {
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.timer {
+  overflow: hidden;
+  width: 75%;
+  background-color: var(--darker-red);
+  height:20px;
+}
+
+.timer-module {
+  float: left;
+  width : .11111111111111%;
+  width: calc(100% / 9 - 10px);
+  margin-right: 5px;
+  margin-left: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  height: 10px;
+  background-color: var(--red);
+}
