@@ -18,18 +18,14 @@ export enum PageStates {
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
-export class AppComponent implements AfterViewInit {
+export class AppComponent {
   constructor(private elementRef: ElementRef) {}
-  @ViewChild('bg') bgOverlay!: ElementRef;
+  @ViewChild('bgOver') bgOverlay!: ElementRef;
   pageStates = PageStates;
   title = 'client';
 
   state = this.pageStates.Landing;
 
-  ngAfterViewInit() {
-    this.elementRef.nativeElement.ownerDocument.body.style.background =
-      'radial-gradient(closest-side, #CE79F6, #030084)';
-  }
   handleChangeState(state: PageStates) {
     switch (state) {
       case PageStates.Landing: {
