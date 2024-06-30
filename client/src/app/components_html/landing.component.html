@@ -14,7 +14,7 @@
           placeholder="Username"
           class="username"
           id="username"
-          value=""
+          [(ngModel)]="username"
           autocomplete="off"
         />
         <div class="controls">
@@ -24,9 +24,15 @@
           @if (clickedJoinGame) {
           <div class="join-input">
             <div class="code-container">
-              <input placeholder="enter a code" class="join-code" value="" />
+              <input
+                placeholder="enter a code"
+                class="join-code"
+                id="join-code"
+                [(ngModel)]="roomCode"
+                autocomplete="off"
+              />
             </div>
-            <div class="control-button">
+            <div class="control-button" (click)="onClickJoin()">
               <div class="join">JOIN!</div>
             </div>
           </div>
@@ -41,5 +47,10 @@
         </div>
       </div>
     </div>
+  </div>
+  <div *ngIf="showPopup" class="popup" @fadeInOut>
+    <span class="popupText">
+      <i class="bi bi-exclamation-triangle error"></i> {{ errorMessage }}
+    </span>
   </div>
 </main>

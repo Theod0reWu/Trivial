@@ -50,5 +50,4 @@ export class AppComponent implements AfterViewInit {
     }
     window.scrollTo(0, 0);
   }
-
 }
