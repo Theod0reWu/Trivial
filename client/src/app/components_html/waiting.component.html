@@ -1,0 +1,94 @@
+<main class="main">
+  <div class="room-code-banner">
+    <div class="room-code-title">Room Code</div>
+    <div
+      #tooltip="matTooltip"
+      class="room-code"
+      (click)="onClickRoomCode()"
+      matTooltip="{{ roomCodeTooltip }}"
+      aria-label="Button that copies room code when clicked on"
+      (mouseleave)="updateRoomCodeTooltip(true)"
+    >
+      {{ roomCode }}
+    </div>
+  </div>
+  <div class="primary-view" [ngStyle]="{ opacity: primaryViewOpacity }">
+    <div class="logo">
+      <div class="logo-item logo-text">
+        <img [ngSrc]="logoUrl" fill priority />
+      </div>
+      <div class="logo-item logo-backdrop">
+        <img [ngSrc]="logoBackdropUrl" fill priority />
+      </div>
+    </div>
+    <div class="menu">
+      <div class="leave-button" (click)="onClickLeaveGame()">
+        <div class="leave">BACK</div>
+      </div>
+      <div class="menu-container">
+        @if (isHost) {
+        <div class="menu-title">Game Options</div>
+        <div class="options">
+          <div class="slider-option">
+            <label for="num-categories">Number of categories</label>
+            <div class="slider-container">
+              <input
+                #numCats
+                type="range"
+                class="slider"
+                id="num-categories"
+                name="num-categories"
+                min="{{ minNumCategories }}"
+                max="{{ maxNumCategories }}"
+                value="{{ numCategories }}"
+                (change)="setNumCategories(numCats.value)"
+                (input)="setNumCategories(numCats.value)"
+              />
+              <div class="slider-count">{{ numCategories }}</div>
+            </div>
+          </div>
+          <div class="slider-option">
+            <label for="num-questions">Number of questions per category</label>
+            <div class="slider-container">
+              <input
+                #numQ
+                type="range"
+                class="slider"
+                id="num-questions"
+                name="num-questions"
+                min="{{ minNumQuestions }}"
+                max="{{ maxNumQuestions }}"
+                value="{{ numQuestions }}"
+                (change)="setNumQuestions(numQ.value)"
+                (input)="setNumQuestions(numQ.value)"
+              />
+              <div class="slider-count">{{ numQuestions }}</div>
+            </div>
+          </div>
+          <div class="tagging-option">
+            <label>Custom Categories</label>
+            <waiting-taglist [categories]="categories" />
+          </div>
+        </div>
+        <div class="start-button" (click)="onClickStartGame()">
+          <div class="start">START GAME</div>
+        </div>
+        } @else {
+        <div class="menu-message">WAITING FOR HOST TO START GAME...</div>
+        }
+      </div>
+    </div>
+  </div>
+  <div class="players">
+    <div class="players-text">Current Contestants</div>
+    <div class="players-container">
+      @for (player of players; track player) {
+      <div class="player-card">
+        {{ player.username }}
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- <div style="height: 200px"></div> -->
+</main>

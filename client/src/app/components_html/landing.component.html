@@ -1,0 +1,56 @@
+<main class="main">
+  <div class="logo">
+    <div class="logo-item logo-text">
+      <img [ngSrc]="logoUrl" fill priority />
+    </div>
+    <div class="logo-item logo-backdrop">
+      <img [ngSrc]="logoBackdropUrl" fill priority />
+    </div>
+  </div>
+  <div style="height: 200px">
+    <div class="control-panel">
+      <div class="control-panel-container">
+        <input
+          placeholder="Username"
+          class="username"
+          id="username"
+          [(ngModel)]="username"
+          autocomplete="off"
+        />
+        <div class="controls">
+          <div class="control-button" (click)="onClickHostGame()">
+            <div class="host">HOST GAME</div>
+          </div>
+          @if (clickedJoinGame) {
+          <div class="join-input">
+            <div class="code-container">
+              <input
+                placeholder="enter a code"
+                class="join-code"
+                id="join-code"
+                [(ngModel)]="roomCode"
+                autocomplete="off"
+              />
+            </div>
+            <div class="control-button" (click)="onClickJoin()">
+              <div class="join">JOIN!</div>
+            </div>
+          </div>
+          } @else {
+          <div class="control-button" (click)="onClickJoinGame()">
+            <div class="join">JOIN GAME</div>
+          </div>
+          }
+        </div>
+        <div class="info">
+          <i class="bi bi-info-circle icon-info"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="showPopup" class="popup" @fadeInOut>
+    <span class="popupText">
+      <i class="bi bi-exclamation-triangle error"></i> {{ errorMessage }}
+    </span>
+  </div>
+</main>

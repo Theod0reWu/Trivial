@@ -1,0 +1,36 @@
+<main class="main">
+  <div class="board">
+    <div class="grid-container">
+      <div class="categories">
+        @for (category of categories; track category; let index = $index) {
+        <div class="category-title" id="{{ index }}">{{ category }}</div>
+        }
+      </div>
+      <div class="clues">
+        <ng-container
+          *ngFor="let item of generatePricesArray(numRows * numCols)"
+        >
+          <div
+            [ngClass]="{ active: isChoosing }"
+            class="clue"
+            (click)="onClickClue($event)"
+          >
+            ${{ item }}
+          </div>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+  <div class="players">
+    <div class="players-container">
+      @for (player of players; track player) {
+      <div class="player-card">
+        <div class="player-score">${{ player.score }}</div>
+        <div class="player-name">{{ player.username }}</div>
+      </div>
+      }
+    </div>
+    <!-- <div class="player-fog"></div> -->
+  </div>
+  <div class="clue-bg"></div>
+</main>

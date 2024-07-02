@@ -1,0 +1,11 @@
+@if (boardView) {
+<board-view
+  (gameStateChange)="handleGameStateChange($event)"
+  [players]="players"
+/>
+} @else {
+<clue-view
+  (gameStateChange)="handleGameStateChange($event)"
+  [players]="players"
+/>
+}
