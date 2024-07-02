@@ -9,6 +9,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
+import { ApiService } from '../api/api.service';
 
 @Component({
   selector: 'landing-view',
@@ -30,7 +31,9 @@ import {
   ],
 })
 export class LandingComponent {
-  @Output() hostGameEvent = new EventEmitter<PageStates>();
+  constructor(private apiService: ApiService) {}
+
+  @Output() hostGameEvent = new EventEmitter<object>();
   username: string = '';
   roomCode: string = '';
   showPopup: boolean = false;
@@ -64,7 +67,7 @@ export class LandingComponent {
     } else {
       this.errorMessage = '';
       this.showPopup = false;
-      this.hostGameEvent.emit(PageStates.Waiting);
+      this.hostGameEvent.emit({ state: PageStates.Waiting });
     }
   }
 
@@ -79,7 +82,16 @@ export class LandingComponent {
     } else {
       this.errorMessage = '';
       this.showPopup = false;
-      this.hostGameEvent.emit(PageStates.Waiting);
+      this.apiService.createRoomId().subscribe({
+        next: (v) => {
+          console.log('Successfully created room id', v);
+          this.hostGameEvent.emit({
+            state: PageStates.Waiting,
+            roomId: v.room_id,
+          });
+        },
+        error: (e) => console.error('Error creating room id:', e),
+      });
     }
   }
 }

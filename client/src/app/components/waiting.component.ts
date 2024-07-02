@@ -24,13 +24,15 @@ import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
 export class WaitingComponent implements AfterViewInit {
   constructor(private clipboard: Clipboard) {}
   @Input() bgOverlay!: ElementRef;
-  @Output() hostGameEvent = new EventEmitter<PageStates>();
+  @Input() roomId!: string;
+  @Output() hostGameEvent = new EventEmitter<object>();
   @ViewChild('tooltip') tooltip!: MatTooltip;
   primaryViewOpacity = 1;
   minPrimaryViewOpacity = 0.2;
 
   isHost = true; // temp isHost var
-  roomCode = '1LOVML'; // temp roomCode var
+  // roomCode = '1LOVML'; // temp roomCode var
+  // roomCode = this.roomId;
   roomCodeTooltip = 'Copy to clipboard';
 
   logoUrl = '/assets/img/trivial.png';
@@ -87,11 +89,11 @@ export class WaitingComponent implements AfterViewInit {
   }
 
   onClickLeaveGame() {
-    this.hostGameEvent.emit(PageStates.Landing);
+    this.hostGameEvent.emit({ state: PageStates.Landing });
   }
   onClickRoomCode() {
     this.tooltip.show();
-    this.clipboard.copy(this.roomCode);
+    this.clipboard.copy(this.roomId);
     this.updateRoomCodeTooltip(false);
     setTimeout(() => this.tooltip.hide(1500));
   }
@@ -123,7 +125,7 @@ export class WaitingComponent implements AfterViewInit {
   // }
 
   onClickStartGame() {
-    this.hostGameEvent.emit(PageStates.InGame);
+    this.hostGameEvent.emit({ state: PageStates.InGame });
   }
 
   //   mainMusicUrl = '/assets/audio/trivial_music.mp3';

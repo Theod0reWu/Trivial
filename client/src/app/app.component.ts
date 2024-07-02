@@ -25,9 +25,10 @@ export class AppComponent {
   title = 'client';
 
   state = this.pageStates.Landing;
+  roomId = '';
 
-  handleChangeState(state: PageStates) {
-    switch (state) {
+  handleChangeState(data: any) {
+    switch (data.state) {
       case PageStates.Landing: {
         this.state = this.pageStates.Landing;
         setTimeout(() => {
@@ -36,6 +37,7 @@ export class AppComponent {
         break;
       }
       case PageStates.Waiting: {
+        this.roomId = data.roomId;
         this.state = this.pageStates.Waiting;
         break;
       }
