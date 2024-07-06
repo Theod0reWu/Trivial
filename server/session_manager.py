@@ -3,6 +3,11 @@ from firebase_admin import firestore
 from uuid import uuid4
 
 class SessionManager:
+    '''
+        Session Manager
+
+        Connects to the firebase db and adds/removes session from rooms
+    '''
     def __init__(self):
         self.sessions = db.collection('Sessions')
 
@@ -12,7 +17,7 @@ class SessionManager:
             if not self.get_session_id_exists(session_id):
                 return session_id
 
-    def get_session_id_exists(self, session_id: str) -> bool:
+    def session_id_exists(self, session_id: str) -> bool:
         session_ref = self.sessions.document(session_id)
         return session_ref.get().exists
     
@@ -33,5 +38,3 @@ class SessionManager:
     def delete_session(self, session_id: str):
         session_ref = self.sessions.document(session_id)
         session_ref.delete()
-
-session_manager = SessionManager()

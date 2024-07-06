@@ -13,4 +13,8 @@ export class ApiService {
   createRoomId(): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/create_room_id`);
   }
+
+  getSession(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/get_session`);
+  }
 }

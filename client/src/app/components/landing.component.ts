@@ -67,7 +67,7 @@ export class LandingComponent {
     } else {
       this.errorMessage = '';
       this.showPopup = false;
-      this.hostGameEvent.emit({ state: PageStates.Waiting });
+      this.hostGameEvent.emit({ state: PageStates.Waiting, host: false});
     }
   }
 
@@ -88,6 +88,7 @@ export class LandingComponent {
           this.hostGameEvent.emit({
             state: PageStates.Waiting,
             roomId: v.room_id,
+            host: true
           });
         },
         error: (e) => console.error('Error creating room id:', e),

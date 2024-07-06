@@ -91,6 +91,3 @@ class RoomManager:
 
     def get_rooms(self):
         return {doc.id: doc.to_dict() for doc in self.rooms.stream()}
-    
-
-room_manager = RoomManager()

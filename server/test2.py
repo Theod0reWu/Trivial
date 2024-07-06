@@ -36,7 +36,7 @@ html = """
         });
 
         function init(room_id, callback) {
-            createSession(room_id).then(s => {
+            createSession(document.getElementById("username").value, room_id).then(s => {
                 session = s;
                 console.log(session);
                 socket = io("http://localhost:8000", {
