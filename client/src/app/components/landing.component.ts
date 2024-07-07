@@ -88,7 +88,8 @@ export class LandingComponent {
           this.hostGameEvent.emit({
             state: PageStates.Waiting,
             roomId: v.room_id,
-            host: true
+            host: true,
+            username: this.username
           });
         },
         error: (e) => console.error('Error creating room id:', e),

@@ -17,7 +17,7 @@ class SessionManager:
             if not self.get_session_id_exists(session_id):
                 return session_id
 
-    def session_id_exists(self, session_id: str) -> bool:
+    def get_session_id_exists(self, session_id: str) -> bool:
         session_ref = self.sessions.document(session_id)
         return session_ref.get().exists
     

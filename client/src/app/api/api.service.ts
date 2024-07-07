@@ -17,4 +17,9 @@ export class ApiService {
   getSession(): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/get_session`);
   }
+
+  createSession(room_id : string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/api/create_session?room_id=${room_id}`);
+  }
+
 }

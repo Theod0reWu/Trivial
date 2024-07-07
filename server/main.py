@@ -6,7 +6,8 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from functools import lru_cache
 import uvicorn
-from socketEvents import socket_app, sio
+from socketio import AsyncServer, ASGIApp
+from socketio.exceptions import ConnectionRefusedError
 
 from room_manager import RoomManager
 from session_manager import SessionManager
@@ -27,6 +28,11 @@ def get_settings():
     return Settings()
 settings: Settings = get_settings()
 
+# setup socketio
+sio = AsyncServer(cors_allowed_origins=[], async_mode="asgi")
+socket_app = ASGIApp(sio)
+
+# setup fastapi app
 app = FastAPI()
 # Cors middleware setup
 origins = [
@@ -50,8 +56,8 @@ To connect 1st time:
 1. host a room
     a. get a room id
     b. make a username
-2. create_session(username, room_id) to get session_id
-3. 
+2. create_session(room_id) to create and get session_id
+3. setup socket
 '''
 
 @app.get("/")
@@ -64,29 +70,27 @@ async def get_rooms():
     rooms = room_manager.get_rooms()
     return {"rooms": rooms}
 
-@app.get("/api/create_session")
-async def get_session(username: str, room_id: str, request: Request):
-    '''
-       Create a session id to identify each client
-       Session_id is stored with firebase, needs the room_id to create a session
-       sessions are stored based upon room_id
-    '''
-
+@app.get("/api/create_session/")
+async def create_session(request: Request):
+    # Create a session id to identify each client
     session_id = request.cookies.get("session_id")
-    if not session_id or not session_manager.session_id_exists(session_id):
+    room_id = request.query_params.get("room_id")
+    if not session_id or not session_manager.get_session_id_exists(session_id):
+        # session_id = str(uuid4())
         session_id = session_manager.create_session(room_id)
-        request.set_cookie(key="session_id", value=session_id, httponly=True)
-        request.set_cookie(key="username", value=username, httponly=True)
-    return {"session_id": session_id}
+        response = Response(content=json.dumps({"session_id": session_id, "room_id": room_id, "reconnect": False}), media_type="application/json")
+        response.set_cookie(key="session_id", value=session_id, httponly=True)
+        return response
+    return {"session_id": session_id, "room_id": session_manager.get_session(session_id)["room_id"], "reconnect": True}
 
-@app.get("/api/get_room")
-async def get_room_id(request: Request):
-    return {"room_id": request.cookies.get("session_id")};
-
-@app.get("/api/delete_session/")
-async def delete_session(request: Request):
-    response.delete_cookie(key="session_id", httponly=True)
-    response.delete_cookie(key="username", httponly=True)
+@app.get("/api/get_session/")
+async def get_session(request: Request):
+    session_id = request.cookies.get("session_id")
+    if not session_id or not session_manager.get_session_id_exists(session_id):
+        response = Response(content=json.dumps({"session_id": None, "room_id": None, "reconnect": False}), media_type="application/json")
+        response.delete_cookie(key="session_id", httponly=True)
+        return response
+    return {"session_id": session_id, "room_id": session_manager.get_session(session_id)["room_id"], "reconnect": True}
 
 @app.get("/api/create_room_id")
 async def create_room_id():
@@ -96,18 +100,75 @@ async def create_room_id():
         room_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=settings.room_id_length))
     return {"room_id": room_id}
 
-@app.get("/api/join_room")
+@app.get("/api/is_host")
+async def is_host(session_id: str):
+    return False
+
+'''
+    Socketio events
+'''
+
+@sio.event
+async def connect(sid, environ, auth):
+    print("connect ", sid)
+    session_id = auth['session_id']
+    session = session_manager.get_session(session_id)
+    # if not room_manager.get_room(session["room_id"]):
+    #     room_manager.create_room(session["room_id"])
+    if not session:
+        raise ConnectionRefusedError('authentication failed')
+    print(auth)
+
+@sio.event
+async def chat_message(sid, data):
+    message = data['message']
+    print("Chatting", sid, ":")
+    room_lst = list(set(sio.manager.get_rooms(sid, "/")).difference({sid}))
+    room_id = room_lst[0]
+    room = room_manager.get_room(room_id)
+    if room:
+        username = [conn["username"] for conn in room["curr_connections"].values() if conn["curr_sid"] == sid][0]
+        await sio.emit('chat_message', {"room_id": room_id, "message": message, "username": username}, room=room_id)
+
+@sio.event
+async def disconnect(sid):
+    # room_lst = list(set(sio.manager.get_rooms(sid, "/")).difference({sid}))
+    # room_id = room_lst[0]
+    # await sio.leave_room(sid, room_id)
+    print('disconnect ', sid)
+
+@sio.event
 async def join_room(sid, data):
     room_id = data["room_id"]
     session_id = data['session_id']
     username = data.get('username', 'Guest')
-
     room_manager.join_room(room_id, session_id, sid, username)
     await sio.enter_room(sid, room_id)
 
     print(f"User {username} joined room {room_id}")
+    # Send a status response to the client
+    await sio.emit("join_room_status", {"status": "success"}, room=room_id)
 
+@sio.event
+async def rejoin_room(sid, data):
+    room_id = data["room_id"]
+    session_id = data["session_id"]
+    username = room_manager.get_room(room_id)["all_connections"][session_id]["username"]
 
+    room_manager.join_room(room_id, session_id, sid, username)
+    await sio.enter_room(sid, room_id)
+
+    await sio.emit("rejoin_room_status", {"status": "success"}, room=room_id)
+
+@sio.event
+async def leave_room(sid, data):
+    room_id = data['room_id']
+    session_id = data['session_id']
+
+    room_manager.leave_room(room_id, session_id)
+    session_manager.delete_session(session_id)
+    await sio.leave_room(sid, room_id)
+    print(f"User {session_id} left room {room_id}")
 
 if __name__ == "__main__":
     uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)

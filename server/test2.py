@@ -1,3 +1,4 @@
+
 # For Testing
 html = """
     <!DOCTYPE html>
@@ -36,7 +37,7 @@ html = """
         });
 
         function init(room_id, callback) {
-            createSession(document.getElementById("username").value, room_id).then(s => {
+            createSession(room_id).then(s => {
                 session = s;
                 console.log(session);
                 socket = io("http://localhost:8000", {
