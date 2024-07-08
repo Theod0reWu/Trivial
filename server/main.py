@@ -57,7 +57,8 @@ To connect 1st time:
     a. get a room id
     b. make a username
 2. create_session(room_id) to create and get session_id
-3. setup socket
+3. setup socket with session_id 
+4. join room from socket
 '''
 
 @app.get("/")

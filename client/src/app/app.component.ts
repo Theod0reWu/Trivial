@@ -5,6 +5,7 @@ import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
 import { SocketService } from './api/socket.service';
 import { ApiService } from './api/api.service';
+import { ConnectorService } from './api/connector.service';
 
 export enum PageStates {
   Landing,
@@ -22,18 +23,15 @@ export enum PageStates {
 })
 export class AppComponent {
   // constructor(private elementRef: ElementRef, private socketService: SocketService) {}
-  constructor(private elementRef: ElementRef, private apiService: ApiService) {}
+  constructor(private elementRef: ElementRef, private connectorService: ConnectorService) {}
   @ViewChild('bgOver') bgOverlay!: ElementRef;
   pageStates = PageStates;
   title = 'client';
 
   state = this.pageStates.Landing;
-  roomId: string = '';
-  host: boolean = false;
-  sessionId: string = '';
-  username: string = '';
 
-  private socketService: SocketService = new SocketService();
+  username: string = '';
+  roomId: string = '';
 
   ngOnInit() : void {
     
@@ -44,15 +42,8 @@ export class AppComponent {
     switch (data.state) {
       case PageStates.Landing: {
         //left the room disconnect socket
-        this.socketService.leaveRoom(this.roomId, this.sessionId);
-        this.socketService.disconnectSocket();
-
-        // reset member variables
+        this.connectorService.disconnectFromRoom();
         this.roomId = '';
-        this.host = false;
-        this.sessionId = '';
-        this.username= '';
-
 
         this.state = this.pageStates.Landing;
         setTimeout(() => {
@@ -62,25 +53,13 @@ export class AppComponent {
       }
       case PageStates.Waiting: {
         this.roomId = data.roomId;
-        this.host = data.host;
+        this.connectorService.setHost(data.host);
+        this.connectorService.setUsername(data.username);
+        this.connectorService.setRoom(data.roomId);
 
 
         // The roomid has been generated we can now connect with sockets.
-        // first get session_id
-        this.apiService.createSession(this.roomId).subscribe( {
-          next: (result) => {
-            this.sessionId = result["session_id"];
-            console.log("session id:", this.sessionId);
-          },
-          error: (err) => {
-            console.error("Observable for creating a session emitted error:" + err);
-          }, 
-          complete: () => {
-            //setup socket with sessionId and roomId
-            this.socketService.initSocket(this.sessionId);
-            this.socketService.joinRoom(this.roomId, this.username, this.sessionId);
-          }
-        });
+        this.connectorService.connectToRoom();
 
         this.state = this.pageStates.Waiting;      
         break;
