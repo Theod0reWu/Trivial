@@ -86,6 +86,12 @@ export class ConnectorService {
 	      		for (var player of result) {
 	      			this.players.push({"username" : player});
 	      		}
+	      		this.apiService.isHost(this.sessionId).subscribe( {
+	      			next: (value) => {
+	      				this.host = value["is_host"];
+	      				console.log(this.sessionId, this.host);
+	      			}
+	      		});
 	      	}
 	      });
 	    }

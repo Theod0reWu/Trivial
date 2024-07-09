@@ -57,6 +57,18 @@ class Room:
             )"
 
 class RoomManager:
+    '''
+        handles firebase database connection for rooms
+
+        Methods:
+            create_room(room_id)
+                - Creates an entry for room_id
+            join_room(room_id, session_id, sid, username)
+                - Creates an entry if room_id doesn't exist (in which case this session_id is the host)
+                - adds session_id and sid to the room_id document
+            leave_room(room_id, session_id)
+
+    '''
     def __init__(self):
         self.rooms = db.collection('Rooms')
     
@@ -69,14 +81,17 @@ class RoomManager:
     def join_room(self, room_id: str, session_id: str, sid: str, username: str):
         room_ref = self.rooms.document(room_id)
         room = room_ref.get().to_dict()
-        print("room debugging!!!", room, room_id)
+        
+        # room doesn't exist yet, create room
         if not room:
             self.create_room(room_id)
             print("new room", room_ref.get().to_dict())
             room = Room().to_dict()
+            room_ref.update({"host": session_id})
+
+        # data held in the room
         room["curr_connections"][session_id] = UserConnection(sid, username).to_dict()
         room["all_connections"][session_id] = UserConnection(sid, username).to_dict()
-        print(room_ref.get().to_dict())
         room_ref.update({"curr_connections": room["curr_connections"], "all_connections": room["all_connections"]})
     
     def leave_room(self, room_id: str, session_id: str):
@@ -89,11 +104,21 @@ class RoomManager:
                 room_ref.delete()
             else:
                 room_ref.update({"curr_connections": room["curr_connections"]})
+
+                # appoint a new host
+                if (room["host"] == session_id):
+                    room_ref.update({"host": list(room["curr_connections"].keys())[0]})
     
     def get_room(self, room_id):
         room_ref = self.rooms.document(room_id)
         room = room_ref.get().to_dict()
         return room
+
+    def is_host(self, room_id: str, session_id: str):
+        # returns if the session_id is the host of the room_id
+        room_ref = self.rooms.document(room_id)
+        room = room_ref.get().to_dict()
+        return room["host"] == session_id
 
     def get_rooms(self):
         return {doc.id: doc.to_dict() for doc in self.rooms.stream()}

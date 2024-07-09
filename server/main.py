@@ -101,7 +101,8 @@ async def create_room_id():
 
 @app.get("/api/is_host")
 async def is_host(session_id: str):
-    return False
+    room_id = session_manager.get_room_id(session_id)
+    return {"is_host": room_manager.is_host(room_id, session_id)}
 
 '''
     Socketio events
@@ -179,6 +180,7 @@ async def leave_room(sid, data):
 
     room_manager.leave_room(room_id, session_id)
     session_manager.delete_session(session_id)
+    
     await sio.leave_room(sid, room_id)
     await send_players(room_id)
     print(f"User {session_id} left room {room_id}")

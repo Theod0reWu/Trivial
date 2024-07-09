@@ -33,7 +33,10 @@ class SessionManager:
             "timestamp": firestore.SERVER_TIMESTAMP
         })
         return session_id
-    
+
+    def get_room_id(self, session_id):
+        return self.sessions.document(session_id).get().to_dict()["room_id"]
+
     # delete session when room it belongs to is deleted, when user leaves the room
     def delete_session(self, session_id: str):
         session_ref = self.sessions.document(session_id)
