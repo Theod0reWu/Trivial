@@ -3,8 +3,6 @@ import { RouterOutlet } from '@angular/router';
 import { LandingComponent } from './components/landing.component';
 import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
-import { SocketService } from './api/socket.service';
-import { ApiService } from './api/api.service';
 import { ConnectorService } from './api/connector.service';
 
 export enum PageStates {
@@ -23,7 +21,7 @@ export enum PageStates {
 })
 export class AppComponent {
   // constructor(private elementRef: ElementRef, private socketService: SocketService) {}
-  constructor(private elementRef: ElementRef, private connectorService: ConnectorService) {}
+  constructor(private elementRef: ElementRef, public connectorService: ConnectorService) {}
   @ViewChild('bgOver') bgOverlay!: ElementRef;
   pageStates = PageStates;
   title = 'client';
@@ -31,11 +29,25 @@ export class AppComponent {
   state = this.pageStates.Landing;
 
   username: string = '';
-  roomId: string = '';
 
   ngOnInit() : void {
-    
+    // handle reconnecting from a disconnect
 
+  }
+
+  updateAndConnect(data: any) : void {
+    /*
+      Updates the member variables based on data from the landing page and establishes the connecter
+    */
+
+    //update connector
+    this.connectorService.setHost(data.host);
+    this.connectorService.setUsername(data.username);
+    this.connectorService.setRoom(data.roomId);
+
+
+    // The roomid has been generated we can now connect with sockets.
+    this.connectorService.connectToRoom();
   }
 
   handleChangeState(data: any) {
@@ -43,7 +55,6 @@ export class AppComponent {
       case PageStates.Landing: {
         //left the room disconnect socket
         this.connectorService.disconnectFromRoom();
-        this.roomId = '';
 
         this.state = this.pageStates.Landing;
         setTimeout(() => {
@@ -52,16 +63,8 @@ export class AppComponent {
         break;
       }
       case PageStates.Waiting: {
-        this.roomId = data.roomId;
-        this.connectorService.setHost(data.host);
-        this.connectorService.setUsername(data.username);
-        this.connectorService.setRoom(data.roomId);
-
-
-        // The roomid has been generated we can now connect with sockets.
-        this.connectorService.connectToRoom();
-
-        this.state = this.pageStates.Waiting;      
+        this.updateAndConnect(data);
+        this.state = this.pageStates.Waiting;     
         break;
       }
       case PageStates.InGame: {

@@ -43,6 +43,12 @@ class Room:
             "all_connections": self.all_connections
         }
 
+    def usernames(self):
+        usernames = []
+        for i in self.curr_connections:
+            usernames.append(self.curr_connections[i]["username"])
+        return usernames
+
     def __repr__(self):
         return f"Room(\
                 state={self.state}, \
@@ -91,3 +97,7 @@ class RoomManager:
 
     def get_rooms(self):
         return {doc.id: doc.to_dict() for doc in self.rooms.stream()}
+
+    def is_valid_room(self, room_id):
+        rooms = self.get_rooms()
+        return room_id in rooms

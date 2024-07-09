@@ -25,6 +25,7 @@ export class WaitingComponent implements AfterViewInit {
   constructor(private clipboard: Clipboard) {}
   @Input() bgOverlay!: ElementRef;
   @Input() roomId!: string;
+  @Input() players!: Array<Record<string, string>>;
   @Output() hostGameEvent = new EventEmitter<object>();
   @ViewChild('tooltip') tooltip!: MatTooltip;
   primaryViewOpacity = 1;
@@ -53,34 +54,13 @@ export class WaitingComponent implements AfterViewInit {
   maxNumCategories = 12;
   maxNumQuestions = 10;
 
-  players = [
-    // temp players list
-    { username: 'Winxler' },
-    { username: 'niflac' },
-    { username: 'Teoz' },
-    { username: 'Dylan' },
-    // { username: 'how' },
-    // { username: 'Winxler' },
-    // { username: 'niflac' },
-    // { username: 'Teoz' },
-    // { username: 'Dylan' },
-    // { username: 'how' },
-    // { username: 'Winxler' },
-    // { username: 'niflac' },
-    // { username: 'Teoz' },
-    // { username: 'Dylan' },
-    // { username: 'how' },
-    // { username: 'Winxler' },
-    // { username: 'niflac' },
-    // { username: 'Teoz' },
-    // { username: 'Dylan' },
-    // { username: 'how' },
-    // { username: 'Winxler' },
-    // { username: 'niflac' },
-    // { username: 'Teoz' },
-    // { username: 'Dylan' },
-    // { username: 'how' },
-  ];
+  // players = [
+  //   // temp players list
+  //   { username: 'Winxler' },
+  //   { username: 'niflac' },
+  //   { username: 'Teoz' },
+  //   { username: 'Dylan' },
+  // ];
 
   ngAfterViewInit() {
     setTimeout(() => {

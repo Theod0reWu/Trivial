@@ -84,7 +84,8 @@
     <div class="players-container">
       @for (player of players; track player) {
       <div class="player-card">
-        {{ player.username }}
+        <!-- {{ player.username }} -->
+        {{ player['username'] }}
       </div>
       }
     </div>

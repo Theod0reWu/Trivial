@@ -65,9 +65,26 @@ export class LandingComponent {
         this.showPopup = false;
       }, 3000);
     } else {
-      this.errorMessage = '';
-      this.showPopup = false;
-      this.hostGameEvent.emit({ state: PageStates.Waiting, host: false});
+      this.apiService.validRoom(this.roomCode).subscribe({
+        next: (value) => {
+          if (value) {
+            this.errorMessage = '';
+            this.showPopup = false;
+            this.hostGameEvent.emit({ 
+              state: PageStates.Waiting, 
+              roomId: this.roomCode,
+              host: false,
+              username: this.username
+            });
+          } else {
+            this.errorMessage = 'A room with that code does not exist!';
+            this.showPopup = true;
+            this.popupTimeout = setTimeout(() => {
+              this.showPopup = false;
+            }, 3000);
+          }
+        }
+      });
     }
   }
 

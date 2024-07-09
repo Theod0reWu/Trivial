@@ -4,7 +4,8 @@
 <waiting-view
   (hostGameEvent)="handleChangeState($event)"
   [bgOverlay]="bgOverlay"
-  [roomId]="roomId"
+  [roomId]="connectorService.roomId"
+  [players]="connectorService.players"
 />
 } @else if (state == pageStates.InGame) {
 <game-view />

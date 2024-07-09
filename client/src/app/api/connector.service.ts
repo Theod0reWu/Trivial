@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable, take, lastValueFrom } from 'rxjs';
 import { SocketService } from './socket.service';
 import { ApiService } from './api.service';
 
@@ -16,11 +17,16 @@ export class ConnectorService {
 	sessionId: string = '';
 	username: string = '';
 
+	players : Array<Record<string, string>> = []; // make an observable for this to update app with list of players as well
+
 	private socketService : SocketService = new SocketService();
 	socketConnected = false;
 
+	playerChange$ : Observable<any>;
+
 	setUsername(username : string) : void {
 		this.username = username;
+		// this.players.push({username: this.username});
 	}
 
 	setRoom(roomId: string): void {
@@ -36,6 +42,11 @@ export class ConnectorService {
         this.host = false;
         this.sessionId = '';
         this.socketConnected = false;
+        this.players = [];
+	}
+
+	isValidRoom(roomId : string): Observable<any> {;
+		return this.apiService.validRoom(roomId);
 	}
 
 	connectToRoom(): boolean{
@@ -55,23 +66,32 @@ export class ConnectorService {
 			return false;
 		}
 		this.apiService.createSession(this.roomId).subscribe( {
-          next: (result) => {
-            this.sessionId = result["session_id"];
-            console.log("session id:", this.sessionId);
-          },
-          error: (err) => {
-            console.error("Observable for creating a session emitted error:" + err);
-            this.socketConnected = false;
-          }, 
-          complete: () => {
-            //setup socket with sessionId and roomId
-            this.socketService.initSocket(this.sessionId);
-            this.socketService.joinRoom(this.roomId, this.username, this.sessionId);
-            this.socketConnected = true;
-          }
-        });
+	    next: (result) => {
+	      this.sessionId = result["session_id"];
+	    },
+	    error: (err) => {
+	      console.error("Observable for creating a session emitted error:" + err);
+	      this.socketConnected = false;
+	    }, 
+	    complete: () => {
+	      //setup socket with sessionId and roomId
+	      this.socketService.initSocket(this.sessionId);
+	      this.socketService.joinRoom(this.roomId, this.username, this.sessionId);
+	      this.socketConnected = true;
 
-        return true;
+	      // setup for when players join a room
+	      this.playerChange$ = this.socketService.onPlayerChange();
+	      this.playerChange$.subscribe( {
+	      	next: (result) => {
+	      		this.players = [];
+	      		for (var player of result) {
+	      			this.players.push({"username" : player});
+	      		}
+	      	}
+	      });
+	    }
+     });
+    return true;
 	}
 
 	disconnectFromRoom(): void {

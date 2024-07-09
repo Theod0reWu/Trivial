@@ -14,6 +14,9 @@ export class SocketService {
     this.socket.on("connect", () => {
       console.log("Connected to server");
     });
+    this.socket.on("error", (err) => {
+      console.error("Error connecting to server:" + err);
+    });
   }
 
   disconnectSocket() {
@@ -38,6 +41,18 @@ export class SocketService {
   // Emit an event to send a game action
   sendGameAction(room: string, action: any): void {
     this.socket.emit('game_action', { room, action });
+  }
+
+  private onRecv(message: string): Observable<any> {
+    return new Observable(observer => {
+      this.socket.on(message, (data) => {
+        observer.next(data);
+      })
+    })
+  }
+
+  onPlayerChange(): Observable<any> {
+    return this.onRecv("players");
   }
 
   // Listen for messages from the server
