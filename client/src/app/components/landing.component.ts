@@ -101,7 +101,6 @@ export class LandingComponent {
       this.showPopup = false;
       this.apiService.createRoomId().subscribe({
         next: (v) => {
-          console.log('Successfully created room id', v);
           this.hostGameEvent.emit({
             state: PageStates.Waiting,
             roomId: v.room_id,

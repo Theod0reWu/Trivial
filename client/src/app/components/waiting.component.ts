@@ -26,14 +26,13 @@ export class WaitingComponent implements AfterViewInit {
   @Input() bgOverlay!: ElementRef;
   @Input() roomId!: string;
   @Input() players!: Array<Record<string, string>>;
+  @Input() isHost!: boolean;
+
   @Output() hostGameEvent = new EventEmitter<object>();
   @ViewChild('tooltip') tooltip!: MatTooltip;
   primaryViewOpacity = 1;
   minPrimaryViewOpacity = 0.2;
 
-  isHost = true; // temp isHost var
-  // roomCode = '1LOVML'; // temp roomCode var
-  // roomCode = this.roomId;
   roomCodeTooltip = 'Copy to clipboard';
 
   logoUrl = '/assets/img/trivial.png';
@@ -105,7 +104,7 @@ export class WaitingComponent implements AfterViewInit {
   // }
 
   onClickStartGame() {
-    this.hostGameEvent.emit({ state: PageStates.InGame });
+    this.hostGameEvent.emit({ state: PageStates.InGame, numQuestions: this.numQuestions, numCategories: this.numCategories });
   }
 
   //   mainMusicUrl = '/assets/audio/trivial_music.mp3';

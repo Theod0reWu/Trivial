@@ -6,6 +6,7 @@
   [bgOverlay]="bgOverlay"
   [roomId]="connectorService.roomId"
   [players]="connectorService.players"
+  [isHost]="connectorService.host"
 />
 } @else if (state == pageStates.InGame) {
 <game-view />

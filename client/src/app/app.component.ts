@@ -28,8 +28,6 @@ export class AppComponent {
 
   state = this.pageStates.Landing;
 
-  username: string = '';
-
   ngOnInit() : void {
     // handle reconnecting from a disconnect
 

@@ -19,10 +19,6 @@ import string
 from uuid import uuid4
 import json
 
-# temp imports
-from fastapi.responses import HTMLResponse
-from test2 import html
-
 @lru_cache
 def get_settings():
     return Settings()
@@ -63,11 +59,6 @@ To connect 1st time:
 To reconnect from a disconnect:
 
 '''
-
-# @app.get("/")
-# async def get():
-#     return HTMLResponse(html)
-#     # return {"message": "Hello World!"}
 
 # @app.get("/api/rooms")
 # async def get_rooms():
@@ -149,6 +140,8 @@ async def disconnect(sid):
 @sio.event
 async def send_players(room_id):
     room = room_manager.get_room(room_id)
+    if (not room):
+        return
     current = room["curr_connections"]
     usernames = [current[i]["username"] for i in current]
     # print("room send", usernames)

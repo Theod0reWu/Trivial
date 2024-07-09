@@ -52,7 +52,7 @@ body {
 html,
 body {
   height: 100%;
-  scrollbar-color: var(--black) var(--black-transparent-25);
+  scrollbar-color: var(--white-transparent-50) var(--dark-blue);
   scrollbar-width: thin;
 }
 body {

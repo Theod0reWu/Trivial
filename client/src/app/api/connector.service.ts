@@ -17,7 +17,7 @@ export class ConnectorService {
 	sessionId: string = '';
 	username: string = '';
 
-	players : Array<Record<string, string>> = []; // make an observable for this to update app with list of players as well
+	players : Array<Record<string, string>> = [];
 
 	private socketService : SocketService = new SocketService();
 	socketConnected = false;
@@ -26,7 +26,6 @@ export class ConnectorService {
 
 	setUsername(username : string) : void {
 		this.username = username;
-		// this.players.push({username: this.username});
 	}
 
 	setRoom(roomId: string): void {
