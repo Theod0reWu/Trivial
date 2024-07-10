@@ -102,7 +102,8 @@ async def create_room_id():
 
 @app.get("/api/is_host")
 async def is_host(session_id: str):
-    return False
+    room_id = session_manager.get_room_id(session_id)
+    return {"is_host": room_manager.is_host(room_id, session_id)}
 
 '''
     Socket.io events
@@ -110,9 +111,6 @@ async def is_host(session_id: str):
 
 def getRoom(sid):
     return list(set(sio.manager.get_rooms(sid, "/")).difference({sid}))[0]
-
-def deleteSessions(room_id):
-    session_manager.delete_session_by_room_id(room_id)
 
 @sio.event
 async def connect(sid, environ, auth):
@@ -140,7 +138,7 @@ async def disconnect(sid):
     # await sio.leave_room(sid, room_id)
     room = session_manager.get_room_by_sid(sid)
     if room:
-        room_manager.leave_room(room["room_id"], room["session_id"], deleteSessions)
+        room_manager.leave_room(room["room_id"], room["session_id"], session_manager)
         await send_players(room["room_id"])
     print('disconnect ', sid)
 
@@ -187,8 +185,9 @@ async def leave_room(sid, data):
     room_id = data['room_id']
     session_id = data['session_id']
 
-    room_manager.leave_room(room_id, session_id, deleteSessions)
+    room_manager.leave_room(room_id, session_id, session_manager)
     session_manager.delete_session(session_id)
+    
     await sio.leave_room(sid, room_id)
     await send_players(room_id)
     print(f"User {session_id} left room {room_id}")

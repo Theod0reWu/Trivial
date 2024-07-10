@@ -27,6 +27,11 @@ class SessionManager:
         session = session_ref.get().to_dict()
         return session
 
+    def get_sessions(self, session_ids: list[str]) -> list[dict]:
+        session_refs = [self.sessions.document(session_id) for session_id in session_ids]
+        docs = db.get_all(session_refs)
+        return [doc.to_dict()|{"session_id": doc.id} for doc in docs if doc.exists]
+
     def create_session(self, room_id: str, username: str) -> str:
         session_id = self.generate_session_id()
         self.sessions.document(session_id).set({
@@ -57,6 +62,9 @@ class SessionManager:
         docs = db.get_all(session_refs)
         return [doc.to_dict().get("username") for doc in docs if doc.exists]
         # return [self.sessions.document(session_id).get().to_dict().get("username") for session_id in session_ids]
+
+    def get_room_id(self, session_id):
+        return self.sessions.document(session_id).get().to_dict()["room_id"]
 
     # delete session when room it belongs to is deleted, when user leaves the room
     def delete_session(self, session_id: str):
