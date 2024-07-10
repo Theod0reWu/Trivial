@@ -123,19 +123,7 @@ async def connect(sid, environ, auth):
     print(auth)
 
 @sio.event
-async def chat_message(sid, data):
-    message = data['message']
-    print("Chatting", sid, ":")
-    # room_id = getRoom(sid)
-    # room = room_manager.get_room_by_id(room_id)
-    # if room:
-    #     username = [conn["username"] for conn in room["curr_connections"].values() if conn["curr_sid"] == sid][0]
-    #     await sio.emit('chat_message', {"room_id": room_id, "message": message, "username": username}, room=room_id)
-
-@sio.event
 async def disconnect(sid):
-    # room_id = getRoom(sid)
-    # await sio.leave_room(sid, room_id)
     room = session_manager.get_room_by_sid(sid)
     if room:
         room_manager.leave_room(room["room_id"], room["session_id"], session_manager)
@@ -147,17 +135,14 @@ async def send_players(room_id):
     room = room_manager.get_room_by_id(room_id)
     if (not room):
         return
-    usernames = session_manager.get_usernames(room["curr_connections"])
-    # current = room["curr_connections"]
-    # usernames = [current[i]["username"] for i in current]
-    # # print("room send", usernames)
-    await sio.emit("players", usernames)
+    # usernames = session_manager.get_usernames(room["curr_connections"])
+    usernames = [i["username"] for i in sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])]
+    await sio.emit("players", usernames, room=room_id)
 
 @sio.event
 async def join_room(sid, data):
     room_id = data["room_id"]
     session_id = data['session_id']
-    # username = data.get('username', 'Guest')
     username = session_manager.get_username(session_id)
     room_manager.join_room(room_id, session_id)
     await sio.enter_room(sid, room_id)
@@ -182,6 +167,9 @@ async def rejoin_room(sid, data):
 
 @sio.event
 async def leave_room(sid, data):
+    '''
+        Expects data to be a dict with keys "room_id" and "session_id"
+    '''
     room_id = data['room_id']
     session_id = data['session_id']
 
@@ -191,6 +179,10 @@ async def leave_room(sid, data):
     await sio.leave_room(sid, room_id)
     await send_players(room_id)
     print(f"User {session_id} left room {room_id}")
+
+@sio.event
+async def get_game_state(sid, room_id):
+    pass
 
 if __name__ == "__main__":
     uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)
