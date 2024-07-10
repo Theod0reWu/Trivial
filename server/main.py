@@ -74,9 +74,10 @@ async def create_session(request: Request):
     # Create a session id to identify each client
     session_id = request.cookies.get("session_id")
     room_id = request.query_params.get("room_id")
+    username = request.query_params.get("username")
     if not session_id or not session_manager.get_session_id_exists(session_id):
         # session_id = str(uuid4())
-        session_id = session_manager.create_session(room_id)
+        session_id = session_manager.create_session(room_id, username)
         response = Response(content=json.dumps({"session_id": session_id, "room_id": room_id, "reconnect": False}), media_type="application/json")
         response.set_cookie(key="session_id", value=session_id, httponly=True)
         return response
@@ -105,7 +106,7 @@ async def is_host(session_id: str):
     return {"is_host": room_manager.is_host(room_id, session_id)}
 
 '''
-    Socketio events
+    Socket.io events
 '''
 
 def getRoom(sid):
@@ -116,44 +117,49 @@ async def connect(sid, environ, auth):
     print("connect ", sid)
     session_id = auth['session_id']
     session = session_manager.get_session(session_id)
-    # if not room_manager.get_room(session["room_id"]):
-    #     room_manager.create_room(session["room_id"])
     if not session:
         raise ConnectionRefusedError('authentication failed')
+    session_manager.update_session(session_id, sid)
     print(auth)
 
 @sio.event
 async def chat_message(sid, data):
     message = data['message']
     print("Chatting", sid, ":")
-    room_id = getRoom(sid)
-    room = room_manager.get_room(room_id)
-    if room:
-        username = [conn["username"] for conn in room["curr_connections"].values() if conn["curr_sid"] == sid][0]
-        await sio.emit('chat_message', {"room_id": room_id, "message": message, "username": username}, room=room_id)
+    # room_id = getRoom(sid)
+    # room = room_manager.get_room_by_id(room_id)
+    # if room:
+    #     username = [conn["username"] for conn in room["curr_connections"].values() if conn["curr_sid"] == sid][0]
+    #     await sio.emit('chat_message', {"room_id": room_id, "message": message, "username": username}, room=room_id)
 
 @sio.event
 async def disconnect(sid):
     # room_id = getRoom(sid)
     # await sio.leave_room(sid, room_id)
+    room = session_manager.get_room_by_sid(sid)
+    if room:
+        room_manager.leave_room(room["room_id"], room["session_id"], session_manager)
+        await send_players(room["room_id"])
     print('disconnect ', sid)
 
 @sio.event
 async def send_players(room_id):
-    room = room_manager.get_room(room_id)
+    room = room_manager.get_room_by_id(room_id)
     if (not room):
         return
-    current = room["curr_connections"]
-    usernames = [current[i]["username"] for i in current]
-    # print("room send", usernames)
+    usernames = session_manager.get_usernames(room["curr_connections"])
+    # current = room["curr_connections"]
+    # usernames = [current[i]["username"] for i in current]
+    # # print("room send", usernames)
     await sio.emit("players", usernames)
 
 @sio.event
 async def join_room(sid, data):
     room_id = data["room_id"]
     session_id = data['session_id']
-    username = data.get('username', 'Guest')
-    room_manager.join_room(room_id, session_id, sid, username)
+    # username = data.get('username', 'Guest')
+    username = session_manager.get_username(session_id)
+    room_manager.join_room(room_id, session_id)
     await sio.enter_room(sid, room_id)
 
     print(f"User {username} joined room {room_id}")
@@ -166,9 +172,10 @@ async def join_room(sid, data):
 async def rejoin_room(sid, data):
     room_id = data["room_id"]
     session_id = data["session_id"]
-    username = room_manager.get_room(room_id)["all_connections"][session_id]["username"]
+    # username = room_manager.get_room_by_id(room_id)["all_connections"][session_id]["username"]
+    username = session_manager.get_username(session_id)
 
-    room_manager.join_room(room_id, session_id, sid, username)
+    room_manager.join_room(room_id, session_id)
     await sio.enter_room(sid, room_id)
 
     await sio.emit("rejoin_room_status", {"status": "success"}, room=room_id)
@@ -178,7 +185,7 @@ async def leave_room(sid, data):
     room_id = data['room_id']
     session_id = data['session_id']
 
-    room_manager.leave_room(room_id, session_id)
+    room_manager.leave_room(room_id, session_id, session_manager)
     session_manager.delete_session(session_id)
     
     await sio.leave_room(sid, room_id)

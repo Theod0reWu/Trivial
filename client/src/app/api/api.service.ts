@@ -18,11 +18,13 @@ export class ApiService {
     return this.http.get(`${this.apiUrl}/api/get_session`);
   }
 
-  createSession(room_id : string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/create_session?room_id=${room_id}`);
+  createSession(room_id: string, username: string): Observable<any> {
+    return this.http.get(
+      `${this.apiUrl}/api/create_session?room_id=${room_id}&username=${username}`
+    );
   }
 
-  validRoom(room_id : string) : Observable<any> {
+  validRoom(room_id: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/api/valid_room?room_id=${room_id}`);
   }
 
