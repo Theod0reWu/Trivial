@@ -17,12 +17,14 @@ export class ConnectorService {
 	sessionId: string = '';
 	username: string = '';
 
+	playerChange$ : Observable<any>;
 	players : Array<Record<string, string>> = [];
 
 	private socketService : SocketService = new SocketService();
 	socketConnected = false;
 
-	playerChange$ : Observable<any>;
+	gameStateChange$: Observable<any>;
+	gameState = null;
 
 	setUsername(username : string) : void {
 		this.username = username;
@@ -89,10 +91,15 @@ export class ConnectorService {
 	      		this.apiService.isHost(this.sessionId).subscribe( {
 	      			next: (value) => {
 	      				this.host = value["is_host"];
-	      				console.log(this.sessionId, this.host);
 	      			}
 	      		});
 	      	}
+	      });
+
+	      // setup for game events being emitted
+	      this.gameStateChange$ = this.socketService.onGameState();
+	      this.gameStateChange$.subscribe( {
+	      	
 	      });
 	    }
      });

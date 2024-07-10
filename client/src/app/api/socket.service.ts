@@ -55,22 +55,12 @@ export class SocketService {
     return this.onRecv("players");
   }
 
-  // Listen for messages from the server
-  onMessage(): Observable<any> {
-    return new Observable(observer => {
-      this.socket.on('message', (data) => {
-        observer.next(data);
-      });
-    });
+  onHost(): Observable<any> {
+    return this.onRecv("host");
   }
 
-  // Listen for game state updates from the server
   onGameState(): Observable<any> {
-    return new Observable(observer => {
-      this.socket.on('game_state', (state) => {
-        observer.next(state);
-      });
-    });
+    return this.onRecv("game_state");
   }
 
   // Disconnect from the socket
