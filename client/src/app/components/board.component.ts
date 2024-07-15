@@ -27,21 +27,6 @@ export class BoardComponent implements AfterViewInit {
   */
 
   isChoosing = true; // temp var for player currently choosing
-  // players = [
-  //   // temp players list
-  //   { username: 'Winxler', score: 0 },
-  //   { username: 'niflac', score: 0 },
-  //   { username: 'Teoz', score: 0 },
-  //   { username: 'Dylan', score: 0 },
-  //   { username: 'Winxler', score: 0 },
-  //   { username: 'niflac', score: 0 },
-  //   { username: 'Teoz', score: 0 },
-  //   { username: 'Dylan', score: 0 },
-  //   { username: 'Winxler', score: 0 },
-  //   { username: 'niflac', score: 0 },
-  //   { username: 'Teoz', score: 0 },
-  //   { username: 'Dylan', score: 0 },
-  // ];
 
   categories = [
     'Category 1',
@@ -67,7 +52,7 @@ export class BoardComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.initScrollSync();
+    // this.initScrollSync();
   }
 
   initScrollSync() {

@@ -10,14 +10,14 @@ class CategoryTree(object):
 
 		A depth of 3 is ideal for generating broad enough categories for the purposes of trivia. (might even be to specific in some cases)
 	"""
-	def __init__(self, start = "general", load_path = './category_data/'):
+	def __init__(self, start = "general", load_path =  os.path.join(os.path.dirname(__file__), 'category_data/')):
 		super(CategoryTree, self).__init__()
 		self.root = CategoryNode(0, None, "general")
 		self.total_topics = 1
 		self.depth = 1
 
 		# self.prompt_gen = TopicGenerator('./prompts/topics_json.txt') # for non-json return format
-		self.prompt_gen = TopicGenerator('./prompts/topics_json.txt')
+		self.prompt_gen = TopicGenerator( os.path.join(os.path.dirname(__file__), 'prompts/topics_json.txt'))
 
 		self.load_path = load_path
 		if (load_path is not None):

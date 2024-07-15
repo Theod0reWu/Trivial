@@ -11,6 +11,7 @@ from socketio.exceptions import ConnectionRefusedError
 
 from room_manager import RoomManager
 from session_manager import SessionManager
+from game_manager import GameManager
 from config import Settings
 
 # built-in libraries
@@ -25,7 +26,7 @@ def get_settings():
 settings: Settings = get_settings()
 
 # setup socketio
-sio = AsyncServer(cors_allowed_origins=[], async_mode="asgi")
+sio = AsyncServer(cors_allowed_origins=[], async_mode="asgi", ping_timeout=500, ping_interval=2500)
 socket_app = ASGIApp(sio)
 
 # setup fastapi app
@@ -46,6 +47,7 @@ app.mount("/socket.io", socket_app)
 # session and room managers
 room_manager = RoomManager()
 session_manager = SessionManager()
+game_manager = GameManager()
 
 '''
 To connect 1st time:
@@ -130,7 +132,6 @@ async def disconnect(sid):
         await send_players(room["room_id"])
     print('disconnect ', sid)
 
-@sio.event
 async def send_players(room_id):
     room = room_manager.get_room_by_id(room_id)
     if (not room):
@@ -138,6 +139,11 @@ async def send_players(room_id):
     # usernames = session_manager.get_usernames(room["curr_connections"])
     usernames = [i["username"] for i in sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])]
     await sio.emit("players", usernames, room=room_id)
+
+async def send_game_state(room_id: str, state = None):
+    if (state is None):
+        state = game_manager.get_game_state(room_id)
+    await sio.emit("game_state", state)
 
 @sio.event
 async def join_room(sid, data):
@@ -182,7 +188,15 @@ async def leave_room(sid, data):
 
 @sio.event
 async def get_game_state(sid, room_id):
-    pass
+    return room_manager.get_room_by_id(room_id)["state"]
+
+@sio.event
+async def start_game(sid, data):
+    room_id, session_id, num_categories, num_clues = data["room_id"], data["session_id"], data["num_categories"], data["num_clues"]
+    if (room_manager.is_host(room_id, session_id)):
+        game_manager.init_game(room_id, room_manager.get_room_by_id(room_id), num_categories, num_clues)
+        game_manager.start_game(room_id)
+    await send_game_state(room_id, "board")
 
 if __name__ == "__main__":
     uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)

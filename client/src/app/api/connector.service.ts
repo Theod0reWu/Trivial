@@ -25,6 +25,7 @@ export class ConnectorService {
 
 	gameStateChange$: Observable<any>;
 	gameState = null;
+	gameData = null;
 
   setUsername(username: string): void {
     this.username = username;
@@ -48,6 +49,10 @@ export class ConnectorService {
 
   isValidRoom(roomId: string): Observable<any> {
     return this.apiService.validRoom(roomId);
+  }
+
+  startGame(numCategories: number, numClues: number): void {
+  	this.socketService.startGame(this.roomId, this.sessionId, numCategories, numClues);
   }
 
   connectToRoom(): boolean {
@@ -99,7 +104,10 @@ export class ConnectorService {
 	      // setup for game events being emitted
 	      this.gameStateChange$ = this.socketService.onGameState();
 	      this.gameStateChange$.subscribe( {
-	      	
+	      	next: (value) => {
+	      		this.gameData = value;
+	      		console.log(this.gameData);
+	      	}
 	      });
 	    }
      });

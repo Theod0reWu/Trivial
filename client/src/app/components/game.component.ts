@@ -17,6 +17,8 @@ export interface Player {
 })
 export class GameComponent {
   boardView = true;
+  // @Input() players!: Array<Record<string, string>>;
+  
   players = [
     // temp players list
     { username: 'Winxler', score: 0 },

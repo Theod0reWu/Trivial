@@ -27,5 +27,11 @@ class BoardItem(object):
 	def check_answer(self, guess, threshold = .95) -> bool:
 		return self.guess_distance(guess) >= threshold
 
+	def to_dict(self):
+		return {
+			"clue": self.clue,
+			"answer": self.answer
+		}
+
 	def __str__(self):
 		return self.clue + "\n" + self.answer + "\n"

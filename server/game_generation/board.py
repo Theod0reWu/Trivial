@@ -1,11 +1,14 @@
 import google.generativeai as genai
 import numpy as np
-
 import os
 
-from prompt import CategoryPromptGenerator, AnswerPromptGenerator, CluePromptGenerator, CategoryAndClueGenerator
-from boarditem import BoardItem
-from gemini import get_and_parse_categories, get_and_parse_answers, get_and_parse_clues, get_and_parse_catans
+from . import prompt
+from . import boarditem
+from . import gemini
+
+from .prompt import CategoryPromptGenerator, AnswerPromptGenerator, CluePromptGenerator, CategoryAndClueGenerator
+from .boarditem import BoardItem
+from .gemini import get_and_parse_categories, get_and_parse_answers, get_and_parse_clues, get_and_parse_catans
 
 import wikipedia
 from wikipedia.exceptions import DisambiguationError, PageError
@@ -23,8 +26,8 @@ class Board(object):
 		self.clues_per_category = clues_per_category
 		self.given_categories = given_categories
 
-		self.category_titles = []
-		self.all_categories = []
+		self.category_titles = [] # title of category for board display
+		self.all_categories = [] # actual category
 		# each item is one clue/answer on the jeopardy board
 		self.items = [[None for i in range(clues_per_category)] for i in range(categories)]
 		# picked represents if a board item has been picked already
@@ -37,12 +40,12 @@ class Board(object):
 		self.clue_gen = CluePromptGenerator()
 
 	def clear_picked(self):
-		self.picked = [[False for i in range(clues_per_category)] for i in range(categories)]
+		self.picked = [[False for i in range(self.clues_per_category)] for i in range(self.categories)]
 
-	def refresh(self):
+	def refresh_new(self):
 		self.clear_picked()
 	
-	def refresh_old(self, model, fact_model = None, min_price = 200, max_price = 1000):
+	def refresh(self, model, fact_model = None, min_price = 200, max_price = 1000):
 		self.clear_picked()
 		price_incr = round((max_price - min_price) / (self.clues_per_category - 1))
 		self.items = []
@@ -54,6 +57,8 @@ class Board(object):
 		categories, all_answers = get_and_parse_catans(model, catans_prompt)
 
 		self.all_categories = [i[0] for i in categories]
+		print(categories, all_answers)
+		
 		at = 0
 		for category in categories:
 			self.category_titles.append(category[1])
@@ -110,8 +115,21 @@ class Board(object):
 				output += self.items[cat][row].answer + "\t\t"
 		return output
 
+	def to_dict(self):
+		print("board:", self.items)
+		data = {}
+		for i in range(self.categories):
+			key = "cat_" + str(i + 1)
+			data[key] = []
+			for e in range(self.clues_per_category):
+				if (self.items[i][e]):
+					data[key].append(self.items[i][e].to_dict())
+				else:
+					data[key].append(None)
+		return data
+
 	def __getitem__(self, category : int):
-		return self.clues[category]
+		return self.items[category]
 
 	def clear(self):
 		for i in range(self.categories):

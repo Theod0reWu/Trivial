@@ -91,7 +91,7 @@ export class WaitingComponent implements AfterViewInit {
   onClickStartGame() {
     this.hostGameEvent.emit( { 
       state: PageStates.InGame, 
-      numQuestions: this.numQuestions, 
+      numClues: this.numQuestions, 
       numCategories: this.numCategories 
     });
   }

@@ -4,6 +4,7 @@ import { LandingComponent } from './components/landing.component';
 import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
 import { ConnectorService } from './api/connector.service';
+import { GameData } from './api/GameData'
 
 export enum PageStates {
   Landing,
@@ -21,7 +22,7 @@ export enum PageStates {
 })
 export class AppComponent {
   // constructor(private elementRef: ElementRef, private socketService: SocketService) {}
-  constructor(private elementRef: ElementRef, public connectorService: ConnectorService) {}
+  constructor(private elementRef: ElementRef, public connectorService: ConnectorService, public gameData: GameData) {}
   @ViewChild('bgOver') bgOverlay!: ElementRef;
   pageStates = PageStates;
   title = 'client';
@@ -67,6 +68,10 @@ export class AppComponent {
       }
       case PageStates.InGame: {
         this.state = this.pageStates.InGame;
+        this.gameData.numCategories = data.numCategories;
+        this.gameData.numClues = data.numClues;
+
+        this.connectorService.startGame(this.gameData.numCategories, this.gameData.numClues);
         break;
       }
     }

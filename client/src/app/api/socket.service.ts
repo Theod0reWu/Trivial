@@ -33,14 +33,9 @@ export class SocketService {
     this.socket.emit("leave_room", { "room_id": roomId, "session_id": sessionId });
   }
 
-  // Emit an event to send a message
-  sendBoardSize(room: string, categories: number, clues : number): void {
-    this.socket.emit('board_size', { room, categories, clues});
-  }
-
-  // Emit an event to send a game action
-  sendGameAction(room: string, action: any): void {
-    this.socket.emit('game_action', { room, action });
+  //start game
+  startGame(roomId: string, sessionId: string, numCategories: number, numClues: number): void {
+    this.socket.emit('start_game', {"room_id": roomId, "session_id": sessionId, "num_categories": numCategories, "num_clues":numClues})
   }
 
   private onRecv(message: string): Observable<any> {

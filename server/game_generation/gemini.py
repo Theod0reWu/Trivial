@@ -3,6 +3,7 @@ from google.api_core.exceptions import ResourceExhausted
 
 import time
 import ast
+import asyncio
 
 '''
 	Returns the first candidate response from the model 
@@ -14,6 +15,21 @@ def get_response(model, prompt):
 			response = model.generate_content(prompt)
 		except ResourceExhausted:
 			time.sleep(.5)
+
+	try:
+		# print(response.candidates[0].content.parts[0].text)
+		return response.candidates[0].content.parts[0].text
+	except:
+		print(response)
+		print(response.prompt_feedback)
+
+async def get_response_async(model, prompt):
+	response = None
+	while response == None:
+		try:
+			response = model.generate_content(prompt)
+		except ResourceExhausted:
+			await asyncio.sleep(.5)
 
 	try:
 		# print(response.candidates[0].content.parts[0].text)
@@ -113,5 +129,10 @@ def get_and_parse_topics(model, prompt):
 
 def get_and_parse_ast(model, prompt):
 	response = get_response(model, prompt)
+	var = ast.literal_eval(response)
+	return var
+
+async def get_and_parse_ast_async(model, prompt):
+	response = await get_response(model, prompt)
 	var = ast.literal_eval(response)
 	return var

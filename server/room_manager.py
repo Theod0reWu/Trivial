@@ -82,6 +82,8 @@ class RoomManager:
             self.create_room(room_id)
             print("new room", room_ref.get().to_dict())
             room = Room().to_dict()
+
+            # the maker is the host
             room_ref.update({"host": session_id})
 
         # data held in the room
@@ -106,7 +108,6 @@ class RoomManager:
                 # appoint a new host
                 if (room["host"] == session_id):
                     new_host = sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])[0]["session_id"]
-                    # print(type(sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])[0]["timestamp"]))
                     room_ref.update({"host": new_host})
     
     def get_room_by_id(self, room_id: str) -> dict:

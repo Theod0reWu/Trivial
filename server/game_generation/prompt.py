@@ -2,6 +2,8 @@
     Note: only the class PromptGenerator is actually needed, the other classes are only used to segment the comments of different prompt types.
 
 '''
+import os
+from pathlib import Path
 
 class PromptGenerator(object):
     """
@@ -35,7 +37,7 @@ class CategoryPromptGenerator(PromptGenerator):
 
         Needs num = <number of categories to generate>
     """
-    def __init__(self, prompt_path = './prompts/categories.txt'): 
+    def __init__(self, prompt_path =  os.path.join(Path(__file__).parent, 'prompts/categories.txt')): 
         super(CategoryPromptGenerator, self).__init__(prompt_path)
 
 class AnswerPromptGenerator(PromptGenerator):
@@ -49,7 +51,7 @@ class AnswerPromptGenerator(PromptGenerator):
             singular = <specific instance of the category>
             plural = <plural descriptor for the category>
     """
-    def __init__(self, prompt_path = './prompts/answer_prompt.txt'):
+    def __init__(self, prompt_path =  os.path.join(Path(__file__).parent, 'prompts/answer_prompt.txt')):
         super(AnswerPromptGenerator, self).__init__(prompt_path)
         
 class CluePromptGenerator(PromptGenerator):
@@ -63,7 +65,7 @@ class CluePromptGenerator(PromptGenerator):
             answers = string of all the answers (num answers)
             information = num paragraphs of information, corresponding to the answers
     """
-    def __init__(self, prompt_path = './prompts/clue.txt'):
+    def __init__(self, prompt_path =  os.path.join(Path(__file__).parent, 'prompts/clue.txt')):
         super(CluePromptGenerator, self).__init__(prompt_path)
 
 class CategoryAndClueGenerator(PromptGenerator):
@@ -77,7 +79,7 @@ class CategoryAndClueGenerator(PromptGenerator):
             num_categories = number of categories
             num_answers = number of answers
     """
-    def __init__(self, prompt_path = './prompts/category_and_answers.txt'):
+    def __init__(self, prompt_path =  os.path.join(Path(__file__).parent, 'prompts/category_and_answers.txt')):
         super(CategoryAndClueGenerator, self).__init__(prompt_path)
         
 class TopicGenerator(PromptGenerator):
@@ -89,5 +91,5 @@ class TopicGenerator(PromptGenerator):
         Needs:
             category: category for the topics to fall under
     """
-    def __init__(self, prompt_path = './prompts/topics.txt'):
+    def __init__(self, prompt_path =  os.path.join(Path(__file__).parent, 'prompts/topics.txt')):
         super(TopicGenerator, self).__init__(prompt_path)
