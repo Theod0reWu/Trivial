@@ -1,8 +1,10 @@
-from . import board
 from .board import Board
-from enum import Enum
+from .category_generator import CategoryTree
 
+from enum import Enum
 import os
+import asyncio
+
 import google.generativeai as genai
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
@@ -25,7 +27,7 @@ class Game(object):
 	"""
 		
 	"""
-	def __init__(self, num_players: int, num_categories: int, num_clues: int):
+	def __init__(self, num_players: int, num_categories: int, num_clues: int, use_json = True):
 		super(Game, self).__init__()
 		self.num_players = num_players
 		self.num_categories = num_categories
@@ -38,15 +40,27 @@ class Game(object):
 		self.picker = -1 # who's turn it is to pick
 
 		self.state = GameState.BOARD
-		self.config = genai.types.GenerationConfig(
-		    candidate_count = 1,
-		    # response_mime_type = "application/json",
-		)
-
+		if (use_json):
+			self.config = genai.types.GenerationConfig(
+			    candidate_count = 1,
+			    response_mime_type = "application/json",
+			)
+		else:
+			self.config = genai.types.GenerationConfig(
+			    candidate_count = 1,
+			)
 		self.model = genai.GenerativeModel('gemini-1.5-pro', generation_config = self.config)
+
+		self.category_tree = CategoryTree()
+
+	def create_new_board(self, num_categories: int, num_clues: int):
+		self.board = Board(num_categories, num_clues)
 
 	def generate_board(self):
 		self.board.refresh(self.model)
+
+	async def generate_board_async(self):
+		await self.board.refresh_async(self.category_tree, self.model)
 
 	def run(self):
 		self.board.refresh()

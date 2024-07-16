@@ -1,0 +1,24 @@
+algebra
+calculus
+geometry
+trigonometry
+statistics
+probability
+logic
+number theory
+set theory
+topology
+fractals
+game theory
+discrete mathematics
+linear algebra
+differential equations
+abstract algebra
+real analysis
+complex analysis
+differential geometry
+mathematical physics
+operations research
+numerical analysis
+combinatorics
+graph theory
