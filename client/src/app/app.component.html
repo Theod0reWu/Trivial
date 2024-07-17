@@ -8,6 +8,8 @@
   [players]="connectorService.players"
   [isHost]="connectorService.host"
 />
+} @else if (state == pageStates.Loading) {
+<loading-view [loadingMessage]="loadingMessage" />
 } @else if (state == pageStates.InGame) {
 <game-view />
 }

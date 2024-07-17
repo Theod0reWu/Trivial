@@ -135,7 +135,7 @@ input::placeholder,
   position: fixed;
   bottom: 40px;
   background-color: var(--red-transparent-50);
-  color: white;
+  color: var(--white);
   padding: 16px;
   border-radius: 4px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

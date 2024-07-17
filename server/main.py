@@ -143,7 +143,7 @@ async def send_players(room_id):
 async def send_game_state(room_id: str, state = None):
     if (state is None):
         state = game_manager.get_game_state(room_id)
-    await sio.emit("game_state", state)
+    await sio.emit("game_state", state, room=room_id)
 
 @sio.event
 async def join_room(sid, data):
@@ -194,6 +194,7 @@ async def get_game_state(sid, room_id):
 async def start_game(sid, data):
     room_id, session_id, num_categories, num_clues = data["room_id"], data["session_id"], data["num_categories"], data["num_clues"]
     if (room_manager.is_host(room_id, session_id)):
+        await send_game_state(room_id, "generating")
         game_manager.init_game(room_id, room_manager.get_room_by_id(room_id), num_categories, num_clues)
         game_manager.start_game(room_id)
     await send_game_state(room_id, "board")

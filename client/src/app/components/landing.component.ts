@@ -50,40 +50,36 @@ export class LandingComponent {
     this.clickedJoinGame = true;
   }
 
+  showError(error: string) {
+    this.errorMessage = error;
+    this.showPopup = true;
+    this.popupTimeout = setTimeout(() => {
+      this.showPopup = false;
+    }, 3000);
+  }
+
   onClickJoin() {
     clearTimeout(this.popupTimeout);
     if (!this.username.trim()) {
-      this.errorMessage = 'Please enter a username first!';
-      this.showPopup = true;
-      this.popupTimeout = setTimeout(() => {
-        this.showPopup = false;
-      }, 3000);
+      this.showError('Please enter a username first!');
     } else if (!this.roomCode.trim()) {
-      this.errorMessage = 'Please enter a valid room code!';
-      this.showPopup = true;
-      this.popupTimeout = setTimeout(() => {
-        this.showPopup = false;
-      }, 3000);
+      this.showError('Please enter a valid room code!');
     } else {
       this.apiService.validRoom(this.roomCode).subscribe({
         next: (value) => {
           if (value) {
             this.errorMessage = '';
             this.showPopup = false;
-            this.hostGameEvent.emit({ 
-              state: PageStates.Waiting, 
+            this.hostGameEvent.emit({
+              state: PageStates.Waiting,
               roomId: this.roomCode,
               host: false,
-              username: this.username
+              username: this.username,
             });
           } else {
-            this.errorMessage = 'A room with that code does not exist!';
-            this.showPopup = true;
-            this.popupTimeout = setTimeout(() => {
-              this.showPopup = false;
-            }, 3000);
+            this.showError('A room with that code does not exist!');
           }
-        }
+        },
       });
     }
   }
@@ -91,11 +87,7 @@ export class LandingComponent {
   onClickHostGame() {
     clearTimeout(this.popupTimeout);
     if (!this.username.trim()) {
-      this.errorMessage = 'Please enter a username first!';
-      this.showPopup = true;
-      this.popupTimeout = setTimeout(() => {
-        this.showPopup = false;
-      }, 3000);
+      this.showError('Please enter a username first!');
     } else {
       this.errorMessage = '';
       this.showPopup = false;
@@ -105,7 +97,7 @@ export class LandingComponent {
             state: PageStates.Waiting,
             roomId: v.room_id,
             host: true,
-            username: this.username
+            username: this.username,
           });
         },
         error: (e) => console.error('Error creating room id:', e),

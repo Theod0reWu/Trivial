@@ -17,15 +17,17 @@ export class ConnectorService {
   sessionId: string = '';
   username: string = '';
 
-	playerChange$ : Observable<any>;
-	players : Array<Record<string, string>> = [];
+  playerChange$: Observable<any>;
+  players: Array<Record<string, string>> = [];
 
   private socketService: SocketService = new SocketService();
   socketConnected = false;
 
-	gameStateChange$: Observable<any>;
-	gameState = null;
-	gameData = null;
+  gameStateChange$: Observable<any>;
+  gameState = null;
+  gameData = null;
+
+  loading = false;
 
   setUsername(username: string): void {
     this.username = username;
@@ -45,6 +47,7 @@ export class ConnectorService {
     this.sessionId = '';
     this.socketConnected = false;
     this.players = [];
+    this.loading = false;
   }
 
   isValidRoom(roomId: string): Observable<any> {
@@ -52,10 +55,16 @@ export class ConnectorService {
   }
 
   startGame(numCategories: number, numClues: number): void {
-  	this.socketService.startGame(this.roomId, this.sessionId, numCategories, numClues);
+    this.socketService.startGame(
+      this.roomId,
+      this.sessionId,
+      numCategories,
+      numClues
+    );
+    this.loading = true;
   }
 
-  connectToRoom(): boolean {
+  connectToRoom(callback: Function): boolean {
     /*
 			Ensure this.setRoom(...) and this.setUsername(...) is called first.
 			Connects to the room specified in this.roomId by creating the sessionId and setting up a socket.
@@ -85,32 +94,33 @@ export class ConnectorService {
         this.socketService.joinRoom(this.roomId, this.username, this.sessionId);
         this.socketConnected = true;
 
-	      // setup for when players join a room
-	      this.playerChange$ = this.socketService.onPlayerChange();
-	      this.playerChange$.subscribe( {
-	      	next: (result) => {
-	      		this.players = [];
-	      		for (var player of result) {
-	      			this.players.push({"username" : player});
-	      		}
-	      		this.apiService.isHost(this.sessionId).subscribe( {
-	      			next: (value) => {
-	      				this.host = value["is_host"];
-	      			}
-	      		});
-	      	}
-	      });
+        // setup for when players join a room
+        this.playerChange$ = this.socketService.onPlayerChange();
+        this.playerChange$.subscribe({
+          next: (result) => {
+            this.players = [];
+            for (var player of result) {
+              this.players.push({ username: player });
+            }
+            this.apiService.isHost(this.sessionId).subscribe({
+              next: (value) => {
+                this.host = value['is_host'];
+              },
+            });
+          },
+        });
 
-	      // setup for game events being emitted
-	      this.gameStateChange$ = this.socketService.onGameState();
-	      this.gameStateChange$.subscribe( {
-	      	next: (value) => {
-	      		this.gameData = value;
-	      		console.log(this.gameData);
-	      	}
-	      });
-	    }
-     });
+        // setup for game events being emitted
+        this.gameStateChange$ = this.socketService.onGameState();
+        this.gameStateChange$.subscribe({
+          next: (value) => {
+            this.gameData = value;
+            console.log(this.gameData);
+          },
+        });
+        callback();
+      },
+    });
     return true;
   }
 
