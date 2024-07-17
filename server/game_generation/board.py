@@ -41,7 +41,8 @@ class Board(object):
 		self.clue_gen = CluePromptGenerator()
 
 		#json prompts
-		self.answer_gen_json = AnswerPromptGenerator(make_json = True)
+		self.answer_gen_json = AnswerPromptGenerator(make_json=True)
+		self.clue_gen_json = CluePromptGenerator(make_json=True)
 
 	def clear_picked(self):
 		self.picked = [[False for i in range(self.clues_per_category)] for i in range(self.num_categories)]
@@ -94,7 +95,6 @@ class Board(object):
 		self.all_categories = [i[0] for i in categories]
 		print(categories, all_answers)
 		
-		at = 0
 		for category in categories:
 			self.category_titles.append(category[1])
 
@@ -117,9 +117,7 @@ class Board(object):
 			items = []
 			for i in range(len(answers)):
 				items.append(BoardItem(clues[i], answers[i], min_price + price_incr * i))
-
 			self.items.append(items)
-			at += 1
 
 	async def refresh_async(self, category_tree, model, fact_model = None, min_price = 200, max_price = 1000):
 		'''
@@ -144,7 +142,6 @@ class Board(object):
 		print(self.all_categories)
 		print(answers)
 
-		at = 0
 		for i in range(self.num_categories):
 			# figure out a better way to get the titles
 			self.category_titles.append(self.all_categories[i])
@@ -152,7 +149,19 @@ class Board(object):
 			ans = answers[i]
 			ans, information = self.get_wikipedia_info(ans)
 
-			print(information)
+			clue_prompt = self.clue_gen_json.generate_prompt(num = self.clues_per_category, answers = ", ".join(ans), information = "\n\n".join(information))
+
+			clues = []
+			if (fact_model is None):
+				clues = await get_and_parse_ast_async(model, clue_prompt)
+			else:
+				clues = await get_and_parse_ast_async(fact_model, clue_prompt)
+			print(clues)
+
+			items = []
+			for i in range(len(answers)):
+				items.append(BoardItem(clues[i], ans[i], min_price + price_incr * i))
+			self.items.append(items)
 
 
 	def __str__(self):
@@ -168,7 +177,7 @@ class Board(object):
 		return output
 
 	def to_dict(self):
-		print("board:", self.items)
+		print("board:", self.items, self.num_categories, self.clues_per_category)
 		data = {}
 		for i in range(self.num_categories):
 			key = "cat_" + str(i + 1)

@@ -30,12 +30,13 @@ def get_response(model, prompt):
 		print(response.prompt_feedback)
 
 async def get_response_async(model, prompt):
+	print(prompt)
 	response = None
 	while response == None:
 		try:
 			response = await model.generate_content_async(prompt)
 		except ResourceExhausted:
-			await asyncio.sleep(.5)
+			await asyncio.sleep(1)
 
 	try:
 		# print(prompt)

@@ -13,6 +13,7 @@ config = genai.types.GenerationConfig(
 )
 
 model = genai.GenerativeModel('gemini-1.5-pro', generation_config = config)
+# model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
 # prompt = TopicGenerator('./prompts/topics_json.txt').generate_prompt(category = "history")
 # output = get_and_parse_ast(model, prompt)
 # print(output)

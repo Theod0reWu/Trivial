@@ -67,7 +67,7 @@ class CluePromptGenerator(PromptGenerator):
             answers = string of all the answers (num answers)
             information = num paragraphs of information, corresponding to the answers
     """
-    def __init__(self, prompt_path =  os.path.join(Path(__file__).parent, 'prompts/clue.txt', make_json = False)):
+    def __init__(self, prompt_path =  os.path.join(Path(__file__).parent, 'prompts/clue.txt'), make_json = False):
         if (make_json):
             prompt_path =  os.path.join(Path(__file__).parent, 'prompts/clue_json.txt')
         super(CluePromptGenerator, self).__init__(prompt_path)
