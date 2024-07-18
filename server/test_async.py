@@ -20,3 +20,5 @@ game = Game(1, 2, 3)
 asyncio.run(game.generate_board_async())
 
 print(game.to_dict())
+
+# looks like there was a index ordering problem in board (to_dict couldn't access all the necessary items)

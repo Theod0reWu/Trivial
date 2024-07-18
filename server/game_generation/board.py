@@ -8,7 +8,8 @@ from . import gemini
 
 from .prompt import CategoryPromptGenerator, AnswerPromptGenerator, CluePromptGenerator, CategoryAndClueGenerator
 from .boarditem import BoardItem
-from .gemini import get_and_parse_categories, get_and_parse_answers, get_and_parse_clues, get_and_parse_catans, get_and_parse_ast_async
+from .gemini import (get_and_parse_categories, get_and_parse_answers, get_and_parse_clues, get_and_parse_catans, 
+	get_and_parse_ast, get_and_parse_ast_async)
 
 import wikipedia
 from wikipedia.exceptions import DisambiguationError, PageError
@@ -62,6 +63,7 @@ class Board(object):
 				page = wikipedia.page(result, auto_suggest = False)
 			except wikipedia.exceptions.DisambiguationError as e:
 				# page = wikipedia.page(e.options[0], auto_suggest = False)
+				print(e.options[0], answers[i] + " " + category[0])
 				try:
 					page = wikipedia.page(e.options[0])
 					answers[i] = e.options[0]
@@ -73,9 +75,43 @@ class Board(object):
 			information.append("Answer: " + answers[i] + "\n Information: " + "\"" + page.summary + "\"")
 		return answers, information
 
-	def refresh(self):
+	def refresh(self, category_tree, model, fact_model = None, min_price = 200, max_price = 1000):
 		self.clear_picked()
-		# use category tree
+		price_incr = round((max_price - min_price) / (self.clues_per_category - 1))
+		self.items = []
+
+		# generate categories (old way: only generates the categories)
+		# self.all_categories = [category_tree.get_random_topic(model, 3) for i in range(self.num_categories)]
+
+		self.all_categories = []
+		answers = []
+		for i in range(self.num_categories):
+			# problem: there could be less children then clues_per_category (error is thrown in this case)
+			output = category_tree.get_n_random_topics(model, 3, self.clues_per_category)
+			answers.append(output["children"])
+			self.all_categories.append(output["parent"])
+		print(self.all_categories)
+		print(answers)
+
+		for i in range(self.num_categories):
+			# figure out a better way to get the titles
+			self.category_titles.append(self.all_categories[i])
+
+			ans = answers[i]
+			ans, information = self.get_wikipedia_info(ans)
+
+			clue_prompt = self.clue_gen_json.generate_prompt(num = self.clues_per_category, answers = ", ".join(ans), information = "\n\n".join(information))
+			clues = []
+			if (fact_model is None):
+				clues = get_and_parse_ast(model, clue_prompt)
+			else:
+				clues = get_and_parse_ast(fact_model, clue_prompt)
+			print(clues)
+
+			items = []
+			for i in range(self.clues_per_category):
+				items.append(BoardItem(clues[i], ans[i], min_price + price_incr * i))
+			self.items.append(items)
 	
 	def refresh_old(self, model, fact_model = None, min_price = 200, max_price = 1000):
 		'''
@@ -95,6 +131,7 @@ class Board(object):
 		self.all_categories = [i[0] for i in categories]
 		print(categories, all_answers)
 		
+		at = 0
 		for category in categories:
 			self.category_titles.append(category[1])
 
@@ -118,6 +155,7 @@ class Board(object):
 			for i in range(len(answers)):
 				items.append(BoardItem(clues[i], answers[i], min_price + price_incr * i))
 			self.items.append(items)
+			at+=1
 
 	async def refresh_async(self, category_tree, model, fact_model = None, min_price = 200, max_price = 1000):
 		'''
@@ -159,7 +197,7 @@ class Board(object):
 			print(clues)
 
 			items = []
-			for i in range(len(answers)):
+			for i in range(self.clues_per_category):
 				items.append(BoardItem(clues[i], ans[i], min_price + price_incr * i))
 			self.items.append(items)
 
@@ -177,7 +215,7 @@ class Board(object):
 		return output
 
 	def to_dict(self):
-		print("board:", self.items, self.num_categories, self.clues_per_category)
+		# print("board:", self.items, self.num_categories, self.clues_per_category)
 		data = {}
 		for i in range(self.num_categories):
 			key = "cat_" + str(i + 1)

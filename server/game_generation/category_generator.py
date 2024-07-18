@@ -64,6 +64,28 @@ class CategoryTree(object):
 			level_at += 1
 		return node_at.topic
 
+	def get_n_random_topics(self, model, level, num = 1):
+		prompt_gen = self.prompt_gen
+		if (model._generation_config["response_mime_type"] == 'application/json'):
+			prompt_gen = self.prompt_gen_json
+
+		level_at = 0
+		node_at = self.root
+		prev_node = None
+		while (level_at < level):
+			new = node_at.make_children(model, prompt_gen)
+			self.total_topics += new
+			if (new > 0 and node_at.level + 1 > self.depth):
+				self.depth = node_at.level + 1
+
+			prev_node = node_at
+			node_at = random.choice(node_at.children)
+			level_at += 1
+
+		# print(len(prev_node.children), num)
+		chosen = random.sample(prev_node.children, k = num)
+		return {"parent":prev_node.topic, "children":[i.topic for i in chosen]}
+
 	async def get_n_random_topics_async(self, model, level, num = 1):
 		prompt_gen = self.prompt_gen
 		if (model._generation_config["response_mime_type"] == 'application/json'):

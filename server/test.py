@@ -2,7 +2,7 @@ import google.generativeai as genai
 import os
 
 from game_generation.board import Board
-
+from game_generation.game import Game
 
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
@@ -22,7 +22,8 @@ fact_config = genai.types.GenerationConfig(
 model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
 fact_model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
 
-board = Board(6, 5)
-board.refresh(model)
-print(board)
 
+game = Game(1, 2, 3)
+game.generate_board()
+
+print(game.to_dict())

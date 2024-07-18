@@ -49,7 +49,8 @@ class Game(object):
 			self.config = genai.types.GenerationConfig(
 			    candidate_count = 1,
 			)
-		self.model = genai.GenerativeModel('gemini-1.5-pro', generation_config = self.config)
+		# self.model = genai.GenerativeModel('gemini-1.5-pro', generation_config = self.config)
+		self.model = genai.GenerativeModel('gemini-1.5-flash', generation_config = self.config)
 
 		self.category_tree = CategoryTree()
 
@@ -57,7 +58,7 @@ class Game(object):
 		self.board = Board(num_categories, num_clues)
 
 	def generate_board(self):
-		self.board.refresh(self.model)
+		self.board.refresh(self.category_tree, self.model)
 
 	async def generate_board_async(self):
 		await self.board.refresh_async(self.category_tree, self.model)
@@ -90,6 +91,21 @@ class Game(object):
 		}
 		data["board_data"] = self.board.to_dict()
 		return data
+
+	def test_dict():
+		data = {
+			"num_players": 1,
+			"player_cash": [0],
+
+			"num_categories": 2,
+			"num_clues": 3,
+			"category_titles": self.board.category_titles,
+			"picked": array_to_dict(self.board.picked),
+
+			"picker": self.picker,
+			"state": self.state.value
+		}
+		data["board_data"] = self.board.to_dict()
 
 	def pick(self, category, clue):
 		return self.board[category][clue]

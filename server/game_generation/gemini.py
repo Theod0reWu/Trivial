@@ -1,5 +1,5 @@
 import google.generativeai as genai
-from google.api_core.exceptions import ResourceExhausted
+from google.api_core.exceptions import ResourceExhausted, InternalServerError
 from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
 import time
@@ -34,8 +34,10 @@ async def get_response_async(model, prompt):
 	response = None
 	while response == None:
 		try:
-			response = await model.generate_content_async(prompt)
-		except ResourceExhausted:
+			# async can generate the following error: google.api_core.exceptions.InternalServerError: 500 An internal error has occurred.
+			# response = await model.generate_content_async(prompt)
+			response = model.generate_content(prompt)
+		except (ResourceExhausted, InternalServerError):
 			await asyncio.sleep(1)
 
 	try:
