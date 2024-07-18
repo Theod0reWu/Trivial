@@ -1,9 +1,15 @@
 import google.generativeai as genai
 from google.api_core.exceptions import ResourceExhausted
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
 
 import time
 import ast
 import asyncio
+
+safety_settings = {
+    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+}
 
 '''
 	Returns the first candidate response from the model 
@@ -24,17 +30,20 @@ def get_response(model, prompt):
 		print(response.prompt_feedback)
 
 async def get_response_async(model, prompt):
+	print(prompt)
 	response = None
 	while response == None:
 		try:
-			response = model.generate_content(prompt)
+			response = await model.generate_content_async(prompt)
 		except ResourceExhausted:
-			await asyncio.sleep(.5)
+			await asyncio.sleep(1)
 
 	try:
+		# print(prompt)
 		# print(response.candidates[0].content.parts[0].text)
 		return response.candidates[0].content.parts[0].text
-	except:
+	except Exception as e:
+		print(e)
 		print(response)
 		print(response.prompt_feedback)
 
@@ -133,6 +142,6 @@ def get_and_parse_ast(model, prompt):
 	return var
 
 async def get_and_parse_ast_async(model, prompt):
-	response = await get_response(model, prompt)
+	response = await get_response_async(model, prompt)
 	var = ast.literal_eval(response)
 	return var

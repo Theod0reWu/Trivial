@@ -17,6 +17,7 @@ export class ConnectorService {
   sessionId: string = '';
   username: string = '';
 
+  hostChange$: Observable<any>;
   playerChange$: Observable<any>;
   players: Array<Record<string, string>> = [];
 
@@ -102,11 +103,20 @@ export class ConnectorService {
             for (var player of result) {
               this.players.push({ username: player });
             }
-            this.apiService.isHost(this.sessionId).subscribe({
-              next: (value) => {
-                this.host = value['is_host'];
-              },
-            });
+            // this.apiService.isHost(this.sessionId).subscribe({
+            //   next: (value) => {
+            //     this.host = value['is_host'];
+            //   },
+            // });
+          },
+        });
+
+        // setup for when a new host needs to be elected after original leaves
+        this.hostChange$ = this.socketService.onHost();
+        this.hostChange$.subscribe({
+          next: (value) => {
+            this.host = true;
+            console.log('help');
           },
         });
 
@@ -118,6 +128,7 @@ export class ConnectorService {
             console.log(this.gameData);
           },
         });
+
         callback();
       },
     });

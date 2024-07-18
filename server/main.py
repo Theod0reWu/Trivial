@@ -114,6 +114,18 @@ async def is_host(session_id: str):
 def getRoom(sid):
     return list(set(sio.manager.get_rooms(sid, "/")).difference({sid}))[0]
 
+async def send_players(room_id):
+    room = room_manager.get_room_by_id(room_id)
+    if (not room):
+        return
+    usernames = [i["username"] for i in sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])]
+    await sio.emit("players", usernames, room=room_id)
+
+async def send_game_state(room_id: str, state = None):
+    if (state is None):
+        state = game_manager.get_game_state(room_id)
+    await sio.emit("game_state", state, room=room_id)
+
 @sio.event
 async def connect(sid, environ, auth):
     print("connect ", sid)
@@ -128,22 +140,11 @@ async def connect(sid, environ, auth):
 async def disconnect(sid):
     room = session_manager.get_room_by_sid(sid)
     if room:
-        room_manager.leave_room(room["room_id"], room["session_id"], session_manager)
+        host = room_manager.leave_room(room["room_id"], room["session_id"], session_manager)
+        if (host):
+            await sio.emit("host", to=host)
         await send_players(room["room_id"])
     print('disconnect ', sid)
-
-async def send_players(room_id):
-    room = room_manager.get_room_by_id(room_id)
-    if (not room):
-        return
-    # usernames = session_manager.get_usernames(room["curr_connections"])
-    usernames = [i["username"] for i in sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])]
-    await sio.emit("players", usernames, room=room_id)
-
-async def send_game_state(room_id: str, state = None):
-    if (state is None):
-        state = game_manager.get_game_state(room_id)
-    await sio.emit("game_state", state, room=room_id)
 
 @sio.event
 async def join_room(sid, data):
@@ -179,7 +180,9 @@ async def leave_room(sid, data):
     room_id = data['room_id']
     session_id = data['session_id']
 
-    room_manager.leave_room(room_id, session_id, session_manager)
+    host = room_manager.leave_room(room_id, session_id, session_manager)
+    if (host):
+        await sio.emit("host", to=host)
     session_manager.delete_session(session_id)
     
     await sio.leave_room(sid, room_id)

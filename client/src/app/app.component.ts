@@ -65,6 +65,8 @@ export class AppComponent {
             this.connectorService.loading = false;
           } else if (value === 'generating') {
             this.state = this.pageStates.Loading;
+            this.loadingMessage =
+              '<b>Hang tight!</b> Generating your clues. This may take a while.';
             this.connectorService.loading = true;
           }
         },
