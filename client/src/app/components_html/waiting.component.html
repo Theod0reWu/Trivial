@@ -82,14 +82,11 @@
   <div class="players">
     <div class="players-text">Current Contestants</div>
     <div class="players-container">
-      @for (player of players; track player) {
-      <div class="player-card">
-        <!-- {{ player.username }} -->
-        {{ player['username'] }}
+      @for (player of players; track player; let index = $index) {
+      <div class="player-card" id="player-{{ index }}">
+        {{ player["username"] }}
       </div>
       }
     </div>
   </div>
-
-  <!-- <div style="height: 200px"></div> -->
 </main>

@@ -3,7 +3,9 @@
     <div class="grid-container">
       <div class="categories">
         @for (category of categories; track category; let index = $index) {
-        <div class="category-title" id="{{ index }}">{{ category }}</div>
+        <div class="category-title" id="category-{{ index }}">
+          {{ category }}
+        </div>
         }
       </div>
       <div class="clues">
@@ -23,8 +25,8 @@
   </div>
   <div class="players">
     <div class="players-container">
-      @for (player of players; track player) {
-      <div class="player-card">
+      @for (player of players; track player; let index = $index) {
+      <div class="player-card" id="player={{ index }}">
         <div class="player-score">${{ player.score }}</div>
         <div class="player-name">{{ player.username }}</div>
       </div>

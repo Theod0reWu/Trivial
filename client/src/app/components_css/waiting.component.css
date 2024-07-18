@@ -223,6 +223,7 @@ waiting-taglist {
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
 .room-code-banner {

@@ -13,11 +13,18 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { PageStates } from '../app.component';
 import { Category, WaitingTaglist } from './waiting_taglist.component';
 import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
+import { LoadingComponent } from './loading.component';
 
 @Component({
   selector: 'waiting-view',
   standalone: true,
-  imports: [NgOptimizedImage, CommonModule, WaitingTaglist, MatTooltipModule],
+  imports: [
+    NgOptimizedImage,
+    CommonModule,
+    WaitingTaglist,
+    MatTooltipModule,
+    LoadingComponent,
+  ],
   templateUrl: '../components_html/waiting.component.html',
   styleUrl: '../components_css/waiting.component.css',
 })
@@ -53,14 +60,6 @@ export class WaitingComponent implements AfterViewInit {
   maxNumCategories = 12;
   maxNumQuestions = 10;
 
-  // players = [
-  //   // temp players list
-  //   { username: 'Winxler' },
-  //   { username: 'niflac' },
-  //   { username: 'Teoz' },
-  //   { username: 'Dylan' },
-  // ];
-
   ngAfterViewInit() {
     setTimeout(() => {
       this.bgOverlay.nativeElement.classList.add('bg-rendered');
@@ -89,10 +88,12 @@ export class WaitingComponent implements AfterViewInit {
   }
 
   onClickStartGame() {
-    this.hostGameEvent.emit( { 
-      state: PageStates.InGame, 
-      numClues: this.numQuestions, 
-      numCategories: this.numCategories 
+    this.hostGameEvent.emit({
+      state: PageStates.Loading,
+      numClues: this.numQuestions,
+      numCategories: this.numCategories,
+      loadingMessage:
+        '<b>Hang tight!</b> Generating your clues. This may take a while.',
     });
   }
 

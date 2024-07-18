@@ -1,29 +1,7 @@
 from firebase_init import db
 from firebase_admin import firestore
 from session_manager import SessionManager
-
-# class UserConnection:
-#     def __init__(self, sid: str, username: str):
-#         self.curr_sid = sid # socket.io session id
-#         self.username = username
-#         self.timestamp = firestore.SERVER_TIMESTAMP
-    
-#     @staticmethod
-#     def from_dict(source):
-#         conn = UserConnection(**source)
-#         return conn
-
-#     def to_dict(self):
-#         return {
-#             "curr_sid": self.curr_sid,
-#             "username": self.username
-#         }
-
-#     def __repr__(self):
-#         return f"UserConnection(\
-#                 curr_sid={self.curr_sid}, \
-#                 username={self.username}\
-#             )"
+from typing import Callable
 
 class Room:
     def __init__(self, state: str = "pregame", curr_connections: list[str] = None, 
@@ -91,12 +69,13 @@ class RoomManager:
         if (session_id not in room["all_connections"]): room["all_connections"].append(session_id)
         room_ref.update({"curr_connections": room["curr_connections"], "all_connections": room["all_connections"]})
     
-    def leave_room(self, room_id: str, session_id: str, session_manager: SessionManager):
+    def leave_room(self, room_id: str, session_id: str, session_manager: SessionManager) -> str:
+        # returns sid of current or newly elected host
         print(f"{session_id} left the room")
         room_ref = self.rooms.document(room_id)
         room = room_ref.get().to_dict()
         if room:
-            # room["curr_connections"].pop(session_id, None)
+            host = room["host"]
             if (session_id in room["curr_connections"]):
                 room["curr_connections"].remove(session_id)
             if (not room["curr_connections"]):
@@ -106,9 +85,12 @@ class RoomManager:
                 room_ref.update({"curr_connections": room["curr_connections"]})
 
                 # appoint a new host
-                if (room["host"] == session_id):
-                    new_host = sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])[0]["session_id"]
-                    room_ref.update({"host": new_host})
+                if (host == session_id):
+                    new_host = sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])[0]
+                    room_ref.update({"host": new_host["session_id"]})
+                    host = new_host["curr_sid"]
+            return host
+        return ""
     
     def get_room_by_id(self, room_id: str) -> dict:
         room_ref = self.rooms.document(room_id)

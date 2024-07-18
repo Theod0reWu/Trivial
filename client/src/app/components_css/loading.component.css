@@ -1,0 +1,43 @@
+.loading-message,
+p {
+  color: var(--white);
+  font-family: var(--robot-font);
+  text-align: center;
+}
+
+.loading-message {
+  font-size: 24px;
+  padding-bottom: 50px;
+}
+
+p {
+  font-size: 18px;
+}
+
+.fun-fact {
+  width: 75vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+b {
+  color: var(--snow);
+}
+
+.about {
+  color: var(--white-transparent-75);
+  font-size: 36px;
+  transition: all 0.2s ease 0s;
+  cursor: pointer;
+}
+
+.about:hover {
+  color: var(--snow);
+  transition: all 0.2s ease 0s;
+}
+
+::ng-deep .loading-text {
+  top: 70% !important;
+}

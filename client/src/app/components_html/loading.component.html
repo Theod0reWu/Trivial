@@ -1,0 +1,21 @@
+<main>
+  <ngx-spinner
+    bdColor="rgba(0, 0, 0, 0.5)"
+    size="medium"
+    color="#fff"
+    type="ball-running-dots"
+    [zIndex]="1"
+  >
+    <div class="fun-fact">
+      <div class="loading-message" [innerHTML]="loadingMessage"></div>
+      <p [innerHTML]="randomFunFacts[randomIndex]"></p>
+      <div
+        #tooltip="matTooltip"
+        matTooltip="{{ loadingTooltip }}"
+        aria-label="Fun fact source"
+      >
+        <i class="bi bi-question-circle-fill about"></i>
+      </div>
+    </div>
+  </ngx-spinner>
+</main>
