@@ -48,32 +48,40 @@ class Board(object):
 	def clear_picked(self):
 		self.picked = [[False for i in range(self.clues_per_category)] for i in range(self.num_categories)]
 
-	def get_wikipedia_info(self, answers):
+	def get_wikipedia_info(self, answers, category):
 		information = []
-		for i in range(self.clues_per_category):
-			# search wikipedia for a relevant page
-			search = wikipedia.search(answers[i], results = 3)
+		for i in range(len(answers)):
+			# search wikipedia for a relevant page (if the answer is not specific enough try it with the category)
+			num_search_results = 3
+			search = wikipedia.search(answers[i], results = num_search_results)
 			if (len(search) == 0):
-				search = wikipedia.search(answers[i] + " " + category[0], results = 3)
-			result = search[0]
+				search = wikipedia.search(answers[i] + " " + categories[i], results = num_search_results)
 
-			# get the wikipedia page
-			page = None
-			try:
-				page = wikipedia.page(result, auto_suggest = False)
-			except wikipedia.exceptions.DisambiguationError as e:
-				# page = wikipedia.page(e.options[0], auto_suggest = False)
-				print(e.options[0], answers[i] + " " + category[0])
+			backup_page, backup_ans = None, None
+			for e in range(num_search_results):
+				result = search[e]
+
+				# get the wikipedia page
+				page = None
 				try:
-					page = wikipedia.page(e.options[0])
-					answers[i] = e.options[0]
-				except wikipedia.exceptions.DisambiguationError:
-					print("Failed generation")
-					return None
+					page = wikipedia.page(result, auto_suggest = False)
+				except wikipedia.exceptions.DisambiguationError as e:
+					# currently the disambiguation error will just select the next best option from suggestions
+					# This is only done from the first result
+					if (i == 0):
+						backup_page = wikipedia.page(e.options[0], auto_suggest = False)
+						backup_ans = e.options[0]
+					continue
 
-			# currently only uses the summary for information
-			information.append("Answer: " + answers[i] + "\n Information: " + "\"" + page.summary + "\"")
-		return answers, information
+				#backup is chosen if none of the search results resulted in pages
+				if (page is not None):
+					information.append("Answer: " + answers[i] + "\n Information: " + "\"" + page.summary + "\"")
+					break
+
+		if (len(information) < i):
+			information.append("Answer: " + backup_ans + "\n Information: " + "\"" + backup_page.summary + "\"")
+			answers[i] = backup_ans
+	return answers, information
 
 	def refresh(self, category_tree, model, fact_model = None, min_price = 200, max_price = 1000):
 		self.clear_picked()
@@ -98,7 +106,7 @@ class Board(object):
 			self.category_titles.append(self.all_categories[i])
 
 			ans = answers[i]
-			ans, information = self.get_wikipedia_info(ans)
+			ans, information = self.get_wikipedia_info(ans, self.all_categories[i])
 
 			clue_prompt = self.clue_gen_json.generate_prompt(num = self.clues_per_category, answers = ", ".join(ans), information = "\n\n".join(information))
 			clues = []
@@ -109,8 +117,8 @@ class Board(object):
 			print(clues)
 
 			items = []
-			for i in range(self.clues_per_category):
-				items.append(BoardItem(clues[i], ans[i], min_price + price_incr * i))
+			for e in range(self.clues_per_category):
+				items.append(BoardItem(clues[e], ans[e], min_price + price_incr * e))
 			self.items.append(items)
 	
 	def refresh_old(self, model, fact_model = None, min_price = 200, max_price = 1000):
@@ -140,7 +148,7 @@ class Board(object):
 			# print(answers)
 			answers = all_answers[at]
 
-			answers, information = self.get_wikipedia_info(answers)
+			answers, information = self.get_wikipedia_info(answers, categories)
 
 			# get clues based on info + answer
 			clue_prompt = self.clue_gen.generate_prompt(num = self.clues_per_category, answers = ", ".join(answers), information = "\n\n".join(information))
