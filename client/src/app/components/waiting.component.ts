@@ -14,6 +14,7 @@ import { PageStates } from '../app.component';
 import { Category, WaitingTaglist } from './waiting_taglist.component';
 import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
 import { LoadingComponent } from './loading.component';
+import { Player } from '../api/GameData';
 
 @Component({
   selector: 'waiting-view',
@@ -32,7 +33,8 @@ export class WaitingComponent implements AfterViewInit {
   constructor(private clipboard: Clipboard) {}
   @Input() bgOverlay!: ElementRef;
   @Input() roomId!: string;
-  @Input() players!: Array<Record<string, string>>;
+  // @Input() players!: Array<Record<string, string>>;
+  @Input() players!: Player[];
   @Input() isHost!: boolean;
 
   @Output() hostGameEvent = new EventEmitter<object>();

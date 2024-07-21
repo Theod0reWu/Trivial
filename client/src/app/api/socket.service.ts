@@ -74,6 +74,18 @@ export class SocketService {
     return this.onRecv('game_state');
   }
 
+  onBoardData(): Observable<any> {
+    return this.onRecv('board_data');
+  }
+
+  onPlayerCash(): Observable<any> {
+    return this.onRecv('player_cash')
+  }
+
+  onTimerEmit(): Observable<any> {
+    return this.onRecv('timer');
+  }
+
   // Disconnect from the socket
   disconnect(): void {
     if (this.socket) {

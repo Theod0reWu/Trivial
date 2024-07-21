@@ -2,6 +2,10 @@
 <board-view
   (gameStateChange)="handleGameStateChange($event)"
   [players]="players"
+  [numRows]="numRows"
+  [numCols]="numCols"
+  [categories]="categoryTitles"
+  [prices]="prices"
 />
 } @else {
 <clue-view

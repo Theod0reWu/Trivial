@@ -38,7 +38,7 @@ main {
 }
 
 .categories {
-  grid-template-columns: repeat(6, 1fr);
+/*  grid-template-columns: repeat(6, 1fr);*/
   gap: 10px;
   font-size: 32px;
   color: var(--snow);
@@ -46,7 +46,7 @@ main {
 }
 
 .clues {
-  grid-template-columns: repeat(6, 1fr);
+/*  grid-template-columns: repeat(6, 1fr);*/
   gap: 10px;
   font-size: 40px;
   color: var(--gold);

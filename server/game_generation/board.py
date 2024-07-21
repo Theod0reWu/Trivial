@@ -81,7 +81,7 @@ class Board(object):
 		if (len(information) < i):
 			information.append("Answer: " + backup_ans + "\n Information: " + "\"" + backup_page.summary + "\"")
 			answers[i] = backup_ans
-	return answers, information
+		return answers, information
 
 	def refresh(self, category_tree, model, fact_model = None, min_price = 200, max_price = 1000):
 		self.clear_picked()
@@ -226,7 +226,7 @@ class Board(object):
 		# print("board:", self.items, self.num_categories, self.clues_per_category)
 		data = {}
 		for i in range(self.num_categories):
-			key = "cat_" + str(i + 1)
+			key = str(i)
 			data[key] = []
 			for e in range(self.clues_per_category):
 				if (self.items[i][e]):

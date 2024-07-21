@@ -1,23 +1,24 @@
 <main class="main">
   <div class="board">
     <div class="grid-container">
-      <div class="categories">
+      <div class="categories" [ngStyle]="{'grid-template-columns': getGridTemplateCategories()}">
         @for (category of categories; track category; let index = $index) {
         <div class="category-title" id="category-{{ index }}">
           {{ category }}
         </div>
         }
       </div>
-      <div class="clues">
+      <div class="clues" *ngIf='prices' [ngStyle]="{'grid-template-columns': getGridTemplateCategories()}">
         <ng-container
-          *ngFor="let item of generatePricesArray(numRows * numCols)"
+          *ngFor="let item of range(numRows * numCols)"
         >
           <div
             [ngClass]="{ active: isChoosing }"
             class="clue"
             (click)="onClickClue($event)"
+            id="item"
           >
-            ${{ item }}
+            ${{ prices[item] }}
           </div>
         </ng-container>
       </div>
@@ -27,8 +28,8 @@
     <div class="players-container">
       @for (player of players; track player; let index = $index) {
       <div class="player-card" id="player={{ index }}">
-        <div class="player-score">${{ player.score }}</div>
-        <div class="player-name">{{ player.username }}</div>
+        <div class="player-score">${{ player['score'] }}</div>
+        <div class="player-name">{{ player['username'] }}</div>
       </div>
       }
     </div>

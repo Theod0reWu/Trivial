@@ -1,13 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 // import { NgOptimizedImage } from '@angular/common';
 import { PageStates } from '../app.component';
 import { BoardComponent } from './board.component';
 import { ClueComponent } from './clue.component';
-
-export interface Player {
-  username: string;
-  score: number;
-}
+import { Player } from '../api/GameData';
 
 @Component({
   selector: 'game-view',
@@ -16,24 +12,13 @@ export interface Player {
   templateUrl: '../components_html/game.component.html',
 })
 export class GameComponent {
+  @Input() numCols!: number;
+  @Input() numRows!: number;
+  @Input() categoryTitles!: string[];
+  @Input() players!: Player[];
+  @Input() prices!: number[];
+
   boardView = true;
-  // @Input() players!: Array<Record<string, string>>;
-  
-  players = [
-    // temp players list
-    { username: 'Winxler', score: 0 },
-    { username: 'niflac', score: 0 },
-    { username: 'Teoz', score: 0 },
-    { username: 'Dylan', score: 0 },
-    { username: 'Winxler', score: 0 },
-    { username: 'niflac', score: 0 },
-    { username: 'Teoz', score: 0 },
-    { username: 'Dylan', score: 0 },
-    { username: 'Winxler', score: 0 },
-    { username: 'niflac', score: 0 },
-    { username: 'Teoz', score: 0 },
-    { username: 'Dylan', score: 0 },
-  ];
 
   handleGameStateChange(boardView: boolean) {
     this.boardView = boardView;

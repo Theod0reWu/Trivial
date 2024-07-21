@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 // import { NgOptimizedImage } from '@angular/common';
 import { PageStates } from '../app.component';
 import { NgClass, NgForOf } from '@angular/common';
-import { Player } from './game.component';
+import { Player } from '../api/GameData';
 import { TimerComponent } from './timer.component';
 
 enum BannerStates {
@@ -22,6 +22,7 @@ enum BannerStates {
 })
 export class ClueComponent {
   @Input() players!: Player[];
+  @Input() scores!: number[];
   @Output() gameStateChange = new EventEmitter<boolean>();
 
   updateTimer(){

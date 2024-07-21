@@ -93,19 +93,47 @@ class Game(object):
 		return data
 
 	def test_dict():
-		data = {
-			"num_players": 1,
-			"player_cash": [0],
-
-			"num_categories": 2,
-			"num_clues": 3,
-			"category_titles": self.board.category_titles,
-			"picked": array_to_dict(self.board.picked),
-
-			"picker": self.picker,
-			"state": self.state.value
+		return {
+			'num_players': 1, 
+			'player_cash': [0], 
+			'num_categories': 2, 
+			'num_clues': 3, 
+			'category_titles': ['baseball', 'emotional intelligence'], 
+			'picked': {'0': {'0': False, '1': False, '2': False}, '1': {'0': False, '1': False, '2': False}}, 
+			'picker': -1, 
+			'state': 'board', 
+			'board_data': 
+			{
+				'0': [
+					{'clue': 'This term is a process of administration that involves the management of resources for organizations of varying types including businesses, nonprofits, and government bodies.', 
+					'answer': 'managers',
+					'price': 100
+					}, 
+					{'clue': "This statistic in baseball and softball is used to measure the number of wins and losses credited to a pitcher and is based on the pitcher's performance in a game and the official scorer's judgment. There are specific rules that govern the attribution of a win, loss, or a no-decision. The number of decisions a pitcher accumulates has been on a gradual decline since the early 1900s as the evolution of baseball has led to a reliance on specialized pitchers.", 
+					'answer': 'pitching records',
+					'price': 200
+					}, 
+					{'clue': 'This part of baseball history revolves around the career of a player whose dominant pitching performance led to his selection as the starting pitcher for the National League in the 2024 All-Star Game, making him only the fifth rookie to achieve this distinction.', 
+					'answer': 'mlb history',
+					'price': 400
+					}
+				], 
+				'1': [
+					{'clue': "It is a concept that describes how individuals within a society become aware of the common ground that connects them and their shared identity, which can lead to social unity and shared goals. It's a key concept in Marxism, where it's argued that economic relations shape social consciousness.", 
+					'answer': 'social awareness',
+					'price': 100
+					}, 
+					{'clue': 'It is a business process that involves managing and analyzing customer interactions across various communication channels, aiming to improve customer satisfaction, retention, and sales growth. It is a multi-billion dollar industry with a large global market.', 
+					'answer': 'relationship management',
+					'price': 200
+					}, 
+					{'clue': "It is a form of organizational management where employees have a significant degree of control over their work processes and the organization's operations. It's a defining feature of socialism and has been advocated by various socialist and anarchist movements. It's often linked to concepts like employee ownership and worker cooperatives.", 
+					'answer': 'self-management',
+					'price': 400
+					}
+				]
+			}
 		}
-		data["board_data"] = self.board.to_dict()
 
 	def pick(self, category, clue):
 		return self.board[category][clue]

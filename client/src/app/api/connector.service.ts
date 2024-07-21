@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, take, lastValueFrom } from 'rxjs';
 import { SocketService } from './socket.service';
 import { ApiService } from './api.service';
+import { GameData, Player} from './GameData';
 
 @Injectable({
   providedIn: 'root',
@@ -19,14 +20,24 @@ export class ConnectorService {
 
   hostChange$: Observable<any>;
   playerChange$: Observable<any>;
-  players: Array<Record<string, string>> = [];
+  players: Player[] = [];
 
   private socketService: SocketService = new SocketService();
   socketConnected = false;
 
   gameStateChange$: Observable<any>;
   gameState = null;
-  gameData = null;
+
+  /*
+  	game data will contain:
+  		numCategories
+  		numClues
+			
+			categoryTitles
+			prices
+
+  */
+  gameData = new GameData();
 
   loading = false;
 
@@ -65,6 +76,58 @@ export class ConnectorService {
     this.loading = true;
   }
 
+  setupSocketEvents(): void {
+  	// setup for when players join a room
+    this.playerChange$ = this.socketService.onPlayerChange();
+    this.playerChange$.subscribe({
+      next: (result) => {
+        this.players = [];
+        for (var player of result) {
+          this.players.push({ username: player, score: 0 });
+        }
+
+        //old method for determining host
+        // this.apiService.isHost(this.sessionId).subscribe({
+        //   next: (value) => {
+        //     this.host = value['is_host'];
+        //   },
+        // });
+      },
+    });
+
+    // setup for when a new host needs to be elected after original leaves
+    this.hostChange$ = this.socketService.onHost();
+    this.hostChange$.subscribe({
+      next: (value) => {
+        this.host = true;
+      },
+    });
+
+    // setup for game state is being emitted
+    this.gameStateChange$ = this.socketService.onGameState();
+    this.gameStateChange$.subscribe({
+      next: (value) => {
+        this.gameState = value;
+      },
+    });
+
+    // setup for when board data is being transmitted (category titles and cost of clues)
+    this.socketService.onBoardData().subscribe({
+    	next: (value) => {
+    		this.gameData.numClues = value["num_clues"];
+    		this.gameData.numCategories = value["num_categories"];
+    		this.gameData.categoryTitles = value["category_titles"];
+    		this.gameData.prices = [];
+    		for (let i = 0; i < this.gameData.numClues; ++i){
+    			for (let e = 0; e < this.gameData.numCategories; ++e) {
+    				this.gameData.prices.push(value["prices"][i]);
+    			}
+    		}
+    		console.log(this.gameData)
+    	}
+    });
+  }
+
   connectToRoom(callback: Function): boolean {
     /*
 			Ensure this.setRoom(...) and this.setUsername(...) is called first.
@@ -94,40 +157,7 @@ export class ConnectorService {
         this.socketService.initSocket(this.sessionId);
         this.socketService.joinRoom(this.roomId, this.username, this.sessionId);
         this.socketConnected = true;
-
-        // setup for when players join a room
-        this.playerChange$ = this.socketService.onPlayerChange();
-        this.playerChange$.subscribe({
-          next: (result) => {
-            this.players = [];
-            for (var player of result) {
-              this.players.push({ username: player });
-            }
-            // this.apiService.isHost(this.sessionId).subscribe({
-            //   next: (value) => {
-            //     this.host = value['is_host'];
-            //   },
-            // });
-          },
-        });
-
-        // setup for when a new host needs to be elected after original leaves
-        this.hostChange$ = this.socketService.onHost();
-        this.hostChange$.subscribe({
-          next: (value) => {
-            this.host = true;
-            console.log('help');
-          },
-        });
-
-        // setup for game events being emitted
-        this.gameStateChange$ = this.socketService.onGameState();
-        this.gameStateChange$.subscribe({
-          next: (value) => {
-            this.gameData = value;
-            console.log(this.gameData);
-          },
-        });
+        this.setupSocketEvents();
 
         callback();
       },

@@ -126,6 +126,16 @@ async def send_game_state(room_id: str, state = None):
         state = game_manager.get_game_state(room_id)
     await sio.emit("game_state", state, room=room_id)
 
+async def send_board_data(room_id:str):
+    '''
+        Sends the list of category titles
+        And a list of the prices of clues
+    '''
+    await sio.emit("board_data", game_manager.get_board_info(room_id))
+
+async def send_player_cash(room_id: str):
+    pass
+
 @sio.event
 async def connect(sid, environ, auth):
     print("connect ", sid)
@@ -194,6 +204,10 @@ async def get_game_state(sid, room_id):
     return room_manager.get_room_by_id(room_id)["state"]
 
 @sio.event
+async def get_categories(sid, data):
+    return game_manager.get_game_categories(data["room_id"])
+
+@sio.event
 async def start_game(sid, data):
     room_id, session_id, num_categories, num_clues = data["room_id"], data["session_id"], data["num_categories"], data["num_clues"]
     if (room_manager.is_host(room_id, session_id)):
@@ -201,6 +215,7 @@ async def start_game(sid, data):
         game_manager.init_game(room_id, room_manager.get_room_by_id(room_id), num_categories, num_clues)
         game_manager.start_game(room_id)
     await send_game_state(room_id, "board")
+    await send_board_data(room_id)
 
 if __name__ == "__main__":
     uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)

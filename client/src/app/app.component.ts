@@ -33,7 +33,7 @@ export class AppComponent {
   constructor(
     private elementRef: ElementRef,
     public connectorService: ConnectorService,
-    public gameData: GameData
+    // public gameData: GameData
   ) {}
   @ViewChild('bgOver') bgOverlay!: ElementRef;
   pageStates = PageStates;
@@ -63,6 +63,7 @@ export class AppComponent {
           if (value === 'board') {
             this.state = this.pageStates.InGame;
             this.connectorService.loading = false;
+            
           } else if (value === 'generating') {
             this.state = this.pageStates.Loading;
             this.loadingMessage =
@@ -94,13 +95,13 @@ export class AppComponent {
       }
       case PageStates.Loading: {
         this.state = this.pageStates.Loading;
-        this.gameData.numCategories = data.numCategories;
-        this.gameData.numClues = data.numClues;
+        this.connectorService.gameData.numCategories = data.numCategories;
+        this.connectorService.gameData.numClues = data.numClues;
         this.loadingMessage = data.loadingMessage;
 
         this.connectorService.startGame(
-          this.gameData.numCategories,
-          this.gameData.numClues
+          this.connectorService.gameData.numCategories,
+          this.connectorService.gameData.numClues
         );
         break;
       }

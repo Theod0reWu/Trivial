@@ -30,7 +30,8 @@ class BoardItem(object):
 	def to_dict(self):
 		return {
 			"clue": self.clue,
-			"answer": self.answer
+			"answer": self.answer,
+			"price": self.price
 		}
 
 	def __str__(self):
