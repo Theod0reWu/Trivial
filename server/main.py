@@ -134,7 +134,11 @@ async def send_board_data(room_id:str):
     await sio.emit("board_data", game_manager.get_board_info(room_id))
 
 async def send_player_cash(room_id: str):
-    pass
+    room = room_manager.get_room_by_id(room_id)
+    if (not room):
+        return
+    session_id = [i.id for i in sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])]
+    return game_manager.get_player_cash(room_id, session_id)
 
 @sio.event
 async def connect(sid, environ, auth):

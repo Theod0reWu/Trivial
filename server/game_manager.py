@@ -20,10 +20,10 @@ class GameManager(object):
 		'''
 		room_ref = self.rooms.document(room_id)
 
-		# game = Game(len(room["curr_connections"]),num_categories, num_clues)
+		game = Game(room["curr_connections"], len(room["curr_connections"]),num_categories, num_clues)
 		# game.generate_board()
 		# data = game.to_dict()
-		data = Game.test_dict()
+		data = Game.test_dict(room["curr_connections"])
 
 		print(num_categories, num_clues)
 		print(data)
@@ -53,6 +53,14 @@ class GameManager(object):
 			"num_clues": room_data["num_clues"]
 		}
 
+	def get_player_cash(self, room_id: str, player_ids: list[str]):
+		'''
+			player_id: list of session ids of players in room_id
+			returns ordered list of player cash
+		'''
+		room_ref = self.rooms.document(room_id)
+		room_data = room_ref.get().to_dict()["player_cash"]
+		return [room_data[i] for i in player_ids]
 
 	# Create a callback on_snapshot function to capture changes
 	def on_snapshot(doc_snapshot, changes, read_time):

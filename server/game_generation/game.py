@@ -27,7 +27,7 @@ class Game(object):
 	"""
 		
 	"""
-	def __init__(self, num_players: int, num_categories: int, num_clues: int, use_json = True):
+	def __init__(self, player_ids, num_players: int, num_categories: int, num_clues: int, use_json = True):
 		super(Game, self).__init__()
 		self.num_players = num_players
 		self.num_categories = num_categories
@@ -35,8 +35,8 @@ class Game(object):
 
 		self.board = Board(num_categories, num_clues)
 
-		self.player_cash = [0 for i in range(num_players)]
-		self.player_ids = [None for i in range(num_players)]
+		self.player_cash = {i:0 for i in player_ids}
+		self.player_ids = player_ids
 		self.picker = -1 # who's turn it is to pick
 
 		self.state = GameState.BOARD
@@ -92,10 +92,10 @@ class Game(object):
 		data["board_data"] = self.board.to_dict()
 		return data
 
-	def test_dict():
+	def test_dict(player_ids):
 		return {
 			'num_players': 1, 
-			'player_cash': [0], 
+			'player_cash': {i:0 for i in player_ids}, 
 			'num_categories': 2, 
 			'num_clues': 3, 
 			'category_titles': ['baseball', 'emotional intelligence'], 
