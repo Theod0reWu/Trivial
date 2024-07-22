@@ -4,6 +4,7 @@ from .category_generator import CategoryTree
 from enum import Enum
 import os
 import asyncio
+import random
 
 import google.generativeai as genai
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
@@ -37,7 +38,7 @@ class Game(object):
 
 		self.player_cash = {i:0 for i in player_ids}
 		self.player_ids = player_ids
-		self.picker = -1 # who's turn it is to pick
+		self.picker = random.choice(player_ids) # who's turn it is to pick
 
 		self.state = GameState.BOARD
 		if (use_json):
@@ -100,7 +101,7 @@ class Game(object):
 			'num_clues': 3, 
 			'category_titles': ['baseball', 'emotional intelligence'], 
 			'picked': {'0': {'0': False, '1': False, '2': False}, '1': {'0': False, '1': False, '2': False}}, 
-			'picker': -1, 
+			'picker': random.choice(player_ids), 
 			'state': 'board', 
 			'board_data': 
 			{

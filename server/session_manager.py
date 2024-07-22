@@ -51,7 +51,11 @@ class SessionManager:
         for result in self.sessions.where(filter=FieldFilter("curr_sid", "==", sid)).stream():
             room = result.to_dict()
             room["session_id"] = result.id
-            return room
+            return room 
+
+    def get_sid(self, session_id: str):
+        session_ref = self.sessions.document(session_id)
+        return session_ref.get().to_dict()['curr_sid']
 
     def get_username(self, session_id: str) -> str:
         session_ref = self.sessions.document(session_id)

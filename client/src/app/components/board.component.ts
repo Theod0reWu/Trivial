@@ -8,7 +8,7 @@ import {
 // import { NgOptimizedImage } from '@angular/common';
 import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule } from '@angular/common';
-import { Player } from '../api/GameData';
+import { Player, GameData } from '../api/GameData';
 
 @Component({
   selector: 'board-view',
@@ -25,6 +25,7 @@ export class BoardComponent implements AfterViewInit {
   @Input() numCols!: number;
   @Input() categories!: string[];
   @Input() prices!: number[];
+  @Input() gameData: GameData;
   @Output() gameStateChange = new EventEmitter<boolean>();
   /* 
   API get on init - who is currently choosing, board state, scores, players
@@ -35,11 +36,7 @@ export class BoardComponent implements AfterViewInit {
   }
 
   isChoosing = true; // temp var for player currently choosing
-
-  // numRows = 5;
-  // numCols = 6;
-  startingPrice = 200;
-  priceIncrement = 200;
+  picking = false;
 
   range(to: number): number[] {
     let x = [];
@@ -76,10 +73,14 @@ export class BoardComponent implements AfterViewInit {
     });
   }
 
-  onClickClue(event: MouseEvent) {
-    // TODO: confirm that it is the player's turn for who clicked first
+  onClickClue(event: MouseEvent): void {
+    if (!this.gameData.isPicker || this.picking) {
+      return;
+    }
+    this.picking = true;
     const target = event.target as HTMLElement;
     const clueBackground = document.querySelector('.clue-bg') as HTMLElement;
+    console.log(target.id);
 
     let isBorderVisible = false;
     const flickerInterval = 200;
@@ -103,6 +104,7 @@ export class BoardComponent implements AfterViewInit {
 
     setTimeout(() => {
       this.gameStateChange.emit(false);
+      this.picking = false;
       clueBackground.style.width = '0';
       clueBackground.style.height = '0';
     }, flickerDuration + 1000);

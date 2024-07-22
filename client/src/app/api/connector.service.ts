@@ -103,6 +103,13 @@ export class ConnectorService {
       },
     });
 
+    this.socketService.onPicker().subscribe({
+    	next: (value) => {
+    		this.gameData.isPicker = value;
+    		console.log(this.gameData.isPicker);
+    	}
+    });
+
     // setup for game state is being emitted
     this.gameStateChange$ = this.socketService.onGameState();
     this.gameStateChange$.subscribe({

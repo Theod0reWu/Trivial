@@ -3,7 +3,7 @@ import { Component, Input } from '@angular/core';
 import { PageStates } from '../app.component';
 import { BoardComponent } from './board.component';
 import { ClueComponent } from './clue.component';
-import { Player } from '../api/GameData';
+import { Player, GameData} from '../api/GameData';
 
 @Component({
   selector: 'game-view',
@@ -17,6 +17,7 @@ export class GameComponent {
   @Input() categoryTitles!: string[];
   @Input() players!: Player[];
   @Input() prices!: number[];
+  @Input() gameData!: GameData;
 
   boardView = true;
 

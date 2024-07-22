@@ -16,4 +16,5 @@ export class GameData {
 	prices: number[];
 
 	playerCash: number[];
+	isPicker: boolean;
 }

@@ -16,7 +16,7 @@
             [ngClass]="{ active: isChoosing }"
             class="clue"
             (click)="onClickClue($event)"
-            id="item"
+            [id]="item"
           >
             ${{ prices[item] }}
           </div>

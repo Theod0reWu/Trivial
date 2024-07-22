@@ -140,6 +140,11 @@ async def send_player_cash(room_id: str):
     session_id = [i.id for i in sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])]
     return game_manager.get_player_cash(room_id, session_id)
 
+async def send_picker(room_id: str):
+    picker_session_id = game_manager.get_picker(room_id)
+    sid = session_manager.get_sid(picker_session_id)
+    await  sio.emit("picker", True, to=sid)
+
 @sio.event
 async def connect(sid, environ, auth):
     print("connect ", sid)
@@ -220,6 +225,7 @@ async def start_game(sid, data):
         game_manager.start_game(room_id)
     await send_game_state(room_id, "board")
     await send_board_data(room_id)
+    await send_picker(room_id)
 
 if __name__ == "__main__":
     uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)

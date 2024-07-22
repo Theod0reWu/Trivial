@@ -86,6 +86,10 @@ export class SocketService {
     return this.onRecv('timer');
   }
 
+  onPicker(): Observable<any> {
+    return this.onRecv('picker');
+  }
+
   // Disconnect from the socket
   disconnect(): void {
     if (this.socket) {
