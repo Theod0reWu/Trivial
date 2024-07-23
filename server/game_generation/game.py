@@ -39,6 +39,7 @@ class Game(object):
 		self.player_cash = {i:0 for i in player_ids}
 		self.player_ids = player_ids
 		self.picker = random.choice(player_ids) # who's turn it is to pick
+		self.picking = {"category_idx": -1, "clue_idx": -1} # last clue picked
 
 		self.state = GameState.BOARD
 		if (use_json):
@@ -86,6 +87,7 @@ class Game(object):
 			"num_clues": self.num_clues,
 			"category_titles": self.board.category_titles,
 			"picked": array_to_dict(self.board.picked),
+			'picking': self.picking,
 
 			"picker": self.picker,
 			"state": self.state.value
@@ -102,6 +104,7 @@ class Game(object):
 			'category_titles': ['baseball', 'emotional intelligence'], 
 			'picked': {'0': {'0': False, '1': False, '2': False}, '1': {'0': False, '1': False, '2': False}}, 
 			'picker': random.choice(player_ids), 
+			'picking': {"category_idx": -1, "clue_idx": -1},
 			'state': 'board', 
 			'board_data': 
 			{

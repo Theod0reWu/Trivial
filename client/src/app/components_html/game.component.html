@@ -1,4 +1,4 @@
-@if (boardView) {
+@if (gameData.state === 'board') {
 <board-view
   (gameStateChange)="handleGameStateChange($event)"
   [players]="players"

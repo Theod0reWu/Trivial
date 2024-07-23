@@ -9,8 +9,9 @@ export interface Player {
   providedIn: 'root',
 })
 export class GameData {
-	numCategories = 0;
-	numClues = 0;
+	numCategories: number = 0;
+	numClues: number = 0;
+	state: string = '';
 
 	categoryTitles: string[];
 	prices: number[];

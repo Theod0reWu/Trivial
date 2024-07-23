@@ -19,6 +19,7 @@ import random
 import string
 from uuid import uuid4
 import json
+import asyncio
 
 @lru_cache
 def get_settings():
@@ -143,7 +144,7 @@ async def send_player_cash(room_id: str):
 async def send_picker(room_id: str):
     picker_session_id = game_manager.get_picker(room_id)
     sid = session_manager.get_sid(picker_session_id)
-    await  sio.emit("picker", True, to=sid)
+    await sio.emit("picker", True, to=sid)
 
 @sio.event
 async def connect(sid, environ, auth):
@@ -226,6 +227,29 @@ async def start_game(sid, data):
     await send_game_state(room_id, "board")
     await send_board_data(room_id)
     await send_picker(room_id)
+
+#### Timer settings ####
+# in seconds
+
+picked_time = 2
+
+### in-game events ####
+
+@sio.event
+async def board_choice(sid, data):
+    '''
+        Receives the picked clue card from the picker and sends out the clue to all the people in the room.
+    '''
+    print("board choice", data)
+    room_id, session_id, category_idx, clue_idx = data["room_id"], data["session_id"], data["category_idx"], data["clue_idx"]
+    clue = game_manager.pick(session_id, room_id, str(category_idx), str(clue_idx))
+    if (clue is None):
+        return
+    # send chosen coords and then send the clue itself
+    await sio.emit("picking", {"category_idx": category_idx, "clue_idx":clue_idx, "duration": picked_time}, room=room_id)
+    await asyncio.sleep(picked_time)
+    await sio.emit("game_state", "clue", room=room_id)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)

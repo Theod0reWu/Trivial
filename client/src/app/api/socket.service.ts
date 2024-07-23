@@ -39,6 +39,10 @@ export class SocketService {
     this.socket.emit('leave_room', { room_id: roomId, session_id: sessionId });
   }
 
+  sendBoardChoice(roomId: string, sessionId: string, category: number, clue: number): void {
+    this.socket.emit("board_choice", {room_id: roomId, session_id: sessionId, category_idx: category, clue_idx: clue});
+  }
+
   //start game
   startGame(
     roomId: string,
@@ -88,6 +92,10 @@ export class SocketService {
 
   onPicker(): Observable<any> {
     return this.onRecv('picker');
+  }
+
+  onPicking(): Observable<any> {
+    return this.onRecv('picking');
   }
 
   // Disconnect from the socket

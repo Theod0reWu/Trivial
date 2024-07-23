@@ -1,4 +1,10 @@
-import { Component, Input } from '@angular/core';
+import { 
+  Component, 
+  Input, 
+  Output, 
+  EventEmitter, 
+  ViewChild, 
+} from '@angular/core';
 // import { NgOptimizedImage } from '@angular/common';
 import { PageStates } from '../app.component';
 import { BoardComponent } from './board.component';
@@ -19,9 +25,15 @@ export class GameComponent {
   @Input() prices!: number[];
   @Input() gameData!: GameData;
 
-  boardView = true;
+  @Output() chosenClue = new EventEmitter<any>();
 
-  handleGameStateChange(boardView: boolean) {
-    this.boardView = boardView;
+  @ViewChild(BoardComponent) boardComponent!: BoardComponent; 
+
+  handleGameStateChange(data: any) {
+    this.chosenClue.emit({category: data.category, clue: data.clue});
+  }
+
+  startFlickerClue(category_idx: number, clue_idx: number, duration: number): void {
+    this.boardComponent.startFlickerClue(category_idx, clue_idx, duration);
   }
 }

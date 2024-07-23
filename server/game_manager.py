@@ -67,6 +67,24 @@ class GameManager(object):
 		room_data = room_ref.get().to_dict()
 		return room_data["picker"]
 
+	def pick(self, session_id: str, room_id:str, category_idx: str, clue_idx: str):
+		room_ref = self.rooms.document(room_id)
+		room_data = room_ref.get().to_dict()
+
+		# ensure session_id of the caller matches the picker
+		if (session_id != room_data["picker"]):
+			return None
+
+		picked = room_data["picked"][category_idx][clue_idx]
+		if (picked):
+			print("cannot pick board spot", category_idx, ",", clue_idx, "due to it already being picked.")
+			return None
+		else:
+			clue = room_data["board_data"][category_idx][int(clue_idx)]["clue"]
+			room_ref.update({"picked."+category_idx + "." + clue_idx: True})
+			room_ref.update({"picking.category_idx":category_idx, "picking.clue_idx": clue_idx});
+			return clue
+
 	# Create a callback on_snapshot function to capture changes
 	def on_snapshot(doc_snapshot, changes, read_time):
 	    for doc in doc_snapshot:

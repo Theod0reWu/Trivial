@@ -18,6 +18,8 @@
   [players]="connectorService.players"
   [prices]="connectorService.gameData.prices"
   [gameData]="connectorService.gameData"
+
+  (chosenClue)="handleChosenClue($event)"
   />
 }
 <div class="bg"></div>

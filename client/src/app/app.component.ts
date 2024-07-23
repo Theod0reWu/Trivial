@@ -29,13 +29,13 @@ export enum PageStates {
   styleUrl: './app.component.css',
 })
 export class AppComponent {
-  // constructor(private elementRef: ElementRef, private socketService: SocketService) {}
   constructor(
     private elementRef: ElementRef,
     public connectorService: ConnectorService,
-    // public gameData: GameData
   ) {}
+  @ViewChild(GameComponent) gameComponent: GameComponent;
   @ViewChild('bgOver') bgOverlay!: ElementRef;
+
   pageStates = PageStates;
   title = 'client';
   loadingMessage = '';
@@ -72,8 +72,18 @@ export class AppComponent {
           }
         },
       });
+
+      this.connectorService.pickingChange$.subscribe({
+        next: (value) => {
+          this.gameComponent.startFlickerClue(value["category_idx"], value["clue_idx"], value["duration"]);
+        }
+      });
     };
     this.connectorService.connectToRoom(callback);
+  }
+
+  handleChosenClue(data: any) {
+    this.connectorService.sendBoardChoice(data.category, data.clue);
   }
 
   handleChangeState(data: any) {

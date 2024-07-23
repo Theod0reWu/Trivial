@@ -10,6 +10,8 @@ import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule } from '@angular/common';
 import { Player, GameData } from '../api/GameData';
 
+const FLICKER_INTERVAL = 200;
+
 @Component({
   selector: 'board-view',
   standalone: true,
@@ -26,7 +28,7 @@ export class BoardComponent implements AfterViewInit {
   @Input() categories!: string[];
   @Input() prices!: number[];
   @Input() gameData: GameData;
-  @Output() gameStateChange = new EventEmitter<boolean>();
+  @Output() gameStateChange = new EventEmitter<any>();
   /* 
   API get on init - who is currently choosing, board state, scores, players
   On choice - which clue was chosen
@@ -36,7 +38,8 @@ export class BoardComponent implements AfterViewInit {
   }
 
   isChoosing = true; // temp var for player currently choosing
-  picking = false;
+  intervalId: any = null;
+  chosenClue: HTMLElement;
 
   range(to: number): number[] {
     let x = [];
@@ -74,39 +77,55 @@ export class BoardComponent implements AfterViewInit {
   }
 
   onClickClue(event: MouseEvent): void {
-    if (!this.gameData.isPicker || this.picking) {
+    if (!this.gameData.isPicker || this.intervalId) {
       return;
     }
-    this.picking = true;
-    const target = event.target as HTMLElement;
+    // get and send the chosen clue to the server
+    this.chosenClue = event.target as HTMLElement;
+
+    let index = Number(this.chosenClue.id)
+    let category_idx = Number(index) % this.numCols;
+    let clue_idx = Math.floor(Number(index) / this.numCols);
+    this.gameStateChange.emit({category: category_idx, clue: clue_idx});
+  }
+
+  startFlickerClue(category_idx: number, clue_idx: number, duration: number): void {
+    let total_idx = category_idx + clue_idx * this.numCols;
+    console.log(total_idx);
+    this.chosenClue = document.getElementById((total_idx).toString()) as HTMLElement;
+    this.startFlicker();
+
+    let realDuration = duration * 1000;
     const clueBackground = document.querySelector('.clue-bg') as HTMLElement;
-    console.log(target.id);
-
-    let isBorderVisible = false;
-    const flickerInterval = 200;
-    const flickerDuration = 2000;
-
-    const intervalId = setInterval(() => {
-      if (isBorderVisible) {
-        target.style.outline = 'none';
-      } else {
-        target.style.outline = '5px solid white';
-      }
-      isBorderVisible = !isBorderVisible;
-    }, flickerInterval);
-
     setTimeout(() => {
-      clearInterval(intervalId);
-      target.style.outline = 'none';
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+
+      this.chosenClue.style.outline = 'none';
       clueBackground.style.width = '100vw';
       clueBackground.style.height = '100vh';
-    }, flickerDuration);
+    }, realDuration / 2);
 
     setTimeout(() => {
-      this.gameStateChange.emit(false);
-      this.picking = false;
       clueBackground.style.width = '0';
       clueBackground.style.height = '0';
-    }, flickerDuration + 1000);
+    }, realDuration);
+  }
+
+  startFlicker(): void {
+    /*
+      Expects this.clueChosen to be set to the HTMLElement of the selected clue
+
+      sets this.intervalId
+    */
+    let isBorderVisible = false;
+    this.intervalId = setInterval(() => {
+      if (isBorderVisible) {
+        this.chosenClue.style.outline = 'none';
+      } else {
+        this.chosenClue.style.outline = '5px solid white';
+      }
+      isBorderVisible = !isBorderVisible;
+    }, FLICKER_INTERVAL);
   }
 }
