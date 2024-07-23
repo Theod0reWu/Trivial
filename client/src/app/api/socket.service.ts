@@ -98,6 +98,10 @@ export class SocketService {
     return this.onRecv('picking');
   }
 
+  onClue(): Observable<any> {
+    return this.onRecv('clue');
+  }
+
   // Disconnect from the socket
   disconnect(): void {
     if (this.socket) {

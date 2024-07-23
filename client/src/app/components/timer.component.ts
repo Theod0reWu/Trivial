@@ -22,7 +22,6 @@ export class TimerComponent {
 
   updateTimer(){
     const timerContainer = document.querySelector('.timer') as HTMLElement;
-    // @ViewChild(".timer") private parentRef: ElementRef<HTMLElement>;
 
     for (var i = 0; i < 9; ++i){
       const child = timerContainer.children[i] as HTMLElement;

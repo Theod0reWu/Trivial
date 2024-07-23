@@ -36,10 +36,9 @@ export class AppComponent {
   @ViewChild(GameComponent) gameComponent: GameComponent;
   @ViewChild('bgOver') bgOverlay!: ElementRef;
 
-  pageStates = PageStates;
-  title = 'client';
   loadingMessage = '';
 
+  pageStates = PageStates;
   state = this.pageStates.Landing;
 
   ngOnInit(): void {

@@ -23,6 +23,7 @@ enum BannerStates {
 export class ClueComponent {
   @Input() players!: Player[];
   @Input() scores!: number[];
+  @Input() clue!: string;
   @Output() gameStateChange = new EventEmitter<boolean>();
 
   updateTimer(){
@@ -37,7 +38,4 @@ export class ClueComponent {
 
   timerFraction = .5;
 
-  // temp clue
-  clue =
-    'This city, known for its stunning architecture and rich history, is home to the iconic Brandenburg Gate and the Reichstag building.';
 }

@@ -18,4 +18,6 @@ export class GameData {
 
 	playerCash: number[];
 	isPicker: boolean;
+
+	current_clue: string;
 }

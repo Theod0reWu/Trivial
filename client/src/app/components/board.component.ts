@@ -91,7 +91,6 @@ export class BoardComponent implements AfterViewInit {
 
   startFlickerClue(category_idx: number, clue_idx: number, duration: number): void {
     let total_idx = category_idx + clue_idx * this.numCols;
-    console.log(total_idx);
     this.chosenClue = document.getElementById((total_idx).toString()) as HTMLElement;
     this.startFlicker();
 

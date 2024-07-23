@@ -232,6 +232,7 @@ async def start_game(sid, data):
 # in seconds
 
 picked_time = 2
+clue_time = 5
 
 ### in-game events ####
 
@@ -249,6 +250,7 @@ async def board_choice(sid, data):
     await sio.emit("picking", {"category_idx": category_idx, "clue_idx":clue_idx, "duration": picked_time}, room=room_id)
     await asyncio.sleep(picked_time)
     await sio.emit("game_state", "clue", room=room_id)
+    await sio.emit("clue", {"clue": clue, "duration": clue_time}, room=room_id)
 
 
 if __name__ == "__main__":

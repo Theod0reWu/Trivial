@@ -137,6 +137,12 @@ export class ConnectorService {
     });
 
     this.pickingChange$ = this.socketService.onPicking();
+
+ 		this.socketService.onClue().subscribe({
+ 			next: (value) => {
+ 				this.gameData.current_clue = value["clue"];
+ 			}
+ 		})
   }
 
   connectToRoom(callback: Function): boolean {
