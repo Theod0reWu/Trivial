@@ -98,7 +98,7 @@ export class BoardComponent implements AfterViewInit {
     const clueBackground = document.querySelector('.clue-bg') as HTMLElement;
     setTimeout(() => {
       clearInterval(this.intervalId);
-      this.intervalId = null;
+      // this.intervalId = null;
 
       this.chosenClue.style.outline = 'none';
       clueBackground.style.width = '100vw';
@@ -106,6 +106,7 @@ export class BoardComponent implements AfterViewInit {
     }, realDuration / 2);
 
     setTimeout(() => {
+      this.intervalId = null;
       clueBackground.style.width = '0';
       clueBackground.style.height = '0';
     }, realDuration);

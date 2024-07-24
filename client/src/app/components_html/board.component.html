@@ -14,7 +14,7 @@
         >
           <div
             [ngClass]="{ active: isChoosing }"
-            [ngStyle]="{'pointer-events': gameData.isPicker && !intervalId ? 'auto' : 'none'}"
+            [ngStyle]="{'pointer-events': gameData.isPicker && !intervalId && gameData.state === 'board' ? 'auto' : 'none'}"
             class="clue"
             (click)="onClickClue($event)"
             [id]="item"

@@ -63,11 +63,17 @@ class GameManager(object):
 		return [room_data[i] for i in player_ids]
 
 	def get_picker(self, room_id: str):
+		'''
+			Returns the session_id of the picker
+		'''
 		room_ref = self.rooms.document(room_id)
 		room_data = room_ref.get().to_dict()
 		return room_data["picker"]
 
 	def pick(self, session_id: str, room_id:str, category_idx: str, clue_idx: str):
+		'''
+			Picks the clue located at category_idx and clue_idx
+		'''
 		room_ref = self.rooms.document(room_id)
 		room_data = room_ref.get().to_dict()
 

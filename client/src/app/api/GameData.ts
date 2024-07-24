@@ -20,4 +20,5 @@ export class GameData {
 	isPicker: boolean;
 
 	current_clue: string;
+	buzz_in_duration: number;
 }

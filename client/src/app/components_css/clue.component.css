@@ -176,3 +176,16 @@
   background-color: var(--black-transparent-75);
   margin-bottom: 50px;
 }
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: var(--black);
+  position: fixed; 
+  bottom:0%;
+}
+
+.progress-bar-fill {
+  background-color: var(--red);
+  height: 100%; /* This is important */
+}

@@ -28,6 +28,7 @@ export class GameComponent {
   @Output() chosenClue = new EventEmitter<any>();
 
   @ViewChild(BoardComponent) boardComponent!: BoardComponent; 
+  @ViewChild(ClueComponent) clueComponent!: ClueComponent;
 
   handleGameStateChange(data: any) {
     this.chosenClue.emit({category: data.category, clue: data.clue});
@@ -35,5 +36,9 @@ export class GameComponent {
 
   startFlickerClue(category_idx: number, clue_idx: number, duration: number): void {
     this.boardComponent.startFlickerClue(category_idx, clue_idx, duration);
+  }
+
+  startProgressBar(duration: number): void {
+    this.clueComponent.startProgressBar(duration);
   }
 }

@@ -34,9 +34,10 @@ export class ConnectorService {
 			categoryTitles
 			prices
   */
-  gameData = new GameData();
+  gameData: GameData = new GameData();
 
   pickingChange$: Observable<any>;
+  clueChange$: Observable<any>;
 
   loading = false;
 
@@ -137,12 +138,7 @@ export class ConnectorService {
     });
 
     this.pickingChange$ = this.socketService.onPicking();
-
- 		this.socketService.onClue().subscribe({
- 			next: (value) => {
- 				this.gameData.current_clue = value["clue"];
- 			}
- 		})
+    this.clueChange$ = this.socketService.onClue();
   }
 
   connectToRoom(callback: Function): boolean {

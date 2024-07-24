@@ -3,6 +3,12 @@ from firebase_admin import firestore
 from session_manager import SessionManager
 from typing import Callable
 
+import random
+import time
+from timer import create_timer, CHECK_FREQUENCY
+
+BUZZ_IN_TIMER_NAME = "buzz_in_timer"
+
 class Room:
     def __init__(self, state: str = "pregame", curr_connections: list[str] = None, 
                  all_connections: set[str] = None):
@@ -70,12 +76,15 @@ class RoomManager:
         room_ref.update({"curr_connections": room["curr_connections"], "all_connections": room["all_connections"]})
     
     def leave_room(self, room_id: str, session_id: str, session_manager: SessionManager) -> str:
-        # returns sid of current or newly elected host
+        '''
+            returns sid of current or newly elected host and the sid of a new picker (if one is needed)
+            returns None is either can't be done
+
+        '''
         print(f"{session_id} left the room")
         room_ref = self.rooms.document(room_id)
         room = room_ref.get().to_dict()
         if room:
-            host = room["host"]
             if (session_id in room["curr_connections"]):
                 room["curr_connections"].remove(session_id)
             if (not room["curr_connections"]):
@@ -83,14 +92,21 @@ class RoomManager:
                 room_ref.delete()
             else:
                 room_ref.update({"curr_connections": room["curr_connections"]})
-
+                new_host = None
+                new_picker = None
                 # appoint a new host
-                if (host == session_id):
-                    new_host = sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])[0]
-                    room_ref.update({"host": new_host["session_id"]})
-                    host = new_host["curr_sid"]
-            return host
-        return ""
+                if (room["host"] == session_id):
+                    new_host_data = sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])[0]
+                    room_ref.update({"host": new_host_data["session_id"]})
+                    new_host = new_host_data["curr_sid"]
+
+                # appoint a new picker
+                if ("picker" in room and session_id == room["picker"] and room["state"] == "board"):
+                    new_picker = random.choice(room["curr_connections"])
+                    room_ref.update({"picker": new_picker})
+                    new_picker = session_manager.get_sid(new_picker)
+                return new_host, new_picker
+        return None, None
     
     def get_room_by_id(self, room_id: str) -> dict:
         room_ref = self.rooms.document(room_id)
@@ -109,3 +125,44 @@ class RoomManager:
     def is_valid_room(self, room_id: str) -> bool:
         rooms = self.get_rooms()
         return room_id in rooms
+
+    def init_buzz_in_timer(self, room_id: str, duration: float):
+        room_ref = self.rooms.document(room_id)
+        timer = create_timer(duration)
+        room_ref.update({BUZZ_IN_TIMER_NAME: timer})
+        return timer
+
+    def check_buzz_in_timer(self, time: float, room_id:str):
+        '''
+            Two cases:
+            1. timer is active (no pause), continue the timer until the end
+            2. timer is paused, wait for the timer to unpause, then continue the timer 
+        '''
+        room_ref = self.rooms.document(room_id)
+        timer_data = room_ref.get().to_dict()[BUZZ_IN_TIMER_NAME]
+
+        if (timer_data["active"]):
+            if (time >= timer_data["end"]):
+                return False, 0
+            else:
+                return True, timer_data["end"] - time
+        else:
+            # timer is currently paused (check if unpaused)
+            return True, CHECK_FREQUENCY
+
+    def get_timer(self, room_id: str, timer_name: str):
+         room_ref = self.rooms.document(room_id)
+         return room_ref.get()[timer_name]
+
+    def pause_buzz_in_timer(self, room_id: str):
+        room_ref = self.rooms.document(room_id)
+        room_ref.update({BUZZ_IN_TIMER_NAME + ".active": False, BUZZ_IN_TIMER_NAME + ".pause_start": time.time()})
+
+    def restart_buzz_in_timer(self, room_id: str):
+        room_ref = self.rooms.document(room_id)
+        timer_data = room_ref.get()[BUZZ_IN_TIMER_NAME]
+        room_ref.update({
+            BUZZ_IN_TIMER_NAME + ".active": True, 
+            BUZZ_IN_TIMER_NAME + ".end": timer_data["end"]  - timer_data["pause_start"] + time.time()
+            })
+        

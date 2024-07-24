@@ -13,6 +13,7 @@ from room_manager import RoomManager
 from session_manager import SessionManager
 from game_manager import GameManager
 from config import Settings
+from timer import run_timer
 
 # built-in libraries
 import random
@@ -20,6 +21,7 @@ import string
 from uuid import uuid4
 import json
 import asyncio
+import time
 
 @lru_cache
 def get_settings():
@@ -146,6 +148,22 @@ async def send_picker(room_id: str):
     sid = session_manager.get_sid(picker_session_id)
     await sio.emit("picker", True, to=sid)
 
+async def handle_leaving_room(room_id: str, session_id: str):
+    '''
+        Leaves the room in the database (handles things like the new host and new picker)
+    '''
+    host, picker = room_manager.leave_room(room_id, session_id, session_manager)
+    if (host):
+        await sio.emit("host", to=host)
+    if (picker):
+        await sio.emit("picker", True, to=picker)
+    await send_players(session_id)
+
+async def send_timer(room_id: str, timer_name: str, timer_data: dict = None):
+    if (not timer_data):
+        await sio.emit(timer_name, timer_data, room=room_id)
+    await sio.emit(timer_name, room_manager.get_timer(room_id, timer_name), room=room_id)
+
 @sio.event
 async def connect(sid, environ, auth):
     print("connect ", sid)
@@ -160,10 +178,7 @@ async def connect(sid, environ, auth):
 async def disconnect(sid):
     room = session_manager.get_room_by_sid(sid)
     if room:
-        host = room_manager.leave_room(room["room_id"], room["session_id"], session_manager)
-        if (host):
-            await sio.emit("host", to=host)
-        await send_players(room["room_id"])
+        await handle_leaving_room(room["room_id"], room["session_id"])
     print('disconnect ', sid)
 
 @sio.event
@@ -200,13 +215,12 @@ async def leave_room(sid, data):
     room_id = data['room_id']
     session_id = data['session_id']
 
-    host = room_manager.leave_room(room_id, session_id, session_manager)
-    if (host):
-        await sio.emit("host", to=host)
+    await handle_leaving_room(room_id, session_id)
+
+    # remove session and remove from sio room
     session_manager.delete_session(session_id)
-    
     await sio.leave_room(sid, room_id)
-    await send_players(room_id)
+
     print(f"User {session_id} left room {room_id}")
 
 @sio.event
@@ -232,7 +246,8 @@ async def start_game(sid, data):
 # in seconds
 
 picked_time = 2
-clue_time = 5
+answer_time = 5
+buzz_in_time = 10
 
 ### in-game events ####
 
@@ -246,11 +261,28 @@ async def board_choice(sid, data):
     clue = game_manager.pick(session_id, room_id, str(category_idx), str(clue_idx))
     if (clue is None):
         return
+
     # send chosen coords and then send the clue itself
     await sio.emit("picking", {"category_idx": category_idx, "clue_idx":clue_idx, "duration": picked_time}, room=room_id)
     await asyncio.sleep(picked_time)
+
+    # start the buzzer timer
+    timer = room_manager.init_buzz_in_timer(room_id, buzz_in_time)
     await sio.emit("game_state", "clue", room=room_id)
-    await sio.emit("clue", {"clue": clue, "duration": clue_time}, room=room_id)
+    await sio.emit("clue", {"clue": clue, "duration": buzz_in_time}, room=room_id)
+    
+
+    await run_timer(buzz_in_time, room_manager.check_buzz_in_timer, {"room_id": room_id})
+    await sio.emit("game_state", "board", room=room_id)
+
+@sio.event
+async def buzz_in(sid, data):
+    '''
+        someone buzzes in on a clue
+    '''
+    room_id, session_id = data["room_id"], data["session_id"]
+    room_manager.pause_buzz_in_timer(room_id)
+
 
 
 if __name__ == "__main__":

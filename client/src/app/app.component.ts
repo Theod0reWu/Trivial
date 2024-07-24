@@ -77,6 +77,14 @@ export class AppComponent {
           this.gameComponent.startFlickerClue(value["category_idx"], value["clue_idx"], value["duration"]);
         }
       });
+
+      this.connectorService.clueChange$.subscribe({
+        next: (value) => {
+          this.connectorService.gameData.current_clue = value["clue"];
+          this.connectorService.gameData.buzz_in_duration = value["duration"];
+          this.gameComponent.startProgressBar(value["duration"]);
+        }
+      });
     };
     this.connectorService.connectToRoom(callback);
   }
