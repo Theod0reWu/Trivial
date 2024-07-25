@@ -26,14 +26,6 @@ export class ConnectorService {
   socketConnected = false;
 
   gameStateChange$: Observable<any>;
-  /*
-  	game data will contain:
-  		numCategories
-  		numClues
-			
-			categoryTitles
-			prices
-  */
   gameData: GameData = new GameData();
 
   pickingChange$: Observable<any>;
@@ -78,6 +70,10 @@ export class ConnectorService {
 
   sendBoardChoice(category: number, clue: number): void {
   	this.socketService.sendBoardChoice(this.roomId, this.sessionId, category, clue);
+  }
+
+  sendBuzzIn(): void {
+  	this.socketService.sendBuzzIn(this.roomId, this.sessionId);
   }
 
   setupSocketEvents(): void {
@@ -139,6 +135,13 @@ export class ConnectorService {
 
     this.pickingChange$ = this.socketService.onPicking();
     this.clueChange$ = this.socketService.onClue();
+
+    this.socketService.onPickerIndex().subscribe({
+    	next: (value) => {
+    		this.gameData.pickerIndex = value;
+    		console.log("picker:", value);
+    	}
+    })
   }
 
   connectToRoom(callback: Function): boolean {

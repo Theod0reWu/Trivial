@@ -25,14 +25,30 @@ export class ClueComponent {
   @Input() scores!: number[];
   @Input() clue!: string;
   @Output() gameStateChange = new EventEmitter<boolean>();
+  @Output() onBuzzIn: EventEmitter<void> = new EventEmitter<void>();
 
   progress: number = 0;
   start_time: number;
   progress_interval: any;
+  public buzzedIn: boolean = false;
+
+  answer_progress: number = 0;
+
+  sendBuzzIn(): void {
+    if (!this.buzzedIn){
+      this.onBuzzIn.emit();
+      this.buzzedIn = true;
+
+      clearInterval(this.progress_interval)
+    }
+  }
 
   startProgressBar(duration: number): void {
     this.start_time = new Date().getTime();
+    this.runProgressBar(duration);
+  }
 
+  runProgressBar(duration: number): void {
     this.progress_interval = setInterval(() => {
       let time = new Date().getTime();
       this.progress = (time - this.start_time) / (1000 * duration);
@@ -40,14 +56,14 @@ export class ClueComponent {
 
     setTimeout(() => {
       clearInterval(this.progress_interval);
-    }, duration * 1000);
+    }, duration * 1000 - (new Date().getTime() - this.start_time));
   }
 
   updateTimer(){
     const timerContainer = document.querySelector('.timer') as HTMLElement;
   }
   
-  BannerType = BannerStates
+  BannerType = BannerStates;
   banner = BannerStates.AltAnswering;
 
   bannerText = "Who/What is Berlin?";

@@ -140,13 +140,22 @@ async def send_player_cash(room_id: str):
     room = room_manager.get_room_by_id(room_id)
     if (not room):
         return
-    session_id = [i.id for i in sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])]
+    session_id = [i["session_id"] for i in sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])]
     return game_manager.get_player_cash(room_id, session_id)
 
-async def send_picker(room_id: str):
-    picker_session_id = game_manager.get_picker(room_id)
+async def send_picker(room_id: str, picker_session_id = None):
+    '''
+        sends to the sid of the person who will pick
+        also sends the index of the person to pick
+    '''
+    if (not picker_session_id):
+        picker_session_id = game_manager.get_picker(room_id)
     sid = session_manager.get_sid(picker_session_id)
     await sio.emit("picker", True, to=sid)
+    room = room_manager.get_room_by_id(room_id)
+    players = [i["session_id"] for i in sorted(session_manager.get_sessions(room["curr_connections"]), key=lambda s: s["timestamp"])]
+    await sio.emit("picker_index", players.index(picker_session_id), room=room_id)
+
 
 async def handle_leaving_room(room_id: str, session_id: str):
     '''
@@ -156,8 +165,10 @@ async def handle_leaving_room(room_id: str, session_id: str):
     if (host):
         await sio.emit("host", to=host)
     if (picker):
-        await sio.emit("picker", True, to=picker)
-    await send_players(session_id)
+        print("picker:", picker)
+        await send_picker(room_id, picker)
+    await send_players(room_id)
+    # needs handle sending player cash and if someone leaves in the clue game state
 
 async def send_timer(room_id: str, timer_name: str, timer_data: dict = None):
     if (not timer_data):
@@ -271,7 +282,6 @@ async def board_choice(sid, data):
     await sio.emit("game_state", "clue", room=room_id)
     await sio.emit("clue", {"clue": clue, "duration": buzz_in_time}, room=room_id)
     
-
     await run_timer(buzz_in_time, room_manager.check_buzz_in_timer, {"room_id": room_id})
     await sio.emit("game_state", "board", room=room_id)
 
@@ -281,8 +291,8 @@ async def buzz_in(sid, data):
         someone buzzes in on a clue
     '''
     room_id, session_id = data["room_id"], data["session_id"]
+    #TODO: check if session id is in the room
     room_manager.pause_buzz_in_timer(room_id)
-
 
 
 if __name__ == "__main__":

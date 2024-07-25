@@ -18,7 +18,10 @@ export class GameData {
 
 	playerCash: number[];
 	isPicker: boolean;
+	pickerIndex: number;
 
 	current_clue: string;
 	buzz_in_duration: number;
+
+	picked: {string : {string: number}};
 }

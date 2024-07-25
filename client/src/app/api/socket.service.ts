@@ -43,6 +43,10 @@ export class SocketService {
     this.socket.emit("board_choice", {room_id: roomId, session_id: sessionId, category_idx: category, clue_idx: clue});
   }
 
+  sendBuzzIn(roomId: string, sessionId: string): void {
+    this.socket.emit("buzz_in", {room_id: roomId, session_id: sessionId});
+  }
+
   //start game
   startGame(
     roomId: string,
@@ -92,6 +96,10 @@ export class SocketService {
 
   onPicker(): Observable<any> {
     return this.onRecv('picker');
+  }
+
+  onPickerIndex(): Observable<any> {
+    return this.onRecv('picker_index');
   }
 
   onPicking(): Observable<any> {

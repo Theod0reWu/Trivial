@@ -26,6 +26,7 @@ export class GameComponent {
   @Input() gameData!: GameData;
 
   @Output() chosenClue = new EventEmitter<any>();
+  @Output() onBuzzIn = new EventEmitter<void>();
 
   @ViewChild(BoardComponent) boardComponent!: BoardComponent; 
   @ViewChild(ClueComponent) clueComponent!: ClueComponent;
@@ -35,10 +36,16 @@ export class GameComponent {
   }
 
   startFlickerClue(category_idx: number, clue_idx: number, duration: number): void {
+    // a clue has been chosen flicker the chosen clue
     this.boardComponent.startFlickerClue(category_idx, clue_idx, duration);
   }
 
   startProgressBar(duration: number): void {
     this.clueComponent.startProgressBar(duration);
+    this.clueComponent.buzzedIn = false;
+  }
+
+  handleBuzzIn(): void {
+    this.onBuzzIn.emit();
   }
 }

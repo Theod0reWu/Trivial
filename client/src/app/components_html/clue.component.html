@@ -19,7 +19,7 @@
     }
 
     <div class="button-panel">
-      <div class="button">Buzz In</div>
+      <div class="button" (click)="sendBuzzIn()" [ngStyle]= "{'background-color': buzzedIn ? 'var(--dangererer)' : 'var(--red)'}">Buzz In</div>
     </div>
   </div>
   <div class="players">

@@ -93,6 +93,10 @@ export class AppComponent {
     this.connectorService.sendBoardChoice(data.category, data.clue);
   }
 
+  handleBuzzIn(): void {
+    this.connectorService.sendBuzzIn();
+  }
+
   handleChangeState(data: any) {
     switch (data.state) {
       case PageStates.Landing: {

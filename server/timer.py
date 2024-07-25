@@ -9,12 +9,17 @@ def create_timer(duration: float):
 		"start": now,
 		"end": now + duration,
 		"pause_start": None,
-		"active": True
+		"active": True,
+		"winner": None
 	}
 
 async def run_timer(duration: float, callback: callable, parameters):
 	proceed = True
 	while (proceed):
 		await asyncio.sleep(duration)
-		proceed, duration = callback(time.time(), **parameters)
-		
+
+		#  catch if the room is empty/deleted but timer is still going (gracefully close the timer)
+		try:
+			proceed, duration = callback(time.time(), **parameters)
+		except TypeError:
+			return

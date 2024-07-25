@@ -11,6 +11,7 @@
 } @else {
 <clue-view
   (gameStateChange)="handleGameStateChange($event)"
+  (onBuzzIn)="handleBuzzIn()"
   [players]="players"
   [clue]="gameData.current_clue"
 />

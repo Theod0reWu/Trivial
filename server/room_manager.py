@@ -77,7 +77,7 @@ class RoomManager:
     
     def leave_room(self, room_id: str, session_id: str, session_manager: SessionManager) -> str:
         '''
-            returns sid of current or newly elected host and the sid of a new picker (if one is needed)
+            returns sid of current or newly elected host and the session_id of a new picker (if one is needed)
             returns None is either can't be done
 
         '''
@@ -104,7 +104,7 @@ class RoomManager:
                 if ("picker" in room and session_id == room["picker"] and room["state"] == "board"):
                     new_picker = random.choice(room["curr_connections"])
                     room_ref.update({"picker": new_picker})
-                    new_picker = session_manager.get_sid(new_picker)
+                    # new_picker = session_manager.get_sid(new_picker)
                 return new_host, new_picker
         return None, None
     
@@ -148,6 +148,7 @@ class RoomManager:
                 return True, timer_data["end"] - time
         else:
             # timer is currently paused (check if unpaused)
+            # use onSnapshot for this to change it (currently uses too any calls)
             return True, CHECK_FREQUENCY
 
     def get_timer(self, room_id: str, timer_name: str):
