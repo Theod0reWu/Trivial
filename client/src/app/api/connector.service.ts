@@ -30,6 +30,8 @@ export class ConnectorService {
 
   pickingChange$: Observable<any>;
   clueChange$: Observable<any>;
+  pausedChange$: Observable<any>;
+  answeringChange$: Observable<any>;
 
   loading = false;
 
@@ -135,6 +137,8 @@ export class ConnectorService {
 
     this.pickingChange$ = this.socketService.onPicking();
     this.clueChange$ = this.socketService.onClue();
+    this.pausedChange$ = this.socketService.onPaused();
+    this.answeringChange$ = this.socketService.onAnswering();
 
     this.socketService.onPickerIndex().subscribe({
     	next: (value) => {

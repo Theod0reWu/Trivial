@@ -45,6 +45,18 @@ export class GameComponent {
     this.clueComponent.buzzedIn = false;
   }
 
+  pauseProgressBar(): void {
+    this.clueComponent.pauseProgressBar();
+  }
+
+  resumeProgressBar(duration:number): void {
+    this.clueComponent.runProgressBar(duration, this.clueComponent.progress);
+  }
+
+  startAnswering(duration: number): void {
+    this.clueComponent.banner = this.clueComponent.BannerType.Answering;
+  }
+
   handleBuzzIn(): void {
     this.onBuzzIn.emit();
   }

@@ -14,13 +14,17 @@
         <timer />
       </div>
     }
-    @else {
-      <div class="banner" [style.opacity] = 0></div>
+    @else if (banner === BannerType.Answering) {
+      <div class="answering-form">
+        <div class="who-or-what"> Who/What is: </div>
+        <input placeholder="your answer">
+      </div>
     }
-
-    <div class="button-panel">
-      <div class="button" (click)="sendBuzzIn()" [ngStyle]= "{'background-color': buzzedIn ? 'var(--dangererer)' : 'var(--red)'}">Buzz In</div>
-    </div>
+    @else {
+      <div class="button-panel">
+        <div class="button" (click)="sendBuzzIn()" [ngStyle]= "{'background-color': buzzedIn ? 'var(--dangererer)' : 'var(--red)'}">Buzz In</div>
+      </div>
+    }
   </div>
   <div class="players">
     <div class="players-container">

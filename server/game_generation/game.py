@@ -37,6 +37,7 @@ class Game(object):
 		self.board = Board(num_categories, num_clues)
 
 		self.player_cash = {i:0 for i in player_ids}
+		self.answered = []#{i:False for i in player_ids}
 		self.player_ids = player_ids
 		self.picker = random.choice(player_ids) # who's turn it is to pick
 		self.picking = {"category_idx": -1, "clue_idx": -1} # last clue picked
@@ -86,10 +87,12 @@ class Game(object):
 			"num_categories": self.num_categories,
 			"num_clues": self.num_clues,
 			"category_titles": self.board.category_titles,
+
 			"picked": array_to_dict(self.board.picked),
 			'picking': self.picking,
-
 			"picker": self.picker,
+			"answered": self.answered,
+
 			"state": self.state.value
 		}
 		data["board_data"] = self.board.to_dict()
@@ -105,6 +108,7 @@ class Game(object):
 			'picked': {'0': {'0': False, '1': False, '2': False}, '1': {'0': False, '1': False, '2': False}}, 
 			'picker': random.choice(player_ids), 
 			'picking': {"category_idx": -1, "clue_idx": -1},
+			'answered': [],
 			'state': 'board', 
 			'board_data': 
 			{

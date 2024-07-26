@@ -110,6 +110,14 @@ export class SocketService {
     return this.onRecv('clue');
   }
 
+  onPaused(): Observable<any> {
+    return this.onRecv('paused');
+  }
+
+  onAnswering(): Observable<any> {
+    return this.onRecv('answering');
+  }
+
   // Disconnect from the socket
   disconnect(): void {
     if (this.socket) {

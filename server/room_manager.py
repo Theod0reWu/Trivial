@@ -4,10 +4,6 @@ from session_manager import SessionManager
 from typing import Callable
 
 import random
-import time
-from timer import create_timer, CHECK_FREQUENCY
-
-BUZZ_IN_TIMER_NAME = "buzz_in_timer"
 
 class Room:
     def __init__(self, state: str = "pregame", curr_connections: list[str] = None, 
@@ -126,44 +122,5 @@ class RoomManager:
         rooms = self.get_rooms()
         return room_id in rooms
 
-    def init_buzz_in_timer(self, room_id: str, duration: float):
-        room_ref = self.rooms.document(room_id)
-        timer = create_timer(duration)
-        room_ref.update({BUZZ_IN_TIMER_NAME: timer})
-        return timer
 
-    def check_buzz_in_timer(self, time: float, room_id:str):
-        '''
-            Two cases:
-            1. timer is active (no pause), continue the timer until the end
-            2. timer is paused, wait for the timer to unpause, then continue the timer 
-        '''
-        room_ref = self.rooms.document(room_id)
-        timer_data = room_ref.get().to_dict()[BUZZ_IN_TIMER_NAME]
-
-        if (timer_data["active"]):
-            if (time >= timer_data["end"]):
-                return False, 0
-            else:
-                return True, timer_data["end"] - time
-        else:
-            # timer is currently paused (check if unpaused)
-            # use onSnapshot for this to change it (currently uses too any calls)
-            return True, CHECK_FREQUENCY
-
-    def get_timer(self, room_id: str, timer_name: str):
-         room_ref = self.rooms.document(room_id)
-         return room_ref.get()[timer_name]
-
-    def pause_buzz_in_timer(self, room_id: str):
-        room_ref = self.rooms.document(room_id)
-        room_ref.update({BUZZ_IN_TIMER_NAME + ".active": False, BUZZ_IN_TIMER_NAME + ".pause_start": time.time()})
-
-    def restart_buzz_in_timer(self, room_id: str):
-        room_ref = self.rooms.document(room_id)
-        timer_data = room_ref.get()[BUZZ_IN_TIMER_NAME]
-        room_ref.update({
-            BUZZ_IN_TIMER_NAME + ".active": True, 
-            BUZZ_IN_TIMER_NAME + ".end": timer_data["end"]  - timer_data["pause_start"] + time.time()
-            })
         

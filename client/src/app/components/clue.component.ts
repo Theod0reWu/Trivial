@@ -38,20 +38,22 @@ export class ClueComponent {
     if (!this.buzzedIn){
       this.onBuzzIn.emit();
       this.buzzedIn = true;
-
-      clearInterval(this.progress_interval)
     }
   }
 
-  startProgressBar(duration: number): void {
-    this.start_time = new Date().getTime();
-    this.runProgressBar(duration);
+  pauseProgressBar(): void {  
+    clearInterval(this.progress_interval);
   }
 
-  runProgressBar(duration: number): void {
+  startProgressBar(duration: number): void {
+    this.runProgressBar(duration, 0);
+  }
+
+  runProgressBar(duration: number, initial_progress: number): void {
+    this.start_time = new Date().getTime();
     this.progress_interval = setInterval(() => {
       let time = new Date().getTime();
-      this.progress = (time - this.start_time) / (1000 * duration);
+      this.progress = (time - this.start_time) / (1000 * duration) + initial_progress;
     }, 17);
 
     setTimeout(() => {
@@ -64,7 +66,7 @@ export class ClueComponent {
   }
   
   BannerType = BannerStates;
-  banner = BannerStates.AltAnswering;
+  banner = BannerStates.Empty;
 
   bannerText = "Who/What is Berlin?";
   answeringText = "Team 1 is answering";

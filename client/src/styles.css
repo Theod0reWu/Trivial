@@ -16,6 +16,7 @@ body {
 
 :root {
   --transparent: rgba(0, 0, 0, 0);
+  --white-transparent-10: rgba(255, 255, 255, 0.10);
   --white-transparent-25: rgba(255, 255, 255, 0.25);
   --white-transparent-50: rgba(255, 255, 255, 0.5);
   --white-transparent-75: rgba(255, 255, 255, 0.75);

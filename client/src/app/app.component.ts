@@ -85,6 +85,18 @@ export class AppComponent {
           this.gameComponent.startProgressBar(value["duration"]);
         }
       });
+
+      this.connectorService.pausedChange$.subscribe({
+        next: (value: any) => {
+          this.gameComponent.pauseProgressBar();
+        }
+      });
+
+      this.connectorService.answeringChange$.subscribe({
+        next: (value: any) => {
+          this.gameComponent.startAnswering(value["duration"]);
+        }
+      })
     };
     this.connectorService.connectToRoom(callback);
   }
