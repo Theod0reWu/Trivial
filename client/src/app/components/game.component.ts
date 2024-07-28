@@ -56,10 +56,8 @@ export class GameComponent {
   }
 
   otherAnswering(): void {
-    console.log("altanswering");
     this.clueComponent.answeringText = this.players[this.gameData.answeringIndex].username + " is answering.";
     this.clueComponent.banner = this.clueComponent.BannerType.AltAnswering;
-    console.log("alt done")
   }
 
   resumeProgressBar(duration:number): void {

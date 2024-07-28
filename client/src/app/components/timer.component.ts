@@ -33,10 +33,8 @@ export class TimerComponent {
   endColor = [122, 114, 114];
 
   ngAfterViewInit(): void{
-    console.log("timer init");
     this.onMessage$.subscribe({
       next: (value) => {
-        console.log(value);
         if (value["action"] === "start") {
           this.start(value["duration"]);
         }

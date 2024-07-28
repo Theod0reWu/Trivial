@@ -99,6 +99,7 @@ export class AppComponent {
             this.gameComponent.startAnsweringTimer(value["duration"]);
           } else if (value["action"] === "stop") {
             //stop pausing go back to buzzer page and resume the progress bar
+            this.gameComponent.gameData.answering = false;
             this.gameComponent.unpause(value["duration"]);
           }
         }
