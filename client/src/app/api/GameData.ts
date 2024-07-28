@@ -24,5 +24,6 @@ export class GameData {
 	buzz_in_duration: number;
 
 	picked: {string : {string: number}};
-	paused = false;
+	answering = false;
+	answeringIndex:number;
 }

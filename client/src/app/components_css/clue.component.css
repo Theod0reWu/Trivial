@@ -200,6 +200,10 @@
   margin-bottom: 5px;
 }
 
+.ans-form {
+  margin-bottom: 5px;
+}
+
 input {
   display: block;
 
@@ -207,8 +211,8 @@ input {
   font-weight: bolder;
   font-size: 22px;
 
-  border-top: 2px solid  #ff0;
-  border-bottom: 2px solid  #ff0;
+  border-top: 2px solid  var(--white);
+  border-bottom: 2px solid  var(--white);
   border-left: 0;
   border-right: 0;
 

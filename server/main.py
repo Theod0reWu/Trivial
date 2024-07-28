@@ -259,7 +259,7 @@ async def start_game(sid, data):
     await send_picker(room_id)
 
 #### Timer settings ####
-# in seconds
+# all time is in seconds
 
 picked_time = 2 # time that the board flickers over the picked item
 answer_time = 6 # time that a user gets to submit an answer
@@ -269,6 +269,13 @@ buzz_in_time = 10 # time that users get to buzz-in for a clue
 
 async def finish_clue(room_id: str):
     await sio.emit("game_state", "board", room=room_id)
+
+async def end_answering(room_id: str):
+    # restart the buzz in timer and send open to new buzz-ins
+    new_buzz_in_time = game_manager.restart_buzz_in_timer(room_id)
+    game_manager.reset_clue(room_id)
+    await sio.emit("paused", {"action": "stop", "duration": new_buzz_in_time}, room=room_id)
+    await run_timer(new_buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id}, "restart initial timer")
 
 @sio.event
 async def board_choice(sid, data):
@@ -286,11 +293,11 @@ async def board_choice(sid, data):
     await asyncio.sleep(picked_time)
 
     # start the timer for hitting the buzzer
-    timer = game_manager.init_buzz_in_timer(room_id, buzz_in_time)
+    game_manager.init_buzz_in_timer(room_id, buzz_in_time)
     await sio.emit("game_state", "clue", room=room_id)
     await sio.emit("clue", {"clue": clue, "duration": buzz_in_time}, room=room_id)
     
-    await run_timer(buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id})
+    await run_timer(buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id}, "initial timer")
     
 @sio.event
 async def buzz_in(sid, data):
@@ -299,11 +306,8 @@ async def buzz_in(sid, data):
     '''
     room_id, session_id = data["room_id"], data["session_id"]
     passed = game_manager.handle_buzz_in(room_id, session_id)
-    print(passed)
     if (not passed):
         return
-    game_manager.pause_buzz_in_timer(room_id)
-    await sio.emit("paused", room=room_id)
 
     room = room_manager.get_room_by_id(room_id)
     sessions = session_manager.get_sessions(room["curr_connections"])
@@ -313,11 +317,19 @@ async def buzz_in(sid, data):
         if (players[p]['session_id'] == session_id):
             buzzer_index = p
             buzzer_sid = players[p]['curr_sid']
-    await sio.emit("someone_answering", {"who": buzzer_index}, room=room_id)
+
+    #pause timer and let everyone know someone will be answering
+    game_manager.pause_buzz_in_timer(room_id)
+    game_manager.init_answer_timer(room_id, answer_time)
     await sio.emit("answering", {"duration": answer_time}, to=buzzer_sid)
+    await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": answer_time}, room=room_id)
+
+    await run_timer(answer_time, game_manager.check_answer_timer, end_answering, {"room_id": room_id}, "buzz-in-timer")
+
 
 async def answer_clue(sid, data):
     room_id, session_id, answer = data["room_id"], data["session_id"], data["answer"]
+    print("got answer:", answer)
 
     # restart the timer
     # game_manager.restart

@@ -6,7 +6,7 @@
   justify-content: center;
 }
 
-.timer {
+.timer-container {
   overflow: hidden;
   width: 75%;
   background-color: var(--darker-red);

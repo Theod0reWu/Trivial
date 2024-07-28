@@ -78,6 +78,10 @@ export class ConnectorService {
   	this.socketService.sendBuzzIn(this.roomId, this.sessionId);
   }
 
+  sendAnswer(answer: string): void {
+  	this.socketService.sendAnswer(this.roomId, this.sessionId, answer);
+  }
+
   setupSocketEvents(): void {
   	// setup for when players join a room
     this.playerChange$ = this.socketService.onPlayerChange();
@@ -108,7 +112,6 @@ export class ConnectorService {
     this.socketService.onPicker().subscribe({
     	next: (value) => {
     		this.gameData.isPicker = value;
-    		console.log("I am picking:", this.gameData.isPicker);
     	}
     });
 
@@ -143,7 +146,6 @@ export class ConnectorService {
     this.socketService.onPickerIndex().subscribe({
     	next: (value) => {
     		this.gameData.pickerIndex = value;
-    		console.log("picker:", value);
     	}
     })
   }

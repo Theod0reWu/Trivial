@@ -10,10 +10,11 @@ def create_timer(duration: float):
 		"end": now + duration,
 		"pause_start": None,
 		"active": True,
-		"winner": None
+		"winner": None,
+		"num_running": 0
 	}
 
-async def run_timer(duration: float, checker: callable , callback: callable, parameters: dict):
+async def run_timer(duration: float, checker: callable , callback: callable, parameters: dict, purpose = None):
 	proceed = True
 	while (proceed):
 		await asyncio.sleep(duration)
@@ -22,5 +23,7 @@ async def run_timer(duration: float, checker: callable , callback: callable, par
 			proceed, duration = checker(time.time(), **parameters)
 		except TypeError:
 			break
+	if (purpose):
+		print(purpose)
 	if (duration == 0):
 		await callback(**parameters)

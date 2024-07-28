@@ -74,6 +74,7 @@ export class AppComponent {
 
       this.connectorService.pickingChange$.subscribe({
         next: (value) => {
+          this.connectorService.gameData.answering = false;
           this.gameComponent.startFlickerClue(value["category_idx"], value["clue_idx"], value["duration"]);
         }
       });
@@ -88,12 +89,24 @@ export class AppComponent {
 
       this.connectorService.pausedChange$.subscribe({
         next: (value: any) => {
-          this.gameComponent.pauseProgressBar();
+          if (value["action"] === "start"){
+            this.connectorService.gameData.answeringIndex = value["who"];
+            if (!this.connectorService.gameData.answering) {
+              this.gameComponent.otherAnswering();
+            }
+            
+            this.gameComponent.pauseProgressBar();
+            this.gameComponent.startAnsweringTimer(value["duration"]);
+          } else if (value["action"] === "stop") {
+            //stop pausing go back to buzzer page and resume the progress bar
+            this.gameComponent.unpause(value["duration"]);
+          }
         }
       });
 
       this.connectorService.answeringChange$.subscribe({
         next: (value: any) => {
+          this.connectorService.gameData.answering = true;
           this.gameComponent.startAnswering(value["duration"]);
         }
       })
@@ -107,6 +120,10 @@ export class AppComponent {
 
   handleBuzzIn(): void {
     this.connectorService.sendBuzzIn();
+  }
+
+  handleAnswer(ans: string) {
+    this.connectorService.sendAnswer(ans);
   }
 
   handleChangeState(data: any) {

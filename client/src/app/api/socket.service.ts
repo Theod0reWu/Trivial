@@ -47,6 +47,10 @@ export class SocketService {
     this.socket.emit("buzz_in", {room_id: roomId, session_id: sessionId});
   }
 
+  sendAnswer(roomId: string, sessionId: string, answer: string): void {
+    this.socket.emit("answer_clue", {room_id: roomId, session_id: sessionId, answer: answer});
+  }
+
   //start game
   startGame(
     roomId: string,
@@ -113,7 +117,7 @@ export class SocketService {
   onPaused(): Observable<any> {
     return this.onRecv('paused');
   }
-
+  
   onAnswering(): Observable<any> {
     return this.onRecv('answering');
   }

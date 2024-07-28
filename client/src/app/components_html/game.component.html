@@ -12,6 +12,7 @@
 <clue-view
   (gameStateChange)="handleGameStateChange($event)"
   (onBuzzIn)="handleBuzzIn()"
+  (onAnswer)="handleAnswer($event)"
   [players]="players"
   [clue]="gameData.current_clue"
 />

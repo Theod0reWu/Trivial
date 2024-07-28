@@ -3,28 +3,33 @@
     <div class="clue">
       <div class="clue-text">{{ clue }}</div>
     </div>
-    @if (banner === BannerType.Green || banner === BannerType.Red) {
+    <div class="colored-banner" *ngIf="banner === BannerType.Green || banner === BannerType.Red">
       <div class="banner" [style.background-color] = banner>
         <div class="banner-text">{{ bannerText }} </div>
       </div>
-    }
-    @else if (banner === BannerType.AltAnswering) {
+    </div>
+    <div class="altanswering" *ngIf="banner === BannerType.AltAnswering">
       <div class="answering-outer">
         <div class="answering-text">{{ answeringText }} </div>
-        <timer />
       </div>
-    }
-    @else if (banner === BannerType.Answering) {
+    </div>
+    <div class="answering" *ngIf="banner === BannerType.Answering">
       <div class="answering-form">
         <div class="who-or-what"> Who/What is: </div>
-        <input placeholder="your answer">
+        <form  class="ans-form" type="submit" (ngSubmit)="onSubmitAnswer()" [formGroup]="form">
+          <input placeholder="your answer" id="ansInput" formControlName="answer" autocomplete="off"> 
+        </form>
       </div>
-    }
-    @else {
+    </div>
+    <div class="empty" *ngIf="banner === BannerType.Empty">
       <div class="button-panel">
         <div class="button" (click)="sendBuzzIn()" [ngStyle]= "{'background-color': buzzedIn ? 'var(--dangererer)' : 'var(--red)'}">Buzz In</div>
       </div>
-    }
+    </div>
+    <timer *ngIf="banner === BannerType.AltAnswering || banner === BannerType.Answering"
+        id="watching-timer"
+        [onMessage$]="timerSubject"
+      />
   </div>
   <div class="players">
     <div class="players-container">

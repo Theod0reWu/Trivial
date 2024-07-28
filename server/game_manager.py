@@ -8,6 +8,7 @@ from game_generation.game import Game, GameState
 from timer import create_timer, CHECK_FREQUENCY
 
 BUZZ_IN_TIMER_NAME = "buzz_in_timer"
+ANSWER_TIMER_NAME = "answer_timer"
 
 class GameManager(object):
 	"""
@@ -97,28 +98,42 @@ class GameManager(object):
 			return clue
 
 	def init_buzz_in_timer(self, room_id: str, duration: float):
-	    room_ref = self.rooms.document(room_id)
-	    timer = create_timer(duration)
-	    room_ref.update({BUZZ_IN_TIMER_NAME: timer})
-	    return timer
+	    return self.init_timer(room_id, BUZZ_IN_TIMER_NAME, duration)
+
+	def init_answer_timer(self, room_id: str, duration: float):
+		return self.init_timer(room_id, ANSWER_TIMER_NAME, duration)
+
+	def init_timer(self, room_id: str, timer_name: str, duration: float):
+		room_ref = self.rooms.document(room_id)
+		timer = create_timer(duration)
+		room_ref.update({timer_name: timer})
+		return timer
 
 	def check_buzz_in_timer(self, time: float, room_id:str):
+		return self.check_timer(time, room_id, BUZZ_IN_TIMER_NAME)
+
+	def check_answer_timer(self, time: float, room_id:str):
+		return self.check_timer(time, room_id, ANSWER_TIMER_NAME)
+
+	def check_timer(self, time: float, room_id: str, timer_name: str):
 	    '''
 	        Two cases:
 	        1. timer is active (no pause), continue the timer until the end
 	        2. timer is paused, wait for the timer to unpause, then continue the timer 
 	    '''
 	    room_ref = self.rooms.document(room_id)
-	    timer_data = room_ref.get().to_dict()[BUZZ_IN_TIMER_NAME]
+	    timer_data = room_ref.get().to_dict()[timer_name]
 
-	    if (timer_data["active"]):
+	    if (timer_data["active"] and timer_data["num_running"] == 0):
 	        if (time >= timer_data["end"]):
 	            return False, 0
 	        else:
-	            return True, timer_data["end"] - time
+	            return True, time - timer_data["end"]
 	    else:
 	        # timer is currently paused (check if unpaused)
-	        # use onSnapshot for this to change it (currently uses too any calls)
+	        # use onSnapshot for this to change it (currently uses too any calls
+	        print("timer over")
+	        room_ref.update({timer_name+".num_running": firestore.Increment(-1)})
 	        return False, 1
 
 	def get_timer(self, room_id: str, timer_name: str):
@@ -127,15 +142,21 @@ class GameManager(object):
 
 	def pause_buzz_in_timer(self, room_id: str):
 	    room_ref = self.rooms.document(room_id)
-	    room_ref.update({BUZZ_IN_TIMER_NAME + ".active": False, BUZZ_IN_TIMER_NAME + ".pause_start": time.time()})
+	    room_ref.update({
+	    	BUZZ_IN_TIMER_NAME + ".active": False, 
+	    	BUZZ_IN_TIMER_NAME + ".pause_start": time.time(),
+	    	BUZZ_IN_TIMER_NAME + ".num_running": firestore.Increment(1)
+	    	})
 
 	def restart_buzz_in_timer(self, room_id: str):
-	    room_ref = self.rooms.document(room_id)
-	    timer_data = room_ref.get()[BUZZ_IN_TIMER_NAME]
-	    room_ref.update({
-	        BUZZ_IN_TIMER_NAME + ".active": True, 
-	        BUZZ_IN_TIMER_NAME + ".end": timer_data["end"]  - timer_data["pause_start"] + time.time()
-	        })
+		room_ref = self.rooms.document(room_id)
+		timer_data = room_ref.get().to_dict()[BUZZ_IN_TIMER_NAME]
+		duration =timer_data["end"] - timer_data["pause_start"]
+		room_ref.update({
+		    BUZZ_IN_TIMER_NAME + ".active": True, 
+		    BUZZ_IN_TIMER_NAME + ".end": duration + time.time(),
+		    })
+		return duration
 
 	def handle_buzz_in(self, room_id:str, session_id: str):
 		room_ref = self.rooms.document(room_id)
@@ -148,6 +169,9 @@ class GameManager(object):
 		room_ref.update({"answered": room_data["answered"]})
 		return True
 
+	def reset_clue(self, room_id: str):
+		room_ref = self.rooms.document(room_id)
+		room_ref.update({"answered": []})
 
 	# Create a callback on_snapshot function to capture changes
 	def on_snapshot(doc_snapshot, changes, read_time):
