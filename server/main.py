@@ -254,9 +254,10 @@ async def start_game(sid, data):
         await send_game_state(room_id, "generating")
         game_manager.init_game(room_id, room_manager.get_room_by_id(room_id), num_categories, num_clues)
         game_manager.start_game(room_id)
-    await send_game_state(room_id, "board")
-    await send_board_data(room_id)
+    
     await send_picker(room_id)
+    await send_board_data(room_id)
+    await send_game_state(room_id, "board")
 
 #### Timer settings ####
 # all time is in seconds
@@ -294,8 +295,8 @@ async def board_choice(sid, data):
 
     # start the timer for hitting the buzzer
     game_manager.init_buzz_in_timer(room_id, buzz_in_time)
-    await sio.emit("game_state", "clue", room=room_id)
     await sio.emit("clue", {"clue": clue, "duration": buzz_in_time}, room=room_id)
+    await sio.emit("game_state", "clue", room=room_id)
     
     await run_timer(buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id}, "initial timer")
     
