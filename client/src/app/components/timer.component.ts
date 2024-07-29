@@ -35,7 +35,7 @@ export class TimerComponent {
   ngAfterViewInit(): void{
     this.onMessage$.subscribe({
       next: (value) => {
-        if (value["action"] === "start") {
+        if (value["action"] === "start" && !this.active) {
           this.start(value["duration"]);
         }
       }

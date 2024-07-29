@@ -59,7 +59,6 @@ export class ClueComponent {
   public timerObservable$ = this.timerSubject.asObservable();
 
   ngAfterViewInit(): void {
-    console.log("clue view reloaded");
     this.onMessage$.subscribe({
       next: (value) => {
         if (value["action"] === "startProgressBar"){
@@ -95,7 +94,6 @@ export class ClueComponent {
 
     this.timeout = setTimeout(() => {
       clearInterval(this.progress_interval);
-      this.timerSubject.next({action:"none"});
     }, duration * 1000);
   }
 
