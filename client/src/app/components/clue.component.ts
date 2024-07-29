@@ -55,10 +55,11 @@ export class ClueComponent {
   public buzzedIn: boolean = false;
 
   // to control the timer
-  private timerSubject = new ReplaySubject<any>();
+  private timerSubject = new ReplaySubject<any>(1);
   public timerObservable$ = this.timerSubject.asObservable();
 
   ngAfterViewInit(): void {
+    console.log("clue view reloaded");
     this.onMessage$.subscribe({
       next: (value) => {
         if (value["action"] === "startProgressBar"){
@@ -94,11 +95,8 @@ export class ClueComponent {
 
     this.timeout = setTimeout(() => {
       clearInterval(this.progress_interval);
+      this.timerSubject.next({action:"none"});
     }, duration * 1000);
-  }
-
-  updateTimer(){
-    const timerContainer = document.querySelector('.timer') as HTMLElement;
   }
 
   startAnsweringTimer(duration: number): void {

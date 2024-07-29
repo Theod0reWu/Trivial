@@ -10,7 +10,7 @@ import { PageStates } from '../app.component';
 import { BoardComponent } from './board.component';
 import { ClueComponent } from './clue.component';
 import { Player, GameData} from '../api/GameData';
-import { Observable, ReplaySubject } from 'rxjs';
+import { Observable, Subject, ReplaySubject } from 'rxjs';
 
 @Component({
   selector: 'game-view',
@@ -33,7 +33,7 @@ export class GameComponent {
   @ViewChild(BoardComponent) boardComponent!: BoardComponent; 
   @ViewChild(ClueComponent) clueComponent!: ClueComponent;
 
-  private clueSubject = new ReplaySubject<any>();
+  private clueSubject = new ReplaySubject<any>(1);
   clueObservable$: Observable<any> = this.clueSubject.asObservable();
 
   handleGameStateChange(data: any) {
@@ -64,9 +64,9 @@ export class GameComponent {
     this.clueComponent.banner = this.clueComponent.BannerType.AltAnswering;
   }
 
-  resumeProgressBar(duration:number): void {
-    this.clueComponent.runProgressBar(duration, this.clueComponent.progress);
-  }
+  // resumeProgressBar(duration:number): void {
+  //   this.clueComponent.runProgressBar(duration, this.clueComponent.progress);
+  // }
 
   startAnswering(duration: number): void {
     this.clueComponent.banner = this.clueComponent.BannerType.Answering;
