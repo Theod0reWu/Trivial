@@ -56,6 +56,15 @@ export class BoardComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     // this.initScrollSync();
+    for(let i = 0; i < this.numCols; ++i) {
+      for (let e = 0; e < this.numRows; ++e) {
+        if (this.gameData.picked[String(i)][String(e)]) {
+          let clue = document.getElementById((i + e * this.numCols).toString()) as HTMLElement;
+          clue.style.color = 'var(--gold-transparent-20)';
+          clue.setAttribute('pointer-events','none');
+        }
+      }
+    }
   }
 
   initScrollSync() {
@@ -76,6 +85,15 @@ export class BoardComponent implements AfterViewInit {
     });
   }
 
+  getCategoryIndex(index: number) {
+    console.log(index);
+    return String(index % this.numCols);
+  }
+
+  getClueIndex(index: number) {
+    return String(Math.floor(index / this.numCols));
+  }
+
   onClickClue(event: MouseEvent): void {
     if (!this.gameData.isPicker || this.intervalId) {
       return;
@@ -84,8 +102,8 @@ export class BoardComponent implements AfterViewInit {
     this.chosenClue = event.target as HTMLElement;
 
     let index = Number(this.chosenClue.id)
-    let category_idx = Number(index) % this.numCols;
-    let clue_idx = Math.floor(Number(index) / this.numCols);
+    let category_idx = index % this.numCols;
+    let clue_idx = Math.floor(index / this.numCols);
     this.gameStateChange.emit({category: category_idx, clue: clue_idx});
   }
 

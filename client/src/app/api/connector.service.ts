@@ -152,7 +152,6 @@ export class ConnectorService {
     this.socketService.onPicked().subscribe({
     	next: (value) => {
     		this.gameData.picked = value;
-    		console.log(this.gameData.picked);
     	}
     });
   }

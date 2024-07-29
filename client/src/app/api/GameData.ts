@@ -23,7 +23,7 @@ export class GameData {
 	current_clue: string;
 	buzz_in_duration: number;
 
-	picked: {string : {string: number}};
+	picked: {[key: string] : { [key: string] : boolean}};
 	answering = false;
 	answeringIndex:number;
 }

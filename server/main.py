@@ -257,6 +257,7 @@ async def start_game(sid, data):
     
     await send_picker(room_id)
     await send_board_data(room_id)
+    await sio.emit("picked", game_manager.get_picked_clues(room_id), room=room_id)
     await send_game_state(room_id, "board")
 
 #### Timer settings ####

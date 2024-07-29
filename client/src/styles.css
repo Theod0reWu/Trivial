@@ -38,6 +38,7 @@ body {
   --blue: #0057ff;
   --dark-blue: #030084;
   --gold: #eba152;
+  --gold-transparent-20: rgba(235, 161, 82, .2);
   --snow: #cdecf2;
   --danger: #912020;
   --dangerer: #761919;
