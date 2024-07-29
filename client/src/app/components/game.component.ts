@@ -10,6 +10,7 @@ import { PageStates } from '../app.component';
 import { BoardComponent } from './board.component';
 import { ClueComponent } from './clue.component';
 import { Player, GameData} from '../api/GameData';
+import { Observable, ReplaySubject } from 'rxjs';
 
 @Component({
   selector: 'game-view',
@@ -32,6 +33,9 @@ export class GameComponent {
   @ViewChild(BoardComponent) boardComponent!: BoardComponent; 
   @ViewChild(ClueComponent) clueComponent!: ClueComponent;
 
+  private clueSubject = new ReplaySubject<any>();
+  clueObservable$: Observable<any> = this.clueSubject.asObservable();
+
   handleGameStateChange(data: any) {
     this.chosenClue.emit({category: data.category, clue: data.clue});
   }
@@ -42,8 +46,8 @@ export class GameComponent {
   }
 
   startProgressBar(duration: number): void {
-    this.clueComponent.buzzedIn = false;
-    this.clueComponent.startProgressBar(duration);
+    // this.clueComponent.startProgressBar(duration);
+    this.clueSubject.next({"action": "startProgressBar", "duration": duration});
   }
 
   pauseProgressBar(): void {

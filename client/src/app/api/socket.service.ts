@@ -110,6 +110,10 @@ export class SocketService {
     return this.onRecv('picking');
   }
 
+  onPicked(): Observable<any> {
+    return this.onRecv('picked');
+  }
+
   onClue(): Observable<any> {
     return this.onRecv('clue');
   }

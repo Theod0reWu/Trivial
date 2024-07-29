@@ -32,12 +32,11 @@ export class ClueComponent {
   @Input() players!: Player[];
   @Input() scores!: number[];
   @Input() clue!: string;
+  @Input() onMessage$: Observable<any>;
 
   @Output() gameStateChange = new EventEmitter<boolean>();
   @Output() onBuzzIn: EventEmitter<void> = new EventEmitter<void>();
   @Output() onAnswer: EventEmitter<string> = new EventEmitter<string>();
-
-  @ViewChild("TimerComponent") timerComponent: TimerComponent;
 
   constructor() {
     this.form = new FormGroup({
@@ -56,8 +55,18 @@ export class ClueComponent {
   public buzzedIn: boolean = false;
 
   // to control the timer
-  public timerSubject = new ReplaySubject<any>();
+  private timerSubject = new ReplaySubject<any>();
   public timerObservable$ = this.timerSubject.asObservable();
+
+  ngAfterViewInit(): void {
+    this.onMessage$.subscribe({
+      next: (value) => {
+        if (value["action"] === "startProgressBar"){
+          this.startProgressBar(value["duration"]);
+        }
+      }
+    });
+  }
 
   sendBuzzIn(): void {
     if (!this.buzzedIn){
@@ -72,6 +81,7 @@ export class ClueComponent {
   }
 
   startProgressBar(duration: number): void {
+    this.buzzedIn = false;
     this.runProgressBar(duration, 0);
   }
 
@@ -93,9 +103,7 @@ export class ClueComponent {
 
   startAnsweringTimer(duration: number): void {
     // this.timerComponent.start(duration);
-    console.log("timer starting", this.banner, duration);
     this.timerSubject.next({action:"start", "duration": duration});
-    console.log("timer sent");
   }
 
   onSubmitAnswer() {

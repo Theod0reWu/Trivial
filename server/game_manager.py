@@ -173,6 +173,18 @@ class GameManager(object):
 		room_ref = self.rooms.document(room_id)
 		room_ref.update({"answered": []})
 
+	def get_picked_clues(self, room_id: str):
+		room_ref = self.rooms.document(room_id)
+		room_data = room_ref.get().to_dict()
+		return room_data["picked"]
+		# picked = []
+		# for i in range(len(room_data["picked"])):
+		# 	temp = []
+		# 	for e in range(len(room_data["picked"][str(i)])):
+		# 		temp.append(room_data["picked"][str(i)][str(e)])
+		# 	picked.append(temp)
+		# return picked
+
 	# Create a callback on_snapshot function to capture changes
 	def on_snapshot(doc_snapshot, changes, read_time):
 	    for doc in doc_snapshot:

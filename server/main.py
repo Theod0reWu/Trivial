@@ -269,6 +269,7 @@ buzz_in_time = 10 # time that users get to buzz-in for a clue
 ### in-game events ####
 
 async def finish_clue(room_id: str):
+    await sio.emit("picked", game_manager.get_picked_clues(room_id), room=room_id)
     await sio.emit("game_state", "board", room=room_id)
 
 async def end_answering(room_id: str):
@@ -297,7 +298,7 @@ async def board_choice(sid, data):
     game_manager.init_buzz_in_timer(room_id, buzz_in_time)
     await sio.emit("clue", {"clue": clue, "duration": buzz_in_time}, room=room_id)
     await sio.emit("game_state", "clue", room=room_id)
-    
+
     await run_timer(buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id}, "initial timer")
     
 @sio.event

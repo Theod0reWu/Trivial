@@ -15,5 +15,6 @@
   (onAnswer)="handleAnswer($event)"
   [players]="players"
   [clue]="gameData.current_clue"
+  [onMessage$]="clueObservable$"
 />
 }

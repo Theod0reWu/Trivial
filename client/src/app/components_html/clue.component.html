@@ -28,7 +28,7 @@
     </div>
     <timer *ngIf="banner === BannerType.AltAnswering || banner === BannerType.Answering"
         id="watching-timer"
-        [onMessage$]="timerSubject"
+        [onMessage$]="timerObservable$"
       />
   </div>
   <div class="players">

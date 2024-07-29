@@ -147,7 +147,14 @@ export class ConnectorService {
     	next: (value) => {
     		this.gameData.pickerIndex = value;
     	}
-    })
+    });
+
+    this.socketService.onPicked().subscribe({
+    	next: (value) => {
+    		this.gameData.picked = value;
+    		console.log(this.gameData.picked);
+    	}
+    });
   }
 
   connectToRoom(callback: Function): boolean {
