@@ -146,7 +146,9 @@ async def send_player_cash(room_id: str):
     if (not room):
         return
     session_id = [i["session_id"] for i in get_ordered_players(room["curr_connections"])]
-    return game_manager.get_player_cash(room_id, session_id)
+    cash = game_manager.get_player_cash(room_id, session_id)
+    print("cash", cash)
+    await sio.emit("player_cash", cash, room=room_id)
 
 async def send_picker(room_id: str, picker_session_id = None):
     '''
@@ -266,6 +268,7 @@ async def start_game(sid, data):
 picked_time = 2 # time that the board flickers over the picked item
 answer_time = 6 # time that a user gets to submit an answer
 buzz_in_time = 10 # time that users get to buzz-in for a clue
+response_show_time = 3 # time to show correct/incorrect reponses
 
 ### in-game events ####
 
@@ -325,17 +328,39 @@ async def buzz_in(sid, data):
     game_manager.pause_buzz_in_timer(room_id)
     game_manager.init_answer_timer(room_id, answer_time)
     await sio.emit("answering", {"duration": answer_time}, to=buzzer_sid)
-    await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": answer_time}, room=room_id)
 
+    await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": answer_time}, room=room_id)
     await run_timer(answer_time, game_manager.check_answer_timer, end_answering, {"room_id": room_id}, "buzz-in-timer")
 
-
+@sio.event
 async def answer_clue(sid, data):
     room_id, session_id, answer = data["room_id"], data["session_id"], data["answer"]
     print("got answer:", answer)
 
-    # restart the timer
-    # game_manager.restart
+    good = False
+    try:
+        good = game_manager.handle_answer(room_id, session_id, answer)
+    except ValueError as e:
+        print(e)
+        return
+
+    if (good):
+        # show the correct response and add points to the right person
+        await sio.emit("response", {"correct": True, "answer": answer}, room=room_id);
+        await send_player_cash(room_id)
+        await sio.sleep(response_show_time)
+
+        await send_picker(room_id, session_id)
+        # return to the board
+        await finish_clue(room_id)
+    else:
+        # show the incorrect response
+        await sio.emit("response", {"correct": False, "answer": answer}, room=room_id);
+        await send_player_cash(room_id)
+        await sio.sleep(response_show_time)
+
+        # restart the timer
+        await end_answering(room_id)
 
 if __name__ == "__main__":
     uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)

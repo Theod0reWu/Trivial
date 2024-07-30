@@ -8,6 +8,18 @@ import random
 
 import google.generativeai as genai
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
+import numpy as np
+
+def get_similarity(answer: str, guess:str):
+	guess_emb = genai.embed_content(
+			    model="models/embedding-001",
+			    content=guess,
+			    task_type="SEMANTIC_SIMILARITY")
+	ans_emb = genai.embed_content(
+			    model="models/embedding-001",
+			    content=answer,
+			    task_type="SEMANTIC_SIMILARITY")
+	return np.dot(ans_emb['embedding'], guess_emb['embedding'])
 
 class GameState(Enum):
     PREGAME = 'pregame'
@@ -40,7 +52,7 @@ class Game(object):
 		self.answered = []#{i:False for i in player_ids}
 		self.player_ids = player_ids
 		self.picker = random.choice(player_ids) # who's turn it is to pick
-		self.picking = {"category_idx": -1, "clue_idx": -1} # last clue picked
+		self.picking = {"category_idx": "", "clue_idx": ""} # last clue picked
 
 		self.state = GameState.BOARD
 		if (use_json):
@@ -91,7 +103,9 @@ class Game(object):
 			"picked": array_to_dict(self.board.picked),
 			'picking': self.picking,
 			"picker": self.picker,
+
 			"answered": self.answered,
+			'answering': None,
 
 			"state": self.state.value
 		}
@@ -105,10 +119,14 @@ class Game(object):
 			'num_categories': 2, 
 			'num_clues': 3, 
 			'category_titles': ['baseball', 'emotional intelligence'], 
+			
 			'picked': {'0': {'0': False, '1': False, '2': False}, '1': {'0': False, '1': False, '2': False}}, 
 			'picker': random.choice(player_ids), 
-			'picking': {"category_idx": -1, "clue_idx": -1},
+			'picking': {"category_idx": "", "clue_idx": ""},
+			
 			'answered': [],
+			'answering': None,
+
 			'state': 'board', 
 			'board_data': 
 			{

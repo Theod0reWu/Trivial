@@ -110,7 +110,13 @@ export class AppComponent {
           this.connectorService.gameData.answering = true;
           this.gameComponent.startAnswering(value["duration"]);
         }
-      })
+      });
+
+      this.connectorService.responseChange$.subscribe({
+        next: (value: any) => {
+          console.log(value);
+        }
+      });
     };
     this.connectorService.connectToRoom(callback);
   }

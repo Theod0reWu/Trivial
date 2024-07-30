@@ -4,7 +4,7 @@ from firebase_admin import firestore
 import sys
 import time
 
-from game_generation.game import Game, GameState
+from game_generation.game import Game, GameState, get_similarity
 from timer import create_timer, CHECK_FREQUENCY
 
 BUZZ_IN_TIMER_NAME = "buzz_in_timer"
@@ -13,6 +13,14 @@ ANSWER_TIMER_NAME = "answer_timer"
 class GameManager(object):
 	"""
 		Responsible for storing game states and info in the database
+
+		game states:
+			pregame
+				-before game starts
+			board
+				-players should be looking at the board
+			clue
+				-players should be looking at a clue
 	"""
 
 	keys = ["state", "categories", "clues"]
@@ -93,8 +101,12 @@ class GameManager(object):
 			return None
 		else:
 			clue = room_data["board_data"][category_idx][int(clue_idx)]["clue"]
-			room_ref.update({"picked."+category_idx + "." + clue_idx: True})
-			room_ref.update({"picking.category_idx":category_idx, "picking.clue_idx": clue_idx});
+			room_ref.update({
+				"picked."+category_idx + "." + clue_idx: True,
+				"picking.category_idx":category_idx, "picking.clue_idx": clue_idx, 
+				"state": "clue",
+				"answered": []
+				})
 			return clue
 
 	def init_buzz_in_timer(self, room_id: str, duration: float):
@@ -128,11 +140,10 @@ class GameManager(object):
 	        if (time >= timer_data["end"]):
 	            return False, 0
 	        else:
+	        	# this should never happen
 	            return True, time - timer_data["end"]
 	    else:
 	        # timer is currently paused (check if unpaused)
-	        # use onSnapshot for this to change it (currently uses too any calls
-	        print("timer over")
 	        room_ref.update({timer_name+".num_running": firestore.Increment(-1)})
 	        return False, 1
 
@@ -141,12 +152,15 @@ class GameManager(object):
 	     return room_ref.get()[timer_name]
 
 	def pause_buzz_in_timer(self, room_id: str):
-	    room_ref = self.rooms.document(room_id)
-	    room_ref.update({
-	    	BUZZ_IN_TIMER_NAME + ".active": False, 
-	    	BUZZ_IN_TIMER_NAME + ".pause_start": time.time(),
-	    	BUZZ_IN_TIMER_NAME + ".num_running": firestore.Increment(1)
-	    	})
+		'''
+			Increments the number of running timers by one in expectation what one will be started
+		'''
+		room_ref = self.rooms.document(room_id)
+		room_ref.update({
+			BUZZ_IN_TIMER_NAME + ".active": False, 
+			BUZZ_IN_TIMER_NAME + ".pause_start": time.time(),
+			BUZZ_IN_TIMER_NAME + ".num_running": firestore.Increment(1)
+			})
 
 	def restart_buzz_in_timer(self, room_id: str):
 		room_ref = self.rooms.document(room_id)
@@ -159,6 +173,10 @@ class GameManager(object):
 		return duration
 
 	def handle_buzz_in(self, room_id:str, session_id: str):
+		'''
+			Returns true is the session_id player successfully buzzed-in for a clue in room_id
+			and false otherwise
+		'''
 		room_ref = self.rooms.document(room_id)
 		room_data = room_ref.get().to_dict()
 
@@ -166,7 +184,7 @@ class GameManager(object):
 		if (not session_id in room_data["curr_connections"] or session_id in room_data["answered"]):
 			return False
 		room_data["answered"].append(session_id)
-		room_ref.update({"answered": room_data["answered"]})
+		room_ref.update({"answered": room_data["answered"], "answering": session_id})
 		return True
 
 	def reset_clue(self, room_id: str):
@@ -177,13 +195,55 @@ class GameManager(object):
 		room_ref = self.rooms.document(room_id)
 		room_data = room_ref.get().to_dict()
 		return room_data["picked"]
-		# picked = []
-		# for i in range(len(room_data["picked"])):
-		# 	temp = []
-		# 	for e in range(len(room_data["picked"][str(i)])):
-		# 		temp.append(room_data["picked"][str(i)][str(e)])
-		# 	picked.append(temp)
-		# return picked
+	
+	def handle_answer(self, room_id: str, session_id: str, answer: str, threshold = .95):
+		'''
+			Ensures that the person who buzzed in is the one answering
+
+			If the player can answer and is correct:
+				increases "player_cash"
+				removes the "picked" clue
+				assignes the answering player as "picker"
+			If the player is incorrect:
+				decreases player cash
+
+			In both cases the answering timer is set to inactive and "answering" marked as None
+		'''
+		room_ref = self.rooms.document(room_id)
+		room_data = room_ref.get().to_dict()
+		picking = room_data["picking"]
+
+		if (session_id != room_data["answering"]):
+			raise ValueError("Wrong user attempting to answer")
+		if (picking["category_idx"] == "" or picking["clue_idx"] == ""):
+			raise ValueError("Not in the correct phase, not clue picked")
+
+		board_item = room_data["board_data"][picking["category_idx"]][int(picking["clue_idx"])]
+
+		right_answer = board_item["answer"]
+
+		similarity_score = get_similarity(right_answer, answer) >= threshold
+		correct = similarity_score >= threshold
+
+		if (correct):
+			room_ref.update({
+				"player_cash." + session_id: room_data["player_cash"][session_id] + board_item["price"],
+				"picking.category_idx": "",
+				"picking.clue_idx": "",
+				"picker": session_id,
+				"answering": None,
+				ANSWER_TIMER_NAME + ".active": False
+				})
+		else:
+			room_ref.update({
+				"player_cash." + session_id: room_data["player_cash"][session_id] - board_item["price"],
+				ANSWER_TIMER_NAME + ".active": False,
+				"answering": None
+				})
+
+		return correct
+
+
 
 	# Create a callback on_snapshot function to capture changes
 	def on_snapshot(doc_snapshot, changes, read_time):

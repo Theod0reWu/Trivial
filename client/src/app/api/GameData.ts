@@ -16,7 +16,6 @@ export class GameData {
 	categoryTitles: string[];
 	prices: number[];
 
-	playerCash: number[];
 	isPicker: boolean;
 	pickerIndex: number;
 

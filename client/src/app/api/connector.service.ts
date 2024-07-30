@@ -32,6 +32,7 @@ export class ConnectorService {
   clueChange$: Observable<any>;
   pausedChange$: Observable<any>;
   answeringChange$: Observable<any>;
+  responseChange$: Observable<any>;
 
   loading = false;
 
@@ -101,6 +102,14 @@ export class ConnectorService {
       },
     });
 
+    this.socketService.onPlayerCash().subscribe({
+    	next: (value) => {
+    		for (let c = 0; c < value.length; ++c) {
+    			this.players[c].score = value[c];
+    		}
+    	}
+    });
+
     // setup for when a new host needs to be elected after original leaves
     this.hostChange$ = this.socketService.onHost();
     this.hostChange$.subscribe({
@@ -142,6 +151,7 @@ export class ConnectorService {
     this.clueChange$ = this.socketService.onClue();
     this.pausedChange$ = this.socketService.onPaused();
     this.answeringChange$ = this.socketService.onAnswering();
+    this.responseChange$ = this.socketService.onResponse();
 
     this.socketService.onPickerIndex().subscribe({
     	next: (value) => {

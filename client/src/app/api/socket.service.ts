@@ -126,6 +126,10 @@ export class SocketService {
     return this.onRecv('answering');
   }
 
+  onResponse(): Observable<any> {
+    return this.onRecv('response');
+  }
+
   // Disconnect from the socket
   disconnect(): void {
     if (this.socket) {

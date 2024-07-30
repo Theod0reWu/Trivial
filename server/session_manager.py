@@ -14,7 +14,7 @@ class SessionManager:
 
     def generate_session_id(self):
         while True:
-            session_id = str(uuid4())
+            session_id = str(uuid4()).replace('-', '_')
             if not self.get_session_id_exists(session_id):
                 return session_id
 
