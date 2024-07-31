@@ -276,12 +276,16 @@ async def finish_clue(room_id: str):
     await sio.emit("picked", game_manager.get_picked_clues(room_id), room=room_id)
     await sio.emit("game_state", "board", room=room_id)
 
-async def end_answering(room_id: str):
+async def end_answering(room_id: str, session_id: str = None):
     # restart the buzz in timer and send open to new buzz-ins
+    if (session_id):
+        print("deducting points")
+        game_manager.deduct_points(room_id, session_id)
+        await send_player_cash(room_id)
+
     new_buzz_in_time = game_manager.restart_buzz_in_timer(room_id)
-    game_manager.reset_clue(room_id)
     await sio.emit("paused", {"action": "stop", "duration": new_buzz_in_time}, room=room_id)
-    await run_timer(new_buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id}, "restart initial timer")
+    await run_timer(new_buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id})
 
 @sio.event
 async def board_choice(sid, data):
@@ -303,7 +307,7 @@ async def board_choice(sid, data):
     await sio.emit("clue", {"clue": clue, "duration": buzz_in_time}, room=room_id)
     await sio.emit("game_state", "clue", room=room_id)
 
-    await run_timer(buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id}, "initial timer")
+    await run_timer(buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id})
     
 @sio.event
 async def buzz_in(sid, data):
@@ -330,7 +334,7 @@ async def buzz_in(sid, data):
     await sio.emit("answering", {"duration": answer_time}, to=buzzer_sid)
 
     await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": answer_time}, room=room_id)
-    await run_timer(answer_time, game_manager.check_answer_timer, end_answering, {"room_id": room_id}, "buzz-in-timer")
+    await run_timer(answer_time, game_manager.check_answer_timer, end_answering, {"room_id": room_id}, {"room_id": room_id, "session_id": session_id})
 
 @sio.event
 async def answer_clue(sid, data):

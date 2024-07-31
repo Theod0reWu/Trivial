@@ -164,7 +164,8 @@ class GameManager(object):
 
 	def restart_buzz_in_timer(self, room_id: str):
 		room_ref = self.rooms.document(room_id)
-		timer_data = room_ref.get().to_dict()[BUZZ_IN_TIMER_NAME]
+		room_data = room_ref.get().to_dict()
+		timer_data = room_data[BUZZ_IN_TIMER_NAME]
 		duration =timer_data["end"] - timer_data["pause_start"]
 		room_ref.update({
 		    BUZZ_IN_TIMER_NAME + ".active": True, 
@@ -240,10 +241,16 @@ class GameManager(object):
 				ANSWER_TIMER_NAME + ".active": False,
 				"answering": None
 				})
-
 		return correct
 
-
+	def deduct_points(self, room_id: str, session_id: str):
+		room_ref = self.rooms.document(room_id)
+		room_data = room_ref.get().to_dict()
+		picking = room_data["picking"]
+		board_item = room_data["board_data"][picking["category_idx"]][int(picking["clue_idx"])]
+		room_ref.update({
+				"player_cash." + session_id: room_data["player_cash"][session_id] - board_item["price"]
+				})
 
 	# Create a callback on_snapshot function to capture changes
 	def on_snapshot(doc_snapshot, changes, read_time):
