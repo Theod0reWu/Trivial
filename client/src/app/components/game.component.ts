@@ -64,10 +64,6 @@ export class GameComponent {
     this.clueComponent.banner = this.clueComponent.BannerType.AltAnswering;
   }
 
-  // resumeProgressBar(duration:number): void {
-  //   this.clueComponent.runProgressBar(duration, this.clueComponent.progress);
-  // }
-
   startAnswering(duration: number): void {
     this.clueComponent.banner = this.clueComponent.BannerType.Answering;
   }
@@ -82,5 +78,15 @@ export class GameComponent {
 
   handleAnswer(ans: string): void {
     this.onAnswer.emit(ans);
+  }
+
+  handleResponse(correct: boolean, text: string): void {
+    if (correct) {
+      this.clueComponent.banner=this.clueComponent.BannerType.Green;     
+    } else {
+      this.clueComponent.banner=this.clueComponent.BannerType.Red;
+    }
+    this.clueComponent.bannerText = this.players[this.gameData.answeringIndex].username + ": Who/What is " + text;
+
   }
 }
