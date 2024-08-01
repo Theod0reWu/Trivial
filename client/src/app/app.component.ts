@@ -115,6 +115,7 @@ export class AppComponent {
       this.connectorService.responseChange$.subscribe({
         next: (value: any) => {
           console.log(value);
+          this.gameComponent.handleResponse(value["correct"], value["answer"]);
         }
       });
     };
