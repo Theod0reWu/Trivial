@@ -262,14 +262,6 @@ async def start_game(sid, data):
     await sio.emit("picked", game_manager.get_picked_clues(room_id), room=room_id)
     await send_game_state(room_id, "board")
 
-#### Timer settings ####
-# all time is in seconds
-
-picked_time = 2 # time that the board flickers over the picked item
-answer_time = 6 # time that a user gets to submit an answer
-buzz_in_time = 10 # time that users get to buzz-in for a clue
-response_show_time = 3 # time to show correct/incorrect reponses
-
 ### in-game events ####
 
 async def finish_clue(room_id: str):
@@ -299,15 +291,15 @@ async def board_choice(sid, data):
         return
 
     # send chosen coords and then send the clue itself
-    await sio.emit("picking", {"category_idx": category_idx, "clue_idx":clue_idx, "duration": picked_time}, room=room_id)
-    await asyncio.sleep(picked_time)
+    await sio.emit("picking", {"category_idx": category_idx, "clue_idx":clue_idx, "duration": settings.picked_time}, room=room_id)
+    await asyncio.sleep(settings.picked_time)
 
     # start the timer for hitting the buzzer
-    game_manager.init_buzz_in_timer(room_id, buzz_in_time)
-    await sio.emit("clue", {"clue": clue, "duration": buzz_in_time}, room=room_id)
+    game_manager.init_buzz_in_timer(room_id, settings.buzz_in_time)
+    await sio.emit("clue", {"clue": clue, "duration": settings.buzz_in_time}, room=room_id)
     await sio.emit("game_state", "clue", room=room_id)
 
-    await run_timer(buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id})
+    await run_timer(settings.buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id})
     
 @sio.event
 async def buzz_in(sid, data):
@@ -330,11 +322,11 @@ async def buzz_in(sid, data):
 
     #pause timer and let everyone know someone will be answering
     game_manager.pause_buzz_in_timer(room_id)
-    game_manager.init_answer_timer(room_id, answer_time)
-    await sio.emit("answering", {"duration": answer_time}, to=buzzer_sid)
+    game_manager.init_answer_timer(room_id, settings.answer_time)
+    await sio.emit("answering", {"duration": settings.answer_time}, to=buzzer_sid)
 
-    await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": answer_time}, room=room_id)
-    await run_timer(answer_time, game_manager.check_answer_timer, end_answering, {"room_id": room_id}, {"room_id": room_id, "session_id": session_id})
+    await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": settings.answer_time}, room=room_id)
+    await run_timer(settings.answer_time, game_manager.check_answer_timer, end_answering, {"room_id": room_id}, {"room_id": room_id, "session_id": session_id})
 
 @sio.event
 async def answer_clue(sid, data):
@@ -352,7 +344,7 @@ async def answer_clue(sid, data):
         # show the correct response and add points to the right person
         await sio.emit("response", {"correct": True, "answer": answer}, room=room_id);
         await send_player_cash(room_id)
-        await sio.sleep(response_show_time)
+        await sio.sleep(settings.response_show_time)
 
         await send_picker(room_id, session_id)
         # return to the board
@@ -361,7 +353,7 @@ async def answer_clue(sid, data):
         # show the incorrect response
         await sio.emit("response", {"correct": False, "answer": answer}, room=room_id);
         await send_player_cash(room_id)
-        await sio.sleep(response_show_time)
+        await sio.sleep(settings.response_show_time)
 
         # restart the timer
         await end_answering(room_id)

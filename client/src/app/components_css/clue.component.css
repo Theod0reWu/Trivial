@@ -79,16 +79,19 @@
 } */
 
 .clue {
-  padding: 10vh;
+  padding: 8vh 5vh 10vh 5vh;
+  height: 45%;
 }
 
 .clue-text {
+  height: 100%;
   color: var(--snow);
   font-family: var(--standard-font);
   font-size: 50px;
   text-align: center;
   line-height: normal;
   text-transform: uppercase;
+  /* font-size: clamp(24px, 2.5cqw, 50px); */
 }
 
 .clue-ui {
@@ -144,13 +147,13 @@
 
 /* banner is 60px tall with 50px botton margin */
 
-.banner{
-    left: 0;
-    right: 0;
-    padding:15px;
-    height:60px;
-    margin-bottom: 50px;
-    /* background-size:100%;    */
+.banner {
+  left: 0;
+  right: 0;
+  padding: 15px;
+  height: 60px;
+  margin-bottom: 50px;
+  /* background-size:100%;    */
 }
 
 .banner-text {
@@ -163,14 +166,14 @@
 
 /* answering text is 40px tall, with timer 20px tall*/
 
-.answering-text{
-    padding:15px;
-    height:40px;
-    color: var(--snow);
-    font-family: var(--robot-font);
-    font-size: 40px;
-    text-align: center;
-    line-height: normal;
+.answering-text {
+  padding: 15px;
+  height: 40px;
+  color: var(--snow);
+  font-family: var(--robot-font);
+  font-size: 40px;
+  text-align: center;
+  line-height: normal;
 }
 
 .answering-outer {
@@ -182,8 +185,8 @@
   width: 100%;
   height: 10px;
   background-color: var(--black);
-  position: fixed; 
-  bottom:0%;
+  position: fixed;
+  bottom: 0%;
 }
 
 .progress-bar-fill {
@@ -195,7 +198,7 @@
   display: block;
   font-size: 24px;
   color: white;
-/*  margin: 0 auto;*/
+  /*  margin: 0 auto;*/
   text-align: center;
   margin-bottom: 5px;
 }
@@ -211,8 +214,8 @@ input {
   font-weight: bolder;
   font-size: 22px;
 
-  border-top: 2px solid  var(--white);
-  border-bottom: 2px solid  var(--white);
+  border-top: 2px solid var(--white);
+  border-bottom: 2px solid var(--white);
   border-left: 0;
   border-right: 0;
 
@@ -224,6 +227,7 @@ input {
   height: 40px;
 }
 
-textarea:focus, input:focus{
-    outline: none;
+textarea:focus,
+input:focus {
+  outline: none;
 }

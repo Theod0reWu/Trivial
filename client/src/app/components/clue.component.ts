@@ -1,12 +1,14 @@
-import { 
-  Component, 
-  EventEmitter, 
-  Input, 
+import {
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  Input,
   Output,
-  ViewChild 
+  ViewChild,
 } from '@angular/core';
 import { PageStates } from '../app.component';
-import { NgClass, NgForOf, CommonModule } from '@angular/common';
+import { NgClass, NgForOf, CommonModule, NgIf } from '@angular/common';
 import { Player } from '../api/GameData';
 import { TimerComponent } from './timer.component';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -14,33 +16,51 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
 
 enum BannerStates {
-  Empty = "empty",
-  Green = "green",
-  Red = "red",
-  AltAnswering = "altanswering",
-  Answering = "answering"
+  Empty = 'empty',
+  Green = 'green',
+  Red = 'red',
+  AltAnswering = 'altanswering',
+  Answering = 'answering',
 }
 
 @Component({
   selector: 'clue-view',
   standalone: true,
-  imports: [NgForOf, NgClass, CommonModule, TimerComponent, ReactiveFormsModule],
+  imports: [
+    NgForOf,
+    NgIf,
+    NgClass,
+    CommonModule,
+    TimerComponent,
+    ReactiveFormsModule,
+  ],
   templateUrl: '../components_html/clue.component.html',
   styleUrl: '../components_css/clue.component.css',
 })
 export class ClueComponent {
+  public _clue!: string;
+
   @Input() players!: Player[];
   @Input() scores!: number[];
-  @Input() clue!: string;
+  @Input() set clue(value: string) {
+    this._clue = value;
+    // dynamically set font size
+    this.changeFontSize();
+  }
   @Input() onMessage$: Observable<any>;
 
   @Output() gameStateChange = new EventEmitter<boolean>();
   @Output() onBuzzIn: EventEmitter<void> = new EventEmitter<void>();
   @Output() onAnswer: EventEmitter<string> = new EventEmitter<string>();
 
+  @ViewChild('clueText') clueText!: ElementRef;
+  @HostListener('window:resize', ['$event']) onResize(event: any) {
+    this.changeFontSize();
+  }
+
   constructor() {
     this.form = new FormGroup({
-      answer: new FormControl('')
+      answer: new FormControl(''),
     });
   }
 
@@ -61,21 +81,22 @@ export class ClueComponent {
   ngAfterViewInit(): void {
     this.onMessage$.subscribe({
       next: (value) => {
-        if (value["action"] === "startProgressBar"){
-          this.startProgressBar(value["duration"]);
+        if (value['action'] === 'startProgressBar') {
+          this.startProgressBar(value['duration']);
         }
-      }
+      },
     });
+    this.changeFontSize();
   }
 
   sendBuzzIn(): void {
-    if (!this.buzzedIn){
+    if (!this.buzzedIn) {
       this.onBuzzIn.emit();
       this.buzzedIn = true;
     }
   }
 
-  pauseProgressBar(): void {  
+  pauseProgressBar(): void {
     clearInterval(this.progress_interval);
     clearTimeout(this.timeout);
   }
@@ -89,7 +110,10 @@ export class ClueComponent {
     this.start_time = new Date().getTime();
     this.progress_interval = setInterval(() => {
       let time = new Date().getTime();
-      this.progress = (time - this.start_time) / (1000 * duration) * (1 - initial_progress) + initial_progress;
+      this.progress =
+        ((time - this.start_time) / (1000 * duration)) *
+          (1 - initial_progress) +
+        initial_progress;
     }, 16);
 
     this.timeout = setTimeout(() => {
@@ -99,20 +123,61 @@ export class ClueComponent {
 
   startAnsweringTimer(duration: number): void {
     // this.timerComponent.start(duration);
-    this.timerSubject.next({action:"start", "duration": duration});
+    this.timerSubject.next({ action: 'start', duration: duration });
   }
 
   onSubmitAnswer() {
     // console.log('Form Data: ', this.form.value);
-    this.onAnswer.emit(this.form.value["answer"]);
+    this.onAnswer.emit(this.form.value['answer']);
   }
-  
+
+  isOverflown(element: any) {
+    return (
+      element &&
+      (element.scrollHeight > element.clientHeight ||
+        element.scrollWidth > element.clientWidth)
+    );
+  }
+
+  changeFontSize() {
+    if (!this.clueText) return;
+    // console.log(
+    //   getComputedStyle(this.clueText.nativeElement).getPropertyValue(
+    //     'font-size'
+    //   )
+    // );
+    let fontSize = parseInt(
+      getComputedStyle(this.clueText.nativeElement).getPropertyValue(
+        'font-size'
+      )
+    );
+    let overflow = this.isOverflown(this.clueText.nativeElement);
+
+    if (overflow) {
+      // shrink text
+      for (let i = fontSize; i > 0; --i) {
+        overflow = this.isOverflown(this.clueText.nativeElement);
+        if (overflow) {
+          --fontSize;
+          this.clueText.nativeElement.style.fontSize = fontSize + 'px';
+        }
+      }
+    } else {
+      // grow text
+      while (!overflow) {
+        overflow = this.isOverflown(this.clueText.nativeElement);
+        ++fontSize;
+        this.clueText.nativeElement.style.fontSize = fontSize + 'px';
+      }
+      --fontSize;
+    }
+  }
+
   BannerType = BannerStates;
   banner = BannerStates.Empty;
 
-  bannerText = "Who/What is Berlin?";
-  answeringText = "Team 1 is answering";
+  bannerText = 'Who/What is Berlin?';
+  answeringText = 'Team 1 is answering';
 
-  timerFraction = .5;
-
+  timerFraction = 0.5;
 }
