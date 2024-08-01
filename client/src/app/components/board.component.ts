@@ -33,9 +33,7 @@ export class BoardComponent implements AfterViewInit {
   API get on init - who is currently choosing, board state, scores, players
   On choice - which clue was chosen
   */
-  ngOnInit(): void {
-    
-  }
+  ngOnInit(): void {}
 
   isChoosing = true; // temp var for player currently choosing
   intervalId: any = null;
@@ -53,36 +51,19 @@ export class BoardComponent implements AfterViewInit {
     return `repeat(${this.numCols}, 1fr)`;
   }
 
-
   ngAfterViewInit() {
-    // this.initScrollSync();
-    for(let i = 0; i < this.numCols; ++i) {
+    console.log(this.gameData);
+    for (let i = 0; i < this.numCols; ++i) {
       for (let e = 0; e < this.numRows; ++e) {
         if (this.gameData.picked[String(i)][String(e)]) {
-          let clue = document.getElementById((i + e * this.numCols).toString()) as HTMLElement;
+          let clue = document.getElementById(
+            (i + e * this.numCols).toString()
+          ) as HTMLElement;
           clue.style.color = 'var(--gold-transparent-20)';
-          clue.setAttribute('pointer-events','none');
+          clue.setAttribute('pointer-events', 'none');
         }
       }
     }
-  }
-
-  initScrollSync() {
-    const mainContainer = document.querySelector('.main') as HTMLElement;
-    const boardContainer = document.querySelector('.board') as HTMLElement;
-    const playerFogContainer = document.querySelector(
-      '.player-fog'
-    ) as HTMLElement;
-    mainContainer.addEventListener('scroll', () => {
-      boardContainer.scrollTop = mainContainer.scrollTop;
-      playerFogContainer.scrollTop = mainContainer.scrollTop;
-    });
-    boardContainer.addEventListener('wheel', (event) => {
-      mainContainer.scrollTop += event.deltaY;
-    });
-    playerFogContainer.addEventListener('wheel', (event) => {
-      mainContainer.scrollTop += event.deltaY;
-    });
   }
 
   getCategoryIndex(index: number) {
@@ -101,15 +82,21 @@ export class BoardComponent implements AfterViewInit {
     // get and send the chosen clue to the server
     this.chosenClue = event.target as HTMLElement;
 
-    let index = Number(this.chosenClue.id)
+    let index = Number(this.chosenClue.id);
     let category_idx = index % this.numCols;
     let clue_idx = Math.floor(index / this.numCols);
-    this.gameStateChange.emit({category: category_idx, clue: clue_idx});
+    this.gameStateChange.emit({ category: category_idx, clue: clue_idx });
   }
 
-  startFlickerClue(category_idx: number, clue_idx: number, duration: number): void {
+  startFlickerClue(
+    category_idx: number,
+    clue_idx: number,
+    duration: number
+  ): void {
     let total_idx = category_idx + clue_idx * this.numCols;
-    this.chosenClue = document.getElementById((total_idx).toString()) as HTMLElement;
+    this.chosenClue = document.getElementById(
+      total_idx.toString()
+    ) as HTMLElement;
     this.startFlicker();
 
     let realDuration = duration * 1000;
@@ -127,7 +114,7 @@ export class BoardComponent implements AfterViewInit {
       this.intervalId = null;
       clueBackground.style.width = '0';
       clueBackground.style.height = '0';
-    }, realDuration);
+    }, realDuration + 1500);
   }
 
   startFlicker(): void {

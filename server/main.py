@@ -158,7 +158,8 @@ async def send_picker(room_id: str, picker_session_id = None):
     if (not picker_session_id):
         picker_session_id = game_manager.get_picker(room_id)
     sid = session_manager.get_sid(picker_session_id)
-    await sio.emit("picker", True, to=sid)
+    await sio.emit("picker", True, room=room_id, to=sid)
+    await sio.emit("picker", False, room=room_id, skip_sid=sid)
     room = room_manager.get_room_by_id(room_id)
     players = [i["session_id"] for i in get_ordered_players(room["curr_connections"])]
     await sio.emit("picker_index", players.index(picker_session_id), room=room_id)
