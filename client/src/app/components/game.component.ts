@@ -87,6 +87,5 @@ export class GameComponent {
       this.clueComponent.banner=this.clueComponent.BannerType.Red;
     }
     this.clueComponent.bannerText = this.players[this.gameData.answeringIndex].username + ": Who/What is " + text;
-
   }
 }

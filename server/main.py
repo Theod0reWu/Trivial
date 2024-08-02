@@ -176,6 +176,7 @@ async def handle_leaving_room(room_id: str, session_id: str):
         print("picker:", picker)
         await send_picker(room_id, picker)
     await send_players(room_id)
+    await send_player_cash(room_id)
     # needs handle sending player cash and if someone leaves in the clue game state
 
 async def send_timer(room_id: str, timer_name: str, timer_data: dict = None):
