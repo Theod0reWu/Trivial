@@ -3,6 +3,10 @@ from firebase_admin import firestore
 
 import sys
 import time
+import asyncio
+import multiprocessing
+import concurrent.futures
+from concurrent.futures import ProcessPoolExecutor
 
 from game_generation.game import Game, GameState, get_similarity
 from timer import create_timer, CHECK_FREQUENCY
@@ -28,18 +32,34 @@ class GameManager(object):
 		super(GameManager, self).__init__()
 		self.rooms = db.collection('Rooms')
 
-	def init_game(self, room_id: str, room, num_categories, num_clues):
+	def init_game(self, room_id: str, num_categories: int, num_clues: int):
 		'''
 			Expects room_id to already exist in firebase from room_manager
 		'''
 		room_ref = self.rooms.document(room_id)
+		room_data = room_ref.get().to_dict()
 
-		game = Game(room["curr_connections"], len(room["curr_connections"]),num_categories, num_clues)
-		# game.generate_board()
-		# data = game.to_dict()
-		data = Game.test_dict(room["curr_connections"])
+		game = Game(room_data["curr_connections"], len(room_data["curr_connections"]),num_categories, num_clues)
+		game.generate_board()
+		data = game.to_dict()
+		# data = Game.test_dict(room["curr_connections"])
 		
 		room_ref.update(data)
+
+	async def init_game_async(self, room_id: str, num_categories: int, num_clues: int):
+		room_ref = self.rooms.document(room_id)
+		room_data = room_ref.get().to_dict()
+		game = Game(room_data["curr_connections"], len(room_data["curr_connections"]),num_categories, num_clues)
+
+		process = multiprocessing.Process(target=game.generate_board())
+		process.start()
+
+		loop = asyncio.get_running_loop()
+		await loop.run_in_executor(None, process.join)
+		data = game.to_dict()
+
+		room_ref.update(data)
+
 
 	def start_game(self, room_id: str):
 		room_ref = self.rooms.document(room_id)
@@ -167,7 +187,7 @@ class GameManager(object):
 		duration =timer_data["end"] - timer_data["pause_start"]
 		room_ref.update({
 		    BUZZ_IN_TIMER_NAME + ".active": True, 
-		    BUZZ_IN_TIMER_NAME + ".end": duration + time.time(),
+		    BUZZ_IN_TIMER_NAME + ".end": duration + time.time()
 		    })
 		return duration
 
@@ -195,6 +215,10 @@ class GameManager(object):
 			room_ref = self.rooms.document(room_id)
 			room_data = room_ref.get().to_dict()
 		return room_data["picked"], room_data
+
+	def stop_answering(self, room_id: str):
+		room_ref = self.rooms.document(room_id)
+		room_ref.update({"answering": None})
 	
 	def handle_answer(self, room_id: str, session_id: str, answer: str, threshold = .95):
 		'''

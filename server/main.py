@@ -253,7 +253,8 @@ async def start_game(sid, data):
     room_id, session_id, num_categories, num_clues = data["room_id"], data["session_id"], data["num_categories"], data["num_clues"]
     if (room_manager.is_host(room_id, session_id)):
         await send_game_state(room_id, "generating")
-        game_manager.init_game(room_id, room_manager.get_room_by_id(room_id), num_categories, num_clues)
+        # game_manager.init_game(room_id, num_categories, num_clues)
+        await game_manager.init_game_async(room_id, num_categories, num_clues)
         game_manager.start_game(room_id)
     
     await send_picker(room_id)
@@ -275,6 +276,7 @@ async def finish_clue(room_id: str, display_ans: bool = True):
 
 async def end_answering(room_id: str, session_id: str = None):
     # if a session_id is given this means someone buzzed in and never answered/answered wrong
+    game_manager.stop_answering(room_id)
     if (session_id):
         all_buzzed_in = game_manager.deduct_points(room_id, session_id)
         await send_player_cash(room_id)
@@ -307,7 +309,7 @@ async def board_choice(sid, data):
     await sio.emit("clue", {"clue": clue, "duration": settings.buzz_in_time}, room=room_id)
     await sio.emit("game_state", "clue", room=room_id)
 
-    await run_timer(settings.buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id})
+    await run_timer(settings.buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id}, {"room_id": room_id, "display_ans": True})
     
 @sio.event
 async def buzz_in(sid, data):

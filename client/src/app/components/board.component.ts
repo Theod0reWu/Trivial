@@ -5,7 +5,6 @@ import {
   Input,
   Output,
 } from '@angular/core';
-// import { NgOptimizedImage } from '@angular/common';
 import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule } from '@angular/common';
 import { Player, GameData } from '../api/GameData';
@@ -20,7 +19,6 @@ const FLICKER_INTERVAL = 200;
   styleUrl: '../components_css/board.component.css',
 })
 export class BoardComponent implements AfterViewInit {
-  //   @Output() hostGameEvent = new EventEmitter<PageStates>();
   @Input() players!: Player[];
   @Input() scores!: number[];
   @Input() numRows!: number;
@@ -29,11 +27,6 @@ export class BoardComponent implements AfterViewInit {
   @Input() prices!: number[];
   @Input() gameData: GameData;
   @Output() gameStateChange = new EventEmitter<any>();
-  /* 
-  API get on init - who is currently choosing, board state, scores, players
-  On choice - which clue was chosen
-  */
-  ngOnInit(): void {}
 
   isChoosing = true; // temp var for player currently choosing
   intervalId: any = null;
@@ -52,6 +45,11 @@ export class BoardComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
+    /*
+      dims all the clues that have already been chosen
+
+      requires that gameData.picked is updated before the view is loaded
+    */
     for (let i = 0; i < this.numCols; ++i) {
       for (let e = 0; e < this.numRows; ++e) {
         if (this.gameData.picked[String(i)][String(e)]) {

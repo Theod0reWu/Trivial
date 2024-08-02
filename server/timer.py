@@ -22,9 +22,10 @@ async def run_timer(duration: float, checker: callable , callback: callable, par
 			proceed, duration = checker(time.time(), **parameters)
 		except TypeError:
 			break
-	if (purpose):
-		print(purpose)
+
 	if (duration == 0):
+		if (purpose):
+			print(purpose)
 		if (callback_params is None):
 			await callback(**parameters)
 		else:
