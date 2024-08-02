@@ -13,9 +13,6 @@ export class SocketService {
     this.socket = io('http://localhost:8000', {
       auth: { session_id: sessionId },
     });
-    this.socket.on('connect', () => {
-      console.log('Connected to server');
-    });
     this.socket.on('error', (err) => {
       console.error('Error connecting to server:' + err);
     });

@@ -147,7 +147,6 @@ async def send_player_cash(room_id: str):
         return
     session_id = [i["session_id"] for i in get_ordered_players(room["curr_connections"])]
     cash = game_manager.get_player_cash(room_id, session_id)
-    print("cash", cash)
     await sio.emit("player_cash", cash, room=room_id)
 
 async def send_picker(room_id: str, picker_session_id = None):
@@ -173,7 +172,6 @@ async def handle_leaving_room(room_id: str, session_id: str):
     if (host):
         await sio.emit("host", to=host)
     if (picker):
-        print("picker:", picker)
         await send_picker(room_id, picker)
     await send_players(room_id)
     await send_player_cash(room_id)
@@ -192,7 +190,6 @@ async def connect(sid, environ, auth):
     if not session:
         raise ConnectionRefusedError('authentication failed')
     session_manager.update_session(session_id, sid)
-    print(auth)
 
 @sio.event
 async def disconnect(sid):
@@ -342,7 +339,6 @@ async def buzz_in(sid, data):
 @sio.event
 async def answer_clue(sid, data):
     room_id, session_id, answer = data["room_id"], data["session_id"], data["answer"]
-    print("got answer:", answer)
 
     good = False
     try:

@@ -52,7 +52,6 @@ export class BoardComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log(this.gameData);
     for (let i = 0; i < this.numCols; ++i) {
       for (let e = 0; e < this.numRows; ++e) {
         if (this.gameData.picked[String(i)][String(e)]) {

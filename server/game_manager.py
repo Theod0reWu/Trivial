@@ -38,9 +38,7 @@ class GameManager(object):
 		# game.generate_board()
 		# data = game.to_dict()
 		data = Game.test_dict(room["curr_connections"])
-
-		print(num_categories, num_clues)
-		print(data)
+		
 		room_ref.update(data)
 
 	def start_game(self, room_id: str):
