@@ -93,7 +93,7 @@ class Game(object):
 
 	def to_dict(self):
 		data = {
-			"num_players": self.num_players,
+			# "num_players": self.num_players,
 			"player_cash": self.player_cash,
 
 			"num_categories": self.num_categories,
@@ -114,7 +114,7 @@ class Game(object):
 
 	def test_dict(player_ids):
 		return {
-			'num_players': 1, 
+			# 'num_players': 1, 
 			'player_cash': {i:0 for i in player_ids}, 
 			'num_categories': 2, 
 			'num_clues': 3, 

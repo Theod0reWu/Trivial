@@ -205,9 +205,6 @@ class GameManager(object):
 				increases "player_cash"
 				removes the "picked" clue
 				assignes the answering player as "picker"
-			If the player is incorrect:
-				decreases player cash
-
 			In both cases the answering timer is set to inactive and "answering" marked as None
 		'''
 		room_ref = self.rooms.document(room_id)
@@ -237,13 +234,18 @@ class GameManager(object):
 				})
 		else:
 			room_ref.update({
-				"player_cash." + session_id: room_data["player_cash"][session_id] - board_item["price"],
+				# "player_cash." + session_id: room_data["player_cash"][session_id] - board_item["price"],
 				ANSWER_TIMER_NAME + ".active": False,
 				"answering": None
 				})
 		return correct
 
 	def deduct_points(self, room_id: str, session_id: str):
+		'''
+			Deducts points from the picked question from the given session_id
+
+			Also returns true if everyone has buzzed in.
+		'''
 		room_ref = self.rooms.document(room_id)
 		room_data = room_ref.get().to_dict()
 		picking = room_data["picking"]
@@ -251,6 +253,7 @@ class GameManager(object):
 		room_ref.update({
 				"player_cash." + session_id: room_data["player_cash"][session_id] - board_item["price"]
 				})
+		return len(room_data["curr_connections"]) == len(room_data["answered"])
 
 	# Create a callback on_snapshot function to capture changes
 	def on_snapshot(doc_snapshot, changes, read_time):

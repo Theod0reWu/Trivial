@@ -273,9 +273,11 @@ async def finish_clue(room_id: str):
 async def end_answering(room_id: str, session_id: str = None):
     # restart the buzz in timer and send open to new buzz-ins
     if (session_id):
-        print("deducting points")
-        game_manager.deduct_points(room_id, session_id)
+        all_buzzed_in = game_manager.deduct_points(room_id, session_id)
         await send_player_cash(room_id)
+        if (all_buzzed_in):
+            await finish_clue(room_id)
+            return
 
     new_buzz_in_time = game_manager.restart_buzz_in_timer(room_id)
     await sio.emit("paused", {"action": "stop", "duration": new_buzz_in_time}, room=room_id)
@@ -286,7 +288,6 @@ async def board_choice(sid, data):
     '''
         Receives the picked clue card from the picker and sends out the clue to all the people in the room.
     '''
-    print("board choice", data)
     room_id, session_id, category_idx, clue_idx = data["room_id"], data["session_id"], data["category_idx"], data["clue_idx"]
     clue = game_manager.pick(session_id, room_id, str(category_idx), str(clue_idx))
     if (clue is None):
@@ -358,7 +359,7 @@ async def answer_clue(sid, data):
         await sio.sleep(settings.response_show_time)
 
         # restart the timer
-        await end_answering(room_id)
+        await end_answering(room_id, session_id)
 
 if __name__ == "__main__":
     uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)
