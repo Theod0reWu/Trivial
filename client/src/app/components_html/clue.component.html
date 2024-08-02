@@ -1,36 +1,79 @@
 <main class="main">
   <div class="clue-ui">
     <div class="clue">
-      <div class="clue-text">{{ clue }}</div>
+      <div class="clue-text" #clueText>{{ _clue }}</div>
     </div>
-    @if (banner === BannerType.Green || banner === BannerType.Red) {
-      <div class="banner" [style.background-color] = banner>
-        <div class="banner-text">{{ bannerText }} </div>
+    <div
+      class="colored-banner"
+      *ngIf="banner === BannerType.Green || banner === BannerType.Red"
+    >
+      <div class="banner" [style.background-color]="banner">
+        <div class="banner-text">{{ bannerText }}</div>
       </div>
-    }
-    @else if (banner === BannerType.AltAnswering) {
+    </div>
+    <div class="altanswering" *ngIf="banner === BannerType.AltAnswering">
       <div class="answering-outer">
-        <div class="answering-text">{{ answeringText }} </div>
-        <timer />
+        <div class="answering-text">{{ answeringText }}</div>
       </div>
-    }
-    @else {
-      <div class="banner" [style.opacity] = 0></div>
-    }
-
-    <div class="button-panel">
-      <div class="button">Buzz In</div>
     </div>
+    <div class="answering" *ngIf="banner === BannerType.Answering">
+      <div class="answering-form">
+        <div class="who-or-what">Who/What is:</div>
+        <form
+          class="ans-form"
+          type="submit"
+          (ngSubmit)="onSubmitAnswer()"
+          [formGroup]="form"
+        >
+          <input
+            placeholder="your answer"
+            id="ansInput"
+            formControlName="answer"
+            autocomplete="off"
+            #myInput
+          />
+          {{ myInput.focus() }}
+        </form>
+      </div>
+    </div>
+    <div class="empty" *ngIf="banner === BannerType.Empty">
+      <div class="button-panel">
+        <div
+          class="button"
+          (click)="sendBuzzIn()"
+          [ngStyle]="{
+            'background-color': buzzedIn ? 'var(--dangererer)' : 'var(--red)'
+          }"
+        >
+          Buzz In
+        </div>
+      </div>
+    </div>
+    <timer
+      *ngIf="
+        banner === BannerType.AltAnswering || banner === BannerType.Answering
+      "
+      id="watching-timer"
+      [onMessage$]="timerObservable$"
+    />
   </div>
   <div class="players">
     <div class="players-container">
-      @for (player of players; track player) {
+      @for (player of players; track player; let index = $index) {
       <div class="player-card">
-        <div class="player-score">${{ player.score }}</div>
-        <div class="player-name">{{ player.username }}</div>
+        <div class="player-score">
+          {{ player["score"] | currency : "USD" : "symbol" : "0.0-0" }}
+        </div>
+        <div class="player-name">{{ player["username"] }}</div>
       </div>
       }
     </div>
-    <!-- <div class="player-fog"></div> -->
+  </div>
+
+  <div class="progress-bar">
+    <div
+      class="progress-bar-fill"
+      [ngStyle]="{ 'width.%': progress * 100 }"
+    ></div>
   </div>
 </main>

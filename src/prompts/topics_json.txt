@@ -1,3 +1,0 @@
-Give an exhaustive list of trivia topics part of the {category} Category. Each topic should not be able to be combined with another topic. Do not include topics such as "General Knowledge", "Trivia", or "Miscellaneous". 
-
-Your output should be a list with each entry in the list a topic.

@@ -1,11 +1,20 @@
-@if (boardView) {
+@if (gameData.state === 'board') {
 <board-view
   (gameStateChange)="handleGameStateChange($event)"
   [players]="players"
+  [numRows]="numRows"
+  [numCols]="numCols"
+  [categories]="categoryTitles"
+  [prices]="prices"
+  [gameData]="gameData"
 />
 } @else {
 <clue-view
   (gameStateChange)="handleGameStateChange($event)"
+  (onBuzzIn)="handleBuzzIn()"
+  (onAnswer)="handleAnswer($event)"
   [players]="players"
+  [clue]="gameData.current_clue"
+  [onMessage$]="clueObservable$"
 />
 }

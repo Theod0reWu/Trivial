@@ -9,6 +9,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
+import { ApiService } from '../api/api.service';
 
 @Component({
   selector: 'landing-view',
@@ -30,7 +31,9 @@ import {
   ],
 })
 export class LandingComponent {
-  @Output() hostGameEvent = new EventEmitter<PageStates>();
+  constructor(private apiService: ApiService) {}
+
+  @Output() hostGameEvent = new EventEmitter<object>();
   username: string = '';
   roomCode: string = '';
   showPopup: boolean = false;
@@ -47,39 +50,58 @@ export class LandingComponent {
     this.clickedJoinGame = true;
   }
 
+  showError(error: string) {
+    this.errorMessage = error;
+    this.showPopup = true;
+    this.popupTimeout = setTimeout(() => {
+      this.showPopup = false;
+    }, 3000);
+  }
+
   onClickJoin() {
     clearTimeout(this.popupTimeout);
     if (!this.username.trim()) {
-      this.errorMessage = 'Please enter a username first!';
-      this.showPopup = true;
-      this.popupTimeout = setTimeout(() => {
-        this.showPopup = false;
-      }, 3000);
+      this.showError('Please enter a username first!');
     } else if (!this.roomCode.trim()) {
-      this.errorMessage = 'Please enter a valid room code!';
-      this.showPopup = true;
-      this.popupTimeout = setTimeout(() => {
-        this.showPopup = false;
-      }, 3000);
+      this.showError('Please enter a valid room code!');
     } else {
-      this.errorMessage = '';
-      this.showPopup = false;
-      this.hostGameEvent.emit(PageStates.Waiting);
+      this.apiService.validRoom(this.roomCode).subscribe({
+        next: (value) => {
+          if (value) {
+            this.errorMessage = '';
+            this.showPopup = false;
+            this.hostGameEvent.emit({
+              state: PageStates.Waiting,
+              roomId: this.roomCode,
+              host: false,
+              username: this.username,
+            });
+          } else {
+            this.showError('A room with that code does not exist!');
+          }
+        },
+      });
     }
   }
 
   onClickHostGame() {
     clearTimeout(this.popupTimeout);
     if (!this.username.trim()) {
-      this.errorMessage = 'Please enter a username first!';
-      this.showPopup = true;
-      this.popupTimeout = setTimeout(() => {
-        this.showPopup = false;
-      }, 3000);
+      this.showError('Please enter a username first!');
     } else {
       this.errorMessage = '';
       this.showPopup = false;
-      this.hostGameEvent.emit(PageStates.Waiting);
+      this.apiService.createRoomId().subscribe({
+        next: (v) => {
+          this.hostGameEvent.emit({
+            state: PageStates.Waiting,
+            roomId: v.room_id,
+            host: true,
+            username: this.username,
+          });
+        },
+        error: (e) => console.error('Error creating room id:', e),
+      });
     }
   }
 }

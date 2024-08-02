@@ -1,57 +1,8 @@
 from socketio import AsyncServer, ASGIApp
-from room_manager import room_manager
-from session_manager import session_manager
 from socketio.exceptions import ConnectionRefusedError
 
-# class UserConnection:
-#     def __init__(self, session_id, sid, username):
-#         self.session_id = session_id
-#         self.curr_sid = sid
-#         self.username = username
-#     def __eq__(self, other):
-#         if isinstance(other, UserConnection):
-#             return self.session_id == other.session_id
-#         elif isinstance(other, str):
-#             return self.session_id == other
-#         return NotImplemented
-#     def __hash__(self):
-#         return hash(self.session_id)
-        
-# class Room:
-#     def __init__(self, id):
-#         self.id = id
-#         self.curr_connections = [] # maintain order of connections
-#         self.all_connections = set() # remember all connections
-#     def updateConnections(self, session_id, sid, username):
-#         try:
-#             idx = self.curr_connections.index(session_id)
-#             self.curr_connections[idx].curr_sid = sid
-#         except ValueError:
-#             self.curr_connections.append(UserConnection(session_id, sid, username))
-#         try:
-#             idx = self.all_connections.index(session_id)
-#             self.all_connections[idx].curr_sid = sid
-#         except ValueError:
-#             self.all_connections.append(UserConnection(session_id, sid, username))
-#     def getCurrConnection(self, **kwargs):
-#         for conn in self.curr_connections:
-#             if "sid" in kwargs and conn.curr_sid == kwargs["sid"] or "session_id" in kwargs and conn.session_id == kwargs["session_id"]:
-#                 return conn
-#         return None
-#     def getConnection(self, **kwargs):
-#         for conn in self.all_connections:
-#             if "sid" in kwargs and conn.curr_sid == kwargs["sid"] or "session_id" in kwargs and conn.session_id == kwargs["session_id"]:
-#                 return conn
-#         return None
-
-    # async def send(self, data):
-    #     for conn in self.curr_connections:
-    #         print(data) #test
-    #         await conn.websocket.send_text(data)
-
-sio = AsyncServer(cors_allowed_origins='*', async_mode="asgi")
+sio = AsyncServer(cors_allowed_origins=[], async_mode="asgi")
 socket_app = ASGIApp(sio)
-# rooms: dict[str, Room] = {}
 
 @sio.event
 async def connect(sid, environ, auth):
@@ -62,14 +13,6 @@ async def connect(sid, environ, auth):
     #     room_manager.create_room(session["room_id"])
     if not session:
         raise ConnectionRefusedError('authentication failed')
-        # print(session["room_id"])
-        # username = room_manager.get_room(session["room_id"])["all_connections"][session_id].username
-        # await sio.emit("reconnect", {"room_id": session["room_id"], "session_id": session_id})
-    # for room_id, room in rooms.items():
-    #     conn = room.getConnection(session_id=session_id)
-    #     if conn is not None:
-    #         await sio.emit("reconnect", {"room_id": room_id, "username": conn.username, "session_id": session_id})
-    #         break
     print(auth)
 
 @sio.event
@@ -82,9 +25,6 @@ async def chat_message(sid, data):
     if room:
         username = [conn["username"] for conn in room["curr_connections"].values() if conn["curr_sid"] == sid][0]
         await sio.emit('chat_message', {"room_id": room_id, "message": message, "username": username}, room=room_id)
-    # if room_id in rooms:
-    #     username = rooms[room_id].getCurrConnection(sid=sid).username
-    #     await sio.emit('chat_message', {"room_id": room_id, "message": message, "username": username}, room=room_id) #skip_sid=sid
 
 @sio.event
 async def disconnect(sid):
@@ -134,8 +74,3 @@ async def leave_room(sid, data):
     session_manager.delete_session(session_id)
     await sio.leave_room(sid, room_id)
     print(f"User {session_id} left room {room_id}")
-
-    # if room_id in rooms:
-    #     rooms[room_id].all_connections.remove(session_id)
-    #     rooms[room_id].curr_connections.remove(session_id)
-    #     print(f"User {username} left room {room_id}")

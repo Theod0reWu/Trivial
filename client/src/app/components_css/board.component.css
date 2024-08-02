@@ -9,7 +9,7 @@ main {
   align-items: center;
   flex-direction: column;
   overflow-y: scroll;
-  scrollbar-color: var(--black) var(--black-transparent-50);
+  /*  scrollbar-color: var(--black) var(--black-transparent-50);*/
   scrollbar-width: thin;
   /* z-index: 10; */
 }
@@ -38,7 +38,7 @@ main {
 }
 
 .categories {
-  grid-template-columns: repeat(6, 1fr);
+  /*  grid-template-columns: repeat(6, 1fr);*/
   gap: 10px;
   font-size: 32px;
   color: var(--snow);
@@ -46,7 +46,7 @@ main {
 }
 
 .clues {
-  grid-template-columns: repeat(6, 1fr);
+  /*  grid-template-columns: repeat(6, 1fr);*/
   gap: 10px;
   font-size: 40px;
   color: var(--gold);
@@ -66,7 +66,7 @@ main {
 }
 
 .clue.active {
-  transition: background-color 0.2s ease 0s transform 0.2s ease 0s;
+  transition: background-color 0.2s ease 0s, transform 0.2s ease 0s;
   cursor: pointer;
 }
 
@@ -91,7 +91,7 @@ main {
 .players-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+  gap: 20px;
   padding: 20px 10px 20px 10px;
   align-self: stretch;
   box-sizing: border-box;
@@ -100,6 +100,8 @@ main {
 .player-card {
   display: grid;
   gap: 2.5px;
+  outline-style: solid;
+  outline-width: 0.5em;
 }
 
 .player-score,

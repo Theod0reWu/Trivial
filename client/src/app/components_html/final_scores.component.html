@@ -1,0 +1,71 @@
+<main>
+  <div class="button-panel">
+    <div class="leave-button">
+      <div class="leave">RETURN TO HOME</div>
+    </div>
+    <!-- host only display return to waiting room button -->
+    <div class="restart-button">
+      <div class="restart">START A NEW GAME</div>
+    </div>
+  </div>
+  <div class="congrats">Thanks for Playing!</div>
+  <div class="standings">
+    <div class="container">
+      <div class="podium-wrapper">
+        <div class="podium">
+          <div class="place third" *ngIf="podium[2]">
+            <div class="player">
+              <span class="podium-place">3rd</span>
+              <div class="podium-text">
+                <span class="podium-username">{{ podium[2].username }}</span>
+                <span class="podium-score">{{
+                  podium[2].score | currency : "USD" : "symbol" : "0.0-0"
+                }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="place first" *ngIf="podium[0]">
+            <div class="player">
+              <span class="podium-place">1st</span>
+              <div class="podium-text">
+                <span class="podium-username">{{ podium[0].username }}</span>
+                <span class="podium-score">{{
+                  podium[0].score | currency : "USD" : "symbol" : "0.0-0"
+                }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="place second" *ngIf="podium[1]">
+            <div class="player">
+              <span class="podium-place">2nd</span>
+              <div class="podium-text">
+                <span class="podium-username">{{ podium[1].username }}</span>
+                <span class="podium-score">{{
+                  podium[1].score | currency : "USD" : "symbol" : "0.0-0"
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="non-podium">
+        <div
+          class="player"
+          *ngFor="let player of nonPodium; trackBy: trackByIndex; index as i"
+        >
+          <div class="non-podium-text">
+            <div class="non-podium-text-left">
+              <span class="non-podium-place">{{ i + 4 }}th</span>
+              <span class="non-podium-username">{{ player.username }}</span>
+            </div>
+            <div class="non-podium-text-right">
+              <span class="non-podium-score">{{
+                player.score | currency : "USD" : "symbol" : "0.0-0"
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

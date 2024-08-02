@@ -1,0 +1,3 @@
+Give an exhaustive list of trivia topics part of the "{category}" Category. Each topic should not be able to be combined with another topic. Each topic should cover an area of expertise/knowledge and should be 3 words or less. Do not include topics such as "General Knowledge", "Trivia", or "Miscellaneous". 
+
+Your output should be a simple list with each entry in the list a topic.

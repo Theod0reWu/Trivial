@@ -15,7 +15,6 @@
   flex-direction: column;
   align-items: center;
   /* justify-content: center; */
-  scrollbar-color: var(--black) var(--black-transparent-50);
   scrollbar-width: thin;
   overflow: scroll;
 }
@@ -80,16 +79,19 @@
 } */
 
 .clue {
-  padding: 10vh;
+  padding: 8vh 5vh 10vh 5vh;
+  height: 45%;
 }
 
 .clue-text {
+  height: 100%;
   color: var(--snow);
   font-family: var(--standard-font);
   font-size: 50px;
   text-align: center;
   line-height: normal;
   text-transform: uppercase;
+  /* font-size: clamp(24px, 2.5cqw, 50px); */
 }
 
 .clue-ui {
@@ -137,19 +139,21 @@
   /* border: 1px solid var(--dangerest); */
 }
 
+/*
 .button:hover {
   background-color: var(--red);
 }
+*/
 
 /* banner is 60px tall with 50px botton margin */
 
-.banner{
-    left: 0;
-    right: 0;
-    padding:15px;
-    height:60px;
-    margin-bottom: 50px;
-    /* background-size:100%;    */
+.banner {
+  left: 0;
+  right: 0;
+  padding: 15px;
+  height: 60px;
+  margin-bottom: 50px;
+  /* background-size:100%;    */
 }
 
 .banner-text {
@@ -162,17 +166,68 @@
 
 /* answering text is 40px tall, with timer 20px tall*/
 
-.answering-text{
-    padding:15px;
-    height:40px;
-    color: var(--snow);
-    font-family: var(--robot-font);
-    font-size: 40px;
-    text-align: center;
-    line-height: normal;
+.answering-text {
+  padding: 15px;
+  height: 40px;
+  color: var(--snow);
+  font-family: var(--robot-font);
+  font-size: 40px;
+  text-align: center;
+  line-height: normal;
 }
 
 .answering-outer {
   background-color: var(--black-transparent-75);
   margin-bottom: 50px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 10px;
+  background-color: var(--black);
+  position: fixed;
+  bottom: 0%;
+}
+
+.progress-bar-fill {
+  background-color: var(--red);
+  height: 100%; /* This is important */
+}
+
+.who-or-what {
+  display: block;
+  font-size: 24px;
+  color: white;
+  /*  margin: 0 auto;*/
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.ans-form {
+  margin-bottom: 5px;
+}
+
+input {
+  display: block;
+
+  background: var(--white-transparent-10);
+  font-weight: bolder;
+  font-size: 22px;
+
+  border-top: 2px solid var(--white);
+  border-bottom: 2px solid var(--white);
+  border-left: 0;
+  border-right: 0;
+
+  color: white;
+  text-align: center;
+
+  margin: 0 auto;
+  width: 80%;
+  height: 40px;
+}
+
+textarea:focus,
+input:focus {
+  outline: none;
 }
