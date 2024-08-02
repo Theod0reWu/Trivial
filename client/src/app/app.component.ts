@@ -31,7 +31,7 @@ export enum PageStates {
 export class AppComponent {
   constructor(
     private elementRef: ElementRef,
-    public connectorService: ConnectorService,
+    public connectorService: ConnectorService
   ) {}
   @ViewChild(GameComponent) gameComponent: GameComponent;
   @ViewChild('bgOver') bgOverlay!: ElementRef;
@@ -62,7 +62,6 @@ export class AppComponent {
           if (value === 'board') {
             this.state = this.pageStates.InGame;
             this.connectorService.loading = false;
-            
           } else if (value === 'generating') {
             this.state = this.pageStates.Loading;
             this.loadingMessage =
@@ -75,48 +74,52 @@ export class AppComponent {
       this.connectorService.pickingChange$.subscribe({
         next: (value) => {
           this.connectorService.gameData.answering = false;
-          this.gameComponent.startFlickerClue(value["category_idx"], value["clue_idx"], value["duration"]);
-        }
+          this.gameComponent.startFlickerClue(
+            value['category_idx'],
+            value['clue_idx'],
+            value['duration']
+          );
+        },
       });
 
       this.connectorService.clueChange$.subscribe({
         next: (value) => {
-          this.connectorService.gameData.current_clue = value["clue"];
-          this.connectorService.gameData.buzz_in_duration = value["duration"];
-          this.gameComponent.startProgressBar(value["duration"]);
-        }
+          this.connectorService.gameData.current_clue = value['clue'];
+          this.connectorService.gameData.buzz_in_duration = value['duration'];
+          this.gameComponent.startProgressBar(value['duration']);
+        },
       });
 
       this.connectorService.pausedChange$.subscribe({
         next: (value: any) => {
-          if (value["action"] === "start"){
-            this.connectorService.gameData.answeringIndex = value["who"];
+          if (value['action'] === 'start') {
+            this.connectorService.gameData.answeringIndex = value['who'];
             if (!this.connectorService.gameData.answering) {
               this.gameComponent.otherAnswering();
             }
-            
+
             this.gameComponent.pauseProgressBar();
-            this.gameComponent.startAnsweringTimer(value["duration"]);
-          } else if (value["action"] === "stop") {
+            this.gameComponent.startAnsweringTimer(value['duration']);
+          } else if (value['action'] === 'stop') {
             //stop pausing go back to buzzer page and resume the progress bar
             this.gameComponent.gameData.answering = false;
-            this.gameComponent.unpause(value["duration"]);
+            this.gameComponent.unpause(value['duration']);
           }
-        }
+        },
       });
 
       this.connectorService.answeringChange$.subscribe({
         next: (value: any) => {
           this.connectorService.gameData.answering = true;
-          this.gameComponent.startAnswering(value["duration"]);
-        }
+          this.gameComponent.startAnswering(value['duration']);
+        },
       });
 
       this.connectorService.responseChange$.subscribe({
         next: (value: any) => {
           console.log(value);
-          this.gameComponent.handleResponse(value["correct"], value["answer"]);
-        }
+          this.gameComponent.handleResponse(value['correct'], value['answer']);
+        },
       });
     };
     this.connectorService.connectToRoom(callback);

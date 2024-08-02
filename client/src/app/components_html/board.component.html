@@ -18,14 +18,13 @@
       >
         <ng-container *ngFor="let item of range(numRows * numCols)">
           <div
-            [ngClass]="{ active: isChoosing }"
             [ngStyle]="{
               'pointer-events':
                 gameData.isPicker && !intervalId && gameData.state === 'board'
                   ? 'auto'
                   : 'none'
             }"
-            class="clue"
+            class="clue active"
             (click)="onClickClue($event)"
             [id]="item"
           >

@@ -109,7 +109,7 @@ class RoomManager:
         room = room_ref.get().to_dict()
         return room
 
-    def is_host(self, room_id: str, session_id: str):
+    def is_host(self, room_id: str, session_id: str) -> bool:
         # returns if the session_id is the host of the room_id
         room_ref = self.rooms.document(room_id)
         room = room_ref.get().to_dict()

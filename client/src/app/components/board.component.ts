@@ -35,7 +35,6 @@ export class BoardComponent implements AfterViewInit {
   */
   ngOnInit(): void {}
 
-  isChoosing = true; // temp var for player currently choosing
   intervalId: any = null;
   chosenClue: HTMLElement;
 
@@ -52,7 +51,7 @@ export class BoardComponent implements AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log(this.gameData);
+    console.log(this.players);
     for (let i = 0; i < this.numCols; ++i) {
       for (let e = 0; e < this.numRows; ++e) {
         if (this.gameData.picked[String(i)][String(e)]) {
