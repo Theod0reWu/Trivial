@@ -192,10 +192,11 @@ class GameManager(object):
 		room_ref = self.rooms.document(room_id)
 		room_ref.update({"answered": []})
 
-	def get_picked_clues(self, room_id: str):
-		room_ref = self.rooms.document(room_id)
-		room_data = room_ref.get().to_dict()
-		return room_data["picked"]
+	def get_picked_clues(self, room_id: str, room_data = None):
+		if (room_data is None):
+			room_ref = self.rooms.document(room_id)
+			room_data = room_ref.get().to_dict()
+		return room_data["picked"], room_data
 	
 	def handle_answer(self, room_id: str, session_id: str, answer: str, threshold = .95):
 		'''
@@ -239,6 +240,14 @@ class GameManager(object):
 				"answering": None
 				})
 		return correct
+
+	def get_correct_ans(self, room_id: str, room_data = None):
+		if (room_data is None):
+			room_ref = self.rooms.document(room_id)
+			room_data = room_ref.get().to_dict()
+		picking = room_data["picking"]
+		board_item = room_data["board_data"][picking["category_idx"]][int(picking["clue_idx"])]
+		return board_item["answer"], room_data
 
 	def deduct_points(self, room_id: str, session_id: str):
 		'''

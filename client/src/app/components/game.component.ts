@@ -88,4 +88,9 @@ export class GameComponent {
     }
     this.clueComponent.bannerText = this.players[this.gameData.answeringIndex].username + ": Who/What is " + text;
   }
+
+  displayCorrectAnswer(text: string): void {
+    this.clueComponent.banner = this.clueComponent.BannerType.Green;
+    this.clueComponent.bannerText = "We were looking for" + ": Who/What is " + text;
+  }
 }

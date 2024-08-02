@@ -114,8 +114,11 @@ export class AppComponent {
 
       this.connectorService.responseChange$.subscribe({
         next: (value: any) => {
-          console.log(value);
-          this.gameComponent.handleResponse(value["correct"], value["answer"]);
+          if ('end' in value) {
+            this.gameComponent.displayCorrectAnswer(value["answer"]);
+          } else {
+            this.gameComponent.handleResponse(value["correct"], value["answer"]);
+          } 
         }
       });
     };

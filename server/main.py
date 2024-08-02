@@ -266,19 +266,27 @@ async def start_game(sid, data):
 
 ### in-game events ####
 
-async def finish_clue(room_id: str):
-    await sio.emit("picked", game_manager.get_picked_clues(room_id), room=room_id)
+async def finish_clue(room_id: str, display_ans: bool = True):
+    room_data = None
+    if (display_ans):
+        answer, room_data = game_manager.get_correct_ans(room_id)
+        await sio.emit("response", {"correct": True, "answer": answer, "end": True}, room=room_id);
+        await sio.sleep(settings.response_show_time)
+
+    await sio.emit("picked", game_manager.get_picked_clues(room_id, room_data)[0], room=room_id)
     await sio.emit("game_state", "board", room=room_id)
 
 async def end_answering(room_id: str, session_id: str = None):
-    # restart the buzz in timer and send open to new buzz-ins
+    # if a session_id is given this means someone buzzed in and never answered/answered wrong
     if (session_id):
         all_buzzed_in = game_manager.deduct_points(room_id, session_id)
         await send_player_cash(room_id)
+        # if everyone buzzed in finish the clue (everyone was wrong)
         if (all_buzzed_in):
-            await finish_clue(room_id)
+            await finish_clue(room_id, True)
             return
 
+    # restart the buzz in timer and send open to new buzz-ins
     new_buzz_in_time = game_manager.restart_buzz_in_timer(room_id)
     await sio.emit("paused", {"action": "stop", "duration": new_buzz_in_time}, room=room_id)
     await run_timer(new_buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id})
@@ -351,7 +359,7 @@ async def answer_clue(sid, data):
 
         await send_picker(room_id, session_id)
         # return to the board
-        await finish_clue(room_id)
+        await finish_clue(room_id, False)
     else:
         # show the incorrect response
         await sio.emit("response", {"correct": False, "answer": answer}, room=room_id);
