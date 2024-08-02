@@ -1,0 +1,250 @@
+main {
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  min-height: 100vh;
+  background-color: var(--black-transparent-50);
+}
+
+.congrats {
+  font-family: var(--congrats-font);
+  font-weight: 400;
+  font-style: normal;
+  color: var(--white);
+  font-size: 65px;
+  clear: both;
+  text-shadow: var(--purple) 1px 0 10px;
+  display: flex;
+  align-items: center;
+  height: 100px;
+  padding-top: 50px;
+}
+
+.standings {
+  width: 65%;
+  display: flex;
+  justify-content: center;
+  padding: 50px 0 50px 0;
+}
+
+.container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 20px;
+  width: 100%;
+}
+
+.podium-wrapper,
+.non-podium .player {
+  display: flex;
+  justify-content: center;
+}
+
+.podium {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 1fr;
+  grid-template-areas:
+    ".  first . "
+    "second first ."
+    "second first third";
+  gap: 10px;
+  height: 250px;
+  position: relative;
+  width: 75%;
+  padding-bottom: 16px;
+}
+
+.podium-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  border: 2px solid #000;
+  box-shadow: 0 4px 8px var(--black-transparent-50);
+  padding: 10px;
+  text-align: center;
+  position: relative;
+}
+
+.first {
+  grid-area: first;
+  height: 100%;
+  background: linear-gradient(to bottom, gold 0%, var(--gold) 100%);
+  z-index: 3;
+}
+
+.second {
+  grid-area: second;
+  background: linear-gradient(to bottom, silver 0%, var(--gray) 100%);
+  z-index: 2;
+}
+
+.third {
+  grid-area: third;
+  background: linear-gradient(to bottom, #cd7f32 0%, var(--dark-red) 100%);
+  z-index: 1;
+}
+
+.non-podium {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.non-podium .player .non-podium-text {
+  border: 1px solid var(--black);
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 4px 8px var(--black-transparent-25);
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--black-transparent-50);
+  border-radius: 5px;
+  width: 85%;
+}
+
+.podium .player,
+.podium-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.podium .player {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 100%;
+}
+
+.podium-place,
+.non-podium-place {
+  font-family: var(--congrats-font);
+  color: var(--snow);
+  text-shadow: var(--black) 1px 0 10px;
+}
+
+.first .podium-place {
+  font-size: 60px;
+}
+
+.second .podium-place {
+  font-size: 40px;
+}
+
+.third .podium-place {
+  font-size: 30px;
+}
+
+.podium-username {
+  font-family: var(--congrats-font);
+  font-weight: 1000;
+  color: var(--black);
+  text-shadow: var(--snow) 1px 0 10px;
+}
+
+.first .podium-username {
+  font-size: 35px;
+  padding-bottom: 20px;
+}
+
+.second .podium-username {
+  font-size: 30px;
+  padding-bottom: 10px;
+}
+
+.third .podium-username {
+  font-size: 24px;
+  padding-bottom: 5px;
+}
+
+.podium-score,
+.non-podium-score {
+  font-family: var(--standard-font);
+  color: var(--yellow);
+  text-shadow: var(--black) 1px 0 10px;
+}
+
+.first .podium-score {
+  font-size: 32px;
+}
+
+.second .podium-score {
+  font-size: 27px;
+}
+
+.third .podium-score {
+  font-size: 22px;
+}
+
+.place {
+  border-radius: 5px;
+  box-shadow: 0 4px 8px var(--black-transparent-50);
+}
+
+.non-podium-place {
+  display: inline-block;
+  width: 50px;
+  padding: 0 50px 0 20px;
+  font-size: 20px;
+  text-shadow: var(--white-transparent-50) 1px 0 10px;
+}
+
+.non-podium-username {
+  font-family: var(--congrats-font);
+  color: var(--white);
+  font-size: 16px;
+}
+
+.non-podium-score {
+  font-size: 20px;
+  padding-right: 20px;
+}
+
+.button-panel {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--black-transparent-50);
+  border-radius: 5px;
+  border: 1px solid var(--black);
+}
+
+.leave-button,
+.restart-button {
+  padding: 12px;
+  font-family: var(--control-font);
+  font-size: 20px;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  text-shadow: rgba(0, 0, 0, 0.5) 1px 1px 0px;
+  cursor: pointer;
+  transition: all 0.2s ease 0s;
+  font-weight: bolder;
+  text-transform: uppercase;
+  margin: 12px;
+  width: 160px;
+  box-sizing: border-box;
+}
+
+.leave-button {
+  background: var(--red);
+}
+
+.leave-button:hover {
+  background: var(--dark-red);
+}
+
+.restart-button {
+  background: var(--purple);
+}
+
+.restart-button:hover {
+  background: var(--dark-purple);
+}

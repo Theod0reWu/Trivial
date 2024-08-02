@@ -28,7 +28,6 @@ export class BoardComponent implements AfterViewInit {
   @Input() gameData: GameData;
   @Output() gameStateChange = new EventEmitter<any>();
 
-  isChoosing = true; // temp var for player currently choosing
   intervalId: any = null;
   chosenClue: HTMLElement;
 

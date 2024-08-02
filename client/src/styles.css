@@ -4,6 +4,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Grape+Nuts&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Audiowide&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Chango&display=swap");
 
 html {
   height: 100%;
@@ -16,7 +17,7 @@ body {
 
 :root {
   --transparent: rgba(0, 0, 0, 0);
-  --white-transparent-10: rgba(255, 255, 255, 0.10);
+  --white-transparent-10: rgba(255, 255, 255, 0.1);
   --white-transparent-25: rgba(255, 255, 255, 0.25);
   --white-transparent-50: rgba(255, 255, 255, 0.5);
   --white-transparent-75: rgba(255, 255, 255, 0.75);
@@ -30,7 +31,7 @@ body {
   --red: #eb3838;
   --dark-red: #972626;
   --red-transparent-50: rgba(235, 56, 56, 0.75);
-  /*  --darker-red: #7B0000;*/
+  --yellow: #fcff64;
   --darker-red: rgba(123, 0, 0, 1);
   --light-gray: #d9d9d9;
   --gray: #828282;
@@ -38,7 +39,7 @@ body {
   --blue: #0057ff;
   --dark-blue: #030084;
   --gold: #eba152;
-  --gold-transparent-20: rgba(235, 161, 82, .2);
+  --gold-transparent-20: rgba(235, 161, 82, 0.2);
   --snow: #cdecf2;
   --danger: #912020;
   --dangerer: #761919;
@@ -50,6 +51,7 @@ body {
   --hand-font: "Grape Nuts", cursive;
   --label-font: "Caveat", cursive;
   --robot-font: "Audiowide", Helvetica, sans-serif;
+  --congrats-font: "Chango", sans-serif;
 }
 
 html,
