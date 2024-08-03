@@ -270,9 +270,13 @@ async def finish_clue(room_id: str, display_ans: bool = True):
         answer, room_data = game_manager.get_correct_ans(room_id)
         await sio.emit("response", {"correct": True, "answer": answer, "end": True}, room=room_id);
         await sio.sleep(settings.response_show_time)
-
-    await sio.emit("picked", game_manager.get_picked_clues(room_id, room_data)[0], room=room_id)
-    await sio.emit("game_state", "board", room=room_id)
+    # end game when all clues have been answered
+    if (game_manager.check_game_over(room_id)):
+        game_manager.end_game(room_id)
+        await sio.emit("game_state", "podium", room=room_id)
+    else:
+        await sio.emit("picked", game_manager.get_picked_clues(room_id, room_data)[0], room=room_id)
+        await sio.emit("game_state", "board", room=room_id)
 
 async def end_answering(room_id: str, session_id: str = None):
     # if a session_id is given this means someone buzzed in and never answered/answered wrong

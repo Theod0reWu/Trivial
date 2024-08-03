@@ -45,6 +45,7 @@ class Game(object):
 		self.num_players = num_players
 		self.num_categories = num_categories
 		self.num_clues = num_clues
+		self.num_finished = 0
 
 		self.board = Board(num_categories, num_clues)
 
@@ -96,6 +97,7 @@ class Game(object):
 			# "num_players": self.num_players,
 			"player_cash": self.player_cash,
 
+			"num_finished": self.num_finished,
 			"num_categories": self.num_categories,
 			"num_clues": self.num_clues,
 			"category_titles": self.board.category_titles,
@@ -116,6 +118,7 @@ class Game(object):
 		return {
 			# 'num_players': 1, 
 			'player_cash': {i:0 for i in player_ids}, 
+			"num_finished": 0,
 			'num_categories': 2, 
 			'num_clues': 3, 
 			'category_titles': ['baseball', 'emotional intelligence'], 

@@ -24,9 +24,11 @@ export class GameComponent {
   @Input() numRows!: number;
   @Input() categoryTitles!: string[];
   @Input() players!: Player[];
+  @Input() isHost!: boolean;
   @Input() prices!: number[];
   @Input() gameData!: GameData;
 
+  @Output() hostGameEvent = new EventEmitter<object>();
   @Output() chosenClue = new EventEmitter<any>();
   @Output() onBuzzIn = new EventEmitter<void>();
   @Output() onAnswer = new EventEmitter<string>();
@@ -92,11 +94,19 @@ export class GameComponent {
     } else {
       this.clueComponent.banner = this.clueComponent.BannerType.Red;
     }
-    this.clueComponent.bannerText = this.players[this.gameData.answeringIndex].username + ": Who/What is " + text;
+    this.clueComponent.bannerText =
+      this.players[this.gameData.answeringIndex].username +
+      ': Who/What is ' +
+      text;
   }
 
   displayCorrectAnswer(text: string): void {
     this.clueComponent.banner = this.clueComponent.BannerType.Green;
-    this.clueComponent.bannerText = "We were looking for" + ": Who/What is " + text;
+    this.clueComponent.bannerText =
+      'We were looking for' + ': Who/What is ' + text;
+  }
+
+  leaveGame(event: any) {
+    this.hostGameEvent.emit({ state: PageStates.Landing });
   }
 }

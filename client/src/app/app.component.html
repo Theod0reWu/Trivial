@@ -12,10 +12,12 @@
 <loading-view [loadingMessage]="loadingMessage" />
 } @else if (state == pageStates.InGame) {
 <game-view
+  (hostGameEvent)="handleChangeState($event)"
   [numRows]="connectorService.gameData.numClues"
   [numCols]="connectorService.gameData.numCategories"
   [categoryTitles]="connectorService.gameData.categoryTitles"
   [players]="connectorService.players"
+  [isHost]="connectorService.host"
   [prices]="connectorService.gameData.prices"
   [gameData]="connectorService.gameData"
   (chosenClue)="handleChosenClue($event)"

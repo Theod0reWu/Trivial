@@ -18,29 +18,31 @@ import { Player } from '../api/GameData';
   styleUrl: '../components_css/final_scores.component.css',
 })
 export class FinalScoresComponent implements OnChanges {
-  //   @Input() players!: Player[];
-  players = [
-    { username: 'winxler', score: 1000 },
-    { username: 'winxler2', score: 900 },
-    { username: 'winxler3', score: 800 },
-    { username: 'winxler4', score: 700 },
-    { username: 'winxler5', score: 600 },
-    { username: 'winxler6', score: 500 },
-    { username: 'winxler6', score: 500 },
-    { username: 'winxler6', score: 500 },
-    { username: 'winxler6', score: 500 },
-    { username: 'winxler6', score: 500 },
-    { username: 'winxler6', score: 500 },
-    { username: 'winxler6', score: 500 },
-    { username: 'winxler6', score: 500 },
-    { username: 'winxler6', score: 500 },
-    { username: 'winxler7', score: 400 },
-    { username: 'winxler8', score: 11000 },
-  ];
+  @Input() players!: Player[];
+  @Input() isHost!: boolean;
+  // players = [
+  //   { username: 'winxler', score: 1000 },
+  //   { username: 'winxler2', score: 900 },
+  //   { username: 'winxler3', score: 800 },
+  //   { username: 'winxler4', score: 700 },
+  //   { username: 'winxler5', score: 600 },
+  //   { username: 'winxler6', score: 500 },
+  //   { username: 'winxler6', score: 500 },
+  //   { username: 'winxler6', score: 500 },
+  //   { username: 'winxler6', score: 500 },
+  //   { username: 'winxler6', score: 500 },
+  //   { username: 'winxler6', score: 500 },
+  //   { username: 'winxler6', score: 500 },
+  //   { username: 'winxler6', score: 500 },
+  //   { username: 'winxler6', score: 500 },
+  //   { username: 'winxler7', score: 400 },
+  //   { username: 'winxler8', score: 11000 },
+  // ];
   sortedPlayers: Player[] = [];
   podium: Player[] = [];
   nonPodium: Player[] = [];
 
+  @Output() leaveGame = new EventEmitter<object>();
   @Output() gameStateChange = new EventEmitter<any>();
 
   ngOnInit() {
@@ -61,5 +63,9 @@ export class FinalScoresComponent implements OnChanges {
 
   trackByIndex(index: number, player: { username: string; score: number }) {
     return index;
+  }
+
+  onClickLeaveGame() {
+    this.leaveGame.emit();
   }
 }

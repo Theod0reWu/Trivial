@@ -8,6 +8,12 @@
   [prices]="prices"
   [gameData]="gameData"
 />
+} @else if (gameData.state === 'podium') {
+<final-scores-view
+  (leaveGame)="leaveGame($event)"
+  [players]="players"
+  [isHost]="isHost"
+/>
 } @else {
 <clue-view
   (gameStateChange)="handleGameStateChange($event)"

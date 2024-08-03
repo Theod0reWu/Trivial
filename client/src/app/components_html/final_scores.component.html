@@ -1,10 +1,9 @@
 <main>
   <div class="button-panel">
-    <div class="leave-button">
+    <div class="leave-button" (click)="onClickLeaveGame()">
       <div class="leave">RETURN TO HOME</div>
     </div>
-    <!-- host only display return to waiting room button -->
-    <div class="restart-button">
+    <div class="restart-button" *ngIf="isHost">
       <div class="restart">START A NEW GAME</div>
     </div>
   </div>
