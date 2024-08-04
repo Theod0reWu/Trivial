@@ -6,6 +6,8 @@ import time
 import ast
 import asyncio
 
+import numpy as np
+
 safety_settings = {
     HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_ONLY_HIGH,
     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
@@ -20,7 +22,7 @@ def get_response(model, prompt):
 		try:
 			response = model.generate_content(prompt)
 		except ResourceExhausted:
-			time.sleep(.5)
+			time.sleep(1)
 
 	try:
 		# print(response.candidates[0].content.parts[0].text)
@@ -140,10 +142,27 @@ def get_and_parse_topics(model, prompt):
 
 def get_and_parse_ast(model, prompt):
 	response = get_response(model, prompt)
-	var = ast.literal_eval(response)
+	var = None
+	try: 
+		var = ast.literal_eval(response)
+	except ValueError as e:
+		print(e)
+		print("Error with this prompt:", prompt)
+		print("Prompt gave this response:", response)
 	return var
 
 async def get_and_parse_ast_async(model, prompt):
 	response = await get_response_async(model, prompt)
 	var = ast.literal_eval(response)
 	return var
+
+def get_similarity(answer: str, guess:str):
+	guess_emb = genai.embed_content(
+			    model="models/embedding-001",
+			    content=guess,
+			    task_type="SEMANTIC_SIMILARITY")
+	ans_emb = genai.embed_content(
+			    model="models/embedding-001",
+			    content=answer,
+			    task_type="SEMANTIC_SIMILARITY")
+	return np.dot(ans_emb['embedding'], guess_emb['embedding'])

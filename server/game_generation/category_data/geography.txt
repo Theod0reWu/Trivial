@@ -1,0 +1,11 @@
+world capitals
+world cities
+country borders
+ocean currents
+mountain ranges
+national parks
+landforms
+continents
+climate zones
+rivers
+lakes

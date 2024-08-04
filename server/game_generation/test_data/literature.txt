@@ -1,0 +1,13 @@
+shakespeare
+classic novels
+poetry
+authors
+literary terms
+literary movements
+fantasy
+science fiction
+historical fiction
+mystery
+thriller
+romance
+dystopian

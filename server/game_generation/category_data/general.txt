@@ -4,12 +4,12 @@ Science
 Literature
 Art
 Music
-Movies/Television
+Movies and Television
 Sports
-Mythology/Religion
+Mythology and Religion
 People
 Current Events
-Food/Drink
+Food and Drink
 Animals
 Language
 Space
@@ -26,5 +26,4 @@ Philosophy
 Law
 Transportation
 Archaeology
-Holidays/Festivals
-Conspiracies/Urban Legends
+Holidays and Festivals

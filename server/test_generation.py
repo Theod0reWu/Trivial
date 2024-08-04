@@ -27,7 +27,7 @@ cat_tree = CategoryTree()
 
 counts = {}
 
-num_topics = 1
+num_topics = 20
 for i in range(num_topics):
     topic = cat_tree.get_random_topic(model, 2)
     if (topic in counts):

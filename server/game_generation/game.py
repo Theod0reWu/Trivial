@@ -8,18 +8,6 @@ import random
 
 import google.generativeai as genai
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-import numpy as np
-
-def get_similarity(answer: str, guess:str):
-	guess_emb = genai.embed_content(
-			    model="models/embedding-001",
-			    content=guess,
-			    task_type="SEMANTIC_SIMILARITY")
-	ans_emb = genai.embed_content(
-			    model="models/embedding-001",
-			    content=answer,
-			    task_type="SEMANTIC_SIMILARITY")
-	return np.dot(ans_emb['embedding'], guess_emb['embedding'])
 
 class GameState(Enum):
     PREGAME = 'pregame'

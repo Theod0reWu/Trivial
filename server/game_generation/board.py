@@ -6,7 +6,7 @@ from . import prompt
 from . import boarditem
 from . import gemini
 
-from .prompt import CategoryPromptGenerator, AnswerPromptGenerator, CluePromptGenerator, CategoryAndClueGenerator
+from .prompt import CategoryPromptGenerator, AnswerPromptGenerator, CluePromptGenerator, CategoryAndClueGenerator, TopicGenerator
 from .boarditem import BoardItem
 from .gemini import (get_and_parse_categories, get_and_parse_answers, get_and_parse_clues, get_and_parse_catans, 
 	get_and_parse_ast, get_and_parse_ast_async)
@@ -44,6 +44,8 @@ class Board(object):
 		#json prompts
 		self.answer_gen_json = AnswerPromptGenerator(make_json=True)
 		self.clue_gen_json = CluePromptGenerator(make_json=True)
+		self.answer_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/answer_json.txt'))
+		self.title_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/category_title_json.txt'))
 
 	def clear_picked(self):
 		self.picked = [[False for i in range(self.clues_per_category)] for i in range(self.num_categories)]
@@ -85,6 +87,41 @@ class Board(object):
 		return answers, information
 
 	def refresh(self, category_tree, model, fact_model = None, min_price = 200, max_price = 1000):
+		self.clear_picked()
+		price_incr = round((max_price - min_price) / (self.clues_per_category - 1)) if self.clues_per_category > 1 else 0
+		self.items = []
+
+		# generate categories
+		self.all_categories = [category_tree.get_random_topic(model, 2) for i in range(self.num_categories)]
+
+		# generate answers
+		answers = []
+		for i in range(self.num_categories):
+			answers.append(get_and_parse_ast(model, self.answer_json.generate_prompt(num=self.clues_per_category, category=self.all_categories[i])))
+		print(self.all_categories)
+		print(answers)
+
+		for i in range(self.num_categories):
+			title = get_and_parse_ast(model, self.title_json.generate_prompt(category=self.all_categories[i], answers=", ".join(answers[i])))
+			self.category_titles.append(title)
+
+			ans = answers[i]
+			ans, information = self.get_wikipedia_info(ans, self.all_categories[i])
+
+			clue_prompt = self.clue_gen_json.generate_prompt(num = self.clues_per_category, answers = ", ".join(ans), information = "\n\n".join(information))
+			clues = []
+			if (fact_model is None):
+				clues = get_and_parse_ast(model, clue_prompt)
+			else:
+				clues = get_and_parse_ast(fact_model, clue_prompt)
+			print(clues)
+
+			items = []
+			for e in range(self.clues_per_category):
+				items.append(BoardItem(clues[e], ans[e], min_price + price_incr * e))
+			self.items.append(items)
+
+	def refresh_v1(self, category_tree, model, fact_model = None, min_price = 200, max_price = 1000):
 		self.clear_picked()
 		price_incr = round((max_price - min_price) / (self.clues_per_category - 1)) if self.clues_per_category > 1 else 0
 		self.items = []

@@ -1,0 +1,10 @@
+sculpture
+painting
+photography
+architecture
+drawing
+music
+dance
+film
+theater
+design
