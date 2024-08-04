@@ -306,7 +306,7 @@ waiting-taglist {
   background-color: var(--dark-blue);
   padding: 20px;
   text-align: center;
-  overflow-x: hidden;
+  overflow: hidden;
   text-wrap: nowrap;
   box-sizing: border-box;
   font-family: var(--hand-font);
