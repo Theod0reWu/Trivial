@@ -37,9 +37,9 @@ export class WaitingComponent implements AfterViewInit {
   constructor(private clipboard: Clipboard) {}
   @Input() bgOverlay!: ElementRef;
   @Input() roomId!: string;
-  // @Input() players!: Array<Record<string, string>>;
   @Input() players!: Player[];
   @Input() isHost!: boolean;
+  @Input() changeFontSize!: (ref: ElementRef) => void;
 
   @Output() hostGameEvent = new EventEmitter<object>();
   @ViewChild('tooltip') tooltip!: MatTooltip;

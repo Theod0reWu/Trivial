@@ -40,15 +40,10 @@ enum BannerStates {
   styleUrl: '../components_css/clue.component.css',
 })
 export class ClueComponent {
-  public _clue!: string;
-
   @Input() players!: Player[];
   @Input() scores!: number[];
-  @Input() set clue(value: string) {
-    this._clue = value;
-    // dynamically set font size
-    this.changeFontSize();
-  }
+  @Input() changeFontSize!: (ref: ElementRef) => void;
+  @Input() clue!: string;
   @Input() onMessage$: Observable<any>;
 
   @Output() gameStateChange = new EventEmitter<boolean>();
@@ -57,7 +52,7 @@ export class ClueComponent {
 
   @ViewChild('clueText') clueText!: ElementRef;
   @HostListener('window:resize', ['$event']) onResize(event: any) {
-    this.changeFontSize();
+    this.changeFontSize(this.clueText);
   }
 
   constructor() {
@@ -88,7 +83,7 @@ export class ClueComponent {
         }
       },
     });
-    this.changeFontSize();
+    this.changeFontSize(this.clueText);
   }
 
   sendBuzzIn(): void {
@@ -131,44 +126,6 @@ export class ClueComponent {
   onSubmitAnswer() {
     // console.log('Form Data: ', this.form.value);
     this.onAnswer.emit(this.form.value['answer']);
-  }
-
-  isOverflown(element: any) {
-    return (
-      element &&
-      (element.scrollHeight > element.clientHeight ||
-        element.scrollWidth > element.clientWidth)
-    );
-  }
-
-  changeFontSize() {
-    if (!this.clueText) return;
-    let fontSize = parseInt(
-      getComputedStyle(this.clueText.nativeElement).getPropertyValue(
-        'font-size'
-      )
-    );
-    let overflow = this.isOverflown(this.clueText.nativeElement);
-
-    if (overflow) {
-      // shrink text
-      for (let i = fontSize; i > 1; --i) {
-        if (overflow) {
-          --fontSize;
-          this.clueText.nativeElement.style.fontSize = fontSize + 'px';
-        }
-        overflow = this.isOverflown(this.clueText.nativeElement);
-      }
-    } else {
-      // grow text
-      while (!overflow) {
-        ++fontSize;
-        this.clueText.nativeElement.style.fontSize = fontSize + 'px';
-        overflow = this.isOverflown(this.clueText.nativeElement);
-      }
-      --fontSize;
-      this.clueText.nativeElement.style.fontSize = fontSize + 'px';
-    }
   }
 
   BannerType = BannerStates;

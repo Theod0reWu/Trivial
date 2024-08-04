@@ -1,0 +1,53 @@
+h1,
+h2 {
+  font-family: var(--standard-font);
+  text-align: center;
+  font-weight: bold !important;
+  line-height: normal !important;
+  color: var(--snow) !important;
+}
+h1 {
+  font-size: 40px !important;
+  margin: 20px;
+}
+h2 {
+  font-size: 20px;
+}
+
+button {
+  padding: 12px;
+  font-family: var(--control-font);
+  font-size: 20px;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  text-shadow: rgba(0, 0, 0, 0.5) 1px 1px 0px;
+  cursor: pointer;
+  transition: all 0.2s ease 0s;
+  font-weight: bolder;
+  text-transform: uppercase;
+  margin: 12px;
+  width: 160px;
+  box-sizing: border-box;
+  border: none;
+}
+
+.leave {
+  background: var(--red);
+}
+
+.leave:hover {
+  background: var(--dark-red);
+}
+
+.cancel {
+  background: var(--purple);
+}
+
+.cancel:hover {
+  background: var(--dark-purple);
+}
+
+mat-dialog-actions {
+  justify-content: center !important;
+}

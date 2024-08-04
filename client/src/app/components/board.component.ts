@@ -1,9 +1,13 @@
 import {
   AfterViewInit,
   Component,
+  ElementRef,
   EventEmitter,
+  HostListener,
   Input,
   Output,
+  QueryList,
+  ViewChildren,
 } from '@angular/core';
 import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule } from '@angular/common';
@@ -11,6 +15,7 @@ import { Player, GameData } from '../api/GameData';
 import { PlayersListComponent } from './player_list.component';
 
 const FLICKER_INTERVAL = 200;
+const MAX_FONT_SIZE = 40;
 
 @Component({
   selector: 'board-view',
@@ -27,7 +32,21 @@ export class BoardComponent implements AfterViewInit {
   @Input() categories!: string[];
   @Input() prices!: number[];
   @Input() gameData: GameData;
+  @Input() changeFontSize!: (ref: ElementRef) => void;
   @Output() gameStateChange = new EventEmitter<any>();
+
+  @ViewChildren('gridItem') gridItems!: QueryList<ElementRef>;
+  @HostListener('window:resize', ['$event']) onResize(event: any) {
+    this.gridItems.toArray().forEach((child) => {
+      this.changeFontSize(child);
+      // clamp fontsize
+      let fontSize = parseInt(
+        getComputedStyle(child.nativeElement).getPropertyValue('font-size')
+      );
+      child.nativeElement.style.fontSize =
+        Math.min(fontSize, MAX_FONT_SIZE) + 'px';
+    });
+  }
 
   intervalId: any = null;
   chosenClue: HTMLElement;
@@ -61,6 +80,18 @@ export class BoardComponent implements AfterViewInit {
         }
       }
     }
+    const changeFontSizes = () => {
+      this.gridItems.toArray().forEach((child) => {
+        this.changeFontSize(child);
+        let fontSize = parseInt(
+          getComputedStyle(child.nativeElement).getPropertyValue('font-size')
+        );
+        child.nativeElement.style.fontSize =
+          Math.min(fontSize, MAX_FONT_SIZE) + 'px';
+      });
+    };
+    this.gridItems.changes.subscribe(changeFontSizes);
+    changeFontSizes();
   }
 
   getCategoryIndex(index: number) {

@@ -1,7 +1,7 @@
 <main class="main">
   <div class="clue-ui">
     <div class="clue">
-      <div class="clue-text" #clueText>{{ _clue }}</div>
+      <div class="clue-text" #clueText>{{ clue }}</div>
     </div>
     <div
       class="colored-banner"
@@ -57,7 +57,11 @@
       [onMessage$]="timerObservable$"
     />
   </div>
-  <players-list [players]="players" [displayState]="'clue'" />
+  <players-list
+    [players]="players"
+    [displayState]="'clue'"
+    [changeFontSize]="changeFontSize"
+  />
   <div class="progress-bar">
     <div
       class="progress-bar-fill"
