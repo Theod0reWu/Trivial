@@ -1,15 +1,11 @@
 main {
   display: flex;
-  /* justify-content: center; */
   align-items: center;
   flex-direction: column;
-  /* width: 100vw; */
-  /* height: 75vh; */
-  /* position: fixed; */
 }
 
 .primary-view {
-  /* height: 75vh; */
+  margin-bottom: 80px;
   width: 100%;
   position: sticky;
   display: flex;
@@ -272,7 +268,6 @@ waiting-taglist {
 :host ::ng-deep .players {
   z-index: 1;
   position: relative;
-  /* margin-top: 75vh; */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -283,7 +278,6 @@ waiting-taglist {
 }
 
 :host ::ng-deep .players-text {
-  margin-top: 80px;
   font-family: var(--standard-font);
   font-size: 25px;
   color: var(--white);
@@ -299,7 +293,6 @@ waiting-taglist {
 
 :host ::ng-deep .players-container {
   background: var(--black-transparent-50);
-  /* min-height: 150px; */
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
@@ -314,7 +307,7 @@ waiting-taglist {
   padding: 20px;
   text-align: center;
   overflow-x: hidden;
-  /* height: 64px; */
+  text-wrap: nowrap;
   box-sizing: border-box;
   font-family: var(--hand-font);
   font-size: 40px;

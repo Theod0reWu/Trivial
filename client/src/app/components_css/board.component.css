@@ -125,6 +125,7 @@ main {
 
 :host ::ng-deep .player-name {
   font-family: var(--hand-font);
+  text-wrap: nowrap;
 }
 
 .clue-bg {

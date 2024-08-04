@@ -17,7 +17,7 @@ import { Player } from '../api/GameData';
   templateUrl: '../components_html/final_scores.component.html',
   styleUrl: '../components_css/final_scores.component.css',
 })
-export class FinalScoresComponent implements OnChanges {
+export class FinalScoresComponent {
   @Input() players!: Player[];
   @Input() isHost!: boolean;
   @Input() gameState!: string;
@@ -51,11 +51,11 @@ export class FinalScoresComponent implements OnChanges {
     this.updatePlayers();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['players']) {
-      this.updatePlayers();
-    }
-  }
+  // ngOnChanges(changes: SimpleChanges) {
+  //   if (changes['players']) {
+  //     this.updatePlayers();
+  //   }
+  // }
 
   updatePlayers() {
     this.sortedPlayers = [...this.players].sort((a, b) => b.score - a.score);
