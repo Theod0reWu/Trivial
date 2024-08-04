@@ -56,7 +56,6 @@ class Board(object):
 			search = wikipedia.search(answers[i], results = num_search_results)
 			if (len(search) == 0):
 				search = wikipedia.search(answers[i] + " " + categories[i], results = num_search_results)
-
 			backup_page, backup_ans = None, None
 			for e in range(num_search_results):
 				result = search[e]
@@ -65,6 +64,8 @@ class Board(object):
 				page = None
 				try:
 					page = wikipedia.page(result, auto_suggest = False)
+					# print(result, page.title)
+					answers[i] = page.title
 				except wikipedia.exceptions.DisambiguationError as e:
 					# currently the disambiguation error will just select the next best option from suggestions
 					# This is only done from the first result

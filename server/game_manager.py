@@ -8,7 +8,8 @@ import multiprocessing
 import concurrent.futures
 from concurrent.futures import ProcessPoolExecutor
 
-from game_generation.game import Game, GameState, get_similarity
+from game_generation.game import Game, GameState
+from game_generation.gemini import get_similarity
 from timer import create_timer, CHECK_FREQUENCY
 
 BUZZ_IN_TIMER_NAME = "buzz_in_timer"
