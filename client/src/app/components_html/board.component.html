@@ -34,24 +34,10 @@
       </div>
     </div>
   </div>
-  <div class="players">
-    <div class="players-container">
-      @for (player of players; track player; let index = $index) {
-      <div
-        class="player-card"
-        id="player={{ index }}"
-        [ngStyle]="{
-          'outline-color':
-            index === gameData.pickerIndex ? 'green' : 'var(--dark-blue)'
-        }"
-      >
-        <div class="player-score">
-          {{ player["score"] | currency : "USD" : "symbol" : "0.0-0" }}
-        </div>
-        <div class="player-name">{{ player["username"] }}</div>
-      </div>
-      }
-    </div>
-  </div>
+  <players-list
+    [players]="players"
+    [displayState]="'board'"
+    [pickerIndex]="gameData.pickerIndex"
+  />
   <div class="clue-bg"></div>
 </main>

@@ -75,7 +75,7 @@ main {
   transform: scale(1.05);
 }
 
-.players {
+:host ::ng-deep .players {
   z-index: 1;
   position: relative;
   margin-top: 80px;
@@ -83,12 +83,14 @@ main {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 60%;
+  width: 60vw;
   background: var(--black-transparent-50);
   border: 3px solid black;
+  min-width: 500px;
+  max-width: 2000px;
 }
 
-.players-container {
+:host ::ng-deep .players-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 20px;
@@ -97,41 +99,34 @@ main {
   box-sizing: border-box;
 }
 
-.player-card {
+:host ::ng-deep .player-card {
   display: grid;
   gap: 2.5px;
   outline-style: solid;
   outline-width: 0.5em;
 }
 
-.player-score,
-.player-name {
+:host ::ng-deep .player-score,
+:host ::ng-deep .player-name {
   background-color: var(--dark-blue);
   padding: 20px;
   text-align: center;
-  height: 60px;
+  height: 64px;
   box-sizing: border-box;
   font-size: 40px;
   color: var(--white);
   user-select: none;
+  overflow-x: hidden;
 }
 
-.player-score {
+:host ::ng-deep .player-score {
   font-family: var(--standard-font);
 }
 
-.player-name {
+:host ::ng-deep .player-name {
   font-family: var(--hand-font);
+  text-wrap: nowrap;
 }
-
-/* .player-fog {
-  width: 100%;
-  height: 80px;
-  position: sticky;
-  bottom: 0;
-  background: linear-gradient(rgba(255, 255, 255, 0), black);
-  z-index: 1;
-} */
 
 .clue-bg {
   transition: all 0.5s ease 0s;

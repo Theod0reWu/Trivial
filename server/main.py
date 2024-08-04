@@ -259,8 +259,15 @@ async def start_game(sid, data):
     
     await send_picker(room_id)
     await send_board_data(room_id)
+    await send_player_cash(room_id)
     await sio.emit("picked", game_manager.get_picked_clues(room_id), room=room_id)
     await send_game_state(room_id, "board")
+
+@sio.event
+async def to_waiting(sid, data):
+    room_id, session_id = data["room_id"], data["session_id"]
+    if (room_manager.is_host(room_id, session_id)):
+        await sio.emit("switch_waiting", room=room_id)
 
 ### in-game events ####
 
@@ -270,9 +277,13 @@ async def finish_clue(room_id: str, display_ans: bool = True):
         answer, room_data = game_manager.get_correct_ans(room_id)
         await sio.emit("response", {"correct": True, "answer": answer, "end": True}, room=room_id);
         await sio.sleep(settings.response_show_time)
-
-    await sio.emit("picked", game_manager.get_picked_clues(room_id, room_data)[0], room=room_id)
-    await sio.emit("game_state", "board", room=room_id)
+    # end game when all clues have been answered
+    if (game_manager.check_game_over(room_id)):
+        game_manager.end_game(room_id)
+        await sio.emit("game_state", "podium", room=room_id)
+    else:
+        await sio.emit("picked", game_manager.get_picked_clues(room_id, room_data)[0], room=room_id)
+        await sio.emit("game_state", "board", room=room_id)
 
 async def end_answering(room_id: str, session_id: str = None):
     # if a session_id is given this means someone buzzed in and never answered/answered wrong

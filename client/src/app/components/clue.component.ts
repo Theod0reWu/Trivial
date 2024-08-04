@@ -14,6 +14,7 @@ import { TimerComponent } from './timer.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
+import { PlayersListComponent } from './player_list.component';
 
 enum BannerStates {
   Empty = 'empty',
@@ -33,6 +34,7 @@ enum BannerStates {
     CommonModule,
     TimerComponent,
     ReactiveFormsModule,
+    PlayersListComponent,
   ],
   templateUrl: '../components_html/clue.component.html',
   styleUrl: '../components_css/clue.component.css',
@@ -141,11 +143,6 @@ export class ClueComponent {
 
   changeFontSize() {
     if (!this.clueText) return;
-    // console.log(
-    //   getComputedStyle(this.clueText.nativeElement).getPropertyValue(
-    //     'font-size'
-    //   )
-    // );
     let fontSize = parseInt(
       getComputedStyle(this.clueText.nativeElement).getPropertyValue(
         'font-size'
@@ -155,21 +152,22 @@ export class ClueComponent {
 
     if (overflow) {
       // shrink text
-      for (let i = fontSize; i > 0; --i) {
-        overflow = this.isOverflown(this.clueText.nativeElement);
+      for (let i = fontSize; i > 1; --i) {
         if (overflow) {
           --fontSize;
           this.clueText.nativeElement.style.fontSize = fontSize + 'px';
         }
+        overflow = this.isOverflown(this.clueText.nativeElement);
       }
     } else {
       // grow text
       while (!overflow) {
-        overflow = this.isOverflown(this.clueText.nativeElement);
         ++fontSize;
         this.clueText.nativeElement.style.fontSize = fontSize + 'px';
+        overflow = this.isOverflown(this.clueText.nativeElement);
       }
       --fontSize;
+      this.clueText.nativeElement.style.fontSize = fontSize + 'px';
     }
   }
 

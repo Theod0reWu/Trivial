@@ -86,7 +86,7 @@ class Board(object):
 
 	def refresh(self, category_tree, model, fact_model = None, min_price = 200, max_price = 1000):
 		self.clear_picked()
-		price_incr = round((max_price - min_price) / (self.clues_per_category - 1))
+		price_incr = round((max_price - min_price) / (self.clues_per_category - 1)) if self.clues_per_category > 1 else 0
 		self.items = []
 
 		# generate categories (old way: only generates the categories)
@@ -128,7 +128,7 @@ class Board(object):
 			Fact model is for the option to provide a different model for clue generation
 		'''
 		self.clear_picked()
-		price_incr = round((max_price - min_price) / (self.clues_per_category - 1))
+		price_incr = round((max_price - min_price) / (self.clues_per_category - 1)) if self.clues_per_category > 1 else 0
 		self.items = []
 
 		# category_prompt = self.category_gen.generate_prompt(num = self.num_categories)
@@ -173,7 +173,7 @@ class Board(object):
 			Excepts model to have reponse type json.
 		'''
 		self.clear_picked()
-		price_incr = round((max_price - min_price) / (self.clues_per_category - 1))
+		price_incr = round((max_price - min_price) / (self.clues_per_category - 1)) if self.clues_per_category > 1 else 0
 		self.items = []
 
 		# generate categories (old way: only generates the categories)
