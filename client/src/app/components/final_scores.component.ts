@@ -51,12 +51,6 @@ export class FinalScoresComponent {
     this.updatePlayers();
   }
 
-  // ngOnChanges(changes: SimpleChanges) {
-  //   if (changes['players']) {
-  //     this.updatePlayers();
-  //   }
-  // }
-
   updatePlayers() {
     this.sortedPlayers = [...this.players].sort((a, b) => b.score - a.score);
     this.podium = this.sortedPlayers.slice(0, 3);

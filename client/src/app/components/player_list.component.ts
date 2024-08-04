@@ -20,6 +20,7 @@ export class PlayersListComponent implements AfterViewInit {
   @Input() players!: Player[];
   @Input() displayState!: string;
   @Input() pickerIndex!: number;
+  @Input() changeFontSize!: (ref: ElementRef) => void;
 
   @ViewChildren('username') usernames!: QueryList<ElementRef>;
   @ViewChildren('score') scores!: QueryList<ElementRef>;
@@ -44,40 +45,5 @@ export class PlayersListComponent implements AfterViewInit {
     this.usernames.changes.subscribe(changeFontSizes);
     this.scores.changes.subscribe(changeFontSizes);
     changeFontSizes();
-  }
-
-  isOverflown(element: any) {
-    return (
-      element &&
-      (element.scrollHeight > element.clientHeight ||
-        element.scrollWidth > element.clientWidth)
-    );
-  }
-
-  changeFontSize(ref: ElementRef) {
-    let fontSize = parseInt(
-      getComputedStyle(ref.nativeElement).getPropertyValue('font-size')
-    );
-    let overflow = this.isOverflown(ref.nativeElement);
-
-    if (overflow) {
-      // shrink text
-      for (let i = fontSize; i > 1; --i) {
-        if (overflow) {
-          --fontSize;
-          ref.nativeElement.style.fontSize = fontSize + 'px';
-        }
-        overflow = this.isOverflown(ref.nativeElement);
-      }
-    } else {
-      // grow text
-      while (!overflow) {
-        ++fontSize;
-        ref.nativeElement.style.fontSize = fontSize + 'px';
-        overflow = this.isOverflown(ref.nativeElement);
-      }
-      --fontSize;
-      ref.nativeElement.style.fontSize = fontSize + 'px';
-    }
   }
 }

@@ -6,7 +6,7 @@
         [ngStyle]="{ 'grid-template-columns': getGridTemplateCategories() }"
       >
         @for (category of categories; track category; let index = $index) {
-        <div class="category-title" id="category-{{ index }}">
+        <div class="category-title" id="category-{{ index }}" #gridItem>
           {{ category }}
         </div>
         }
@@ -27,6 +27,7 @@
             class="clue active"
             (click)="onClickClue($event)"
             [id]="item"
+            #gridItem
           >
             ${{ prices[item] }}
           </div>
@@ -38,6 +39,7 @@
     [players]="players"
     [displayState]="'board'"
     [pickerIndex]="gameData.pickerIndex"
+    [changeFontSize]="changeFontSize"
   />
   <div class="clue-bg"></div>
 </main>

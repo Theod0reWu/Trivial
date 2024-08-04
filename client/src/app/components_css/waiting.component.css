@@ -183,7 +183,7 @@ label {
   overflow-y: scroll;
   background-color: var(--black-transparent-50);
   padding-top: 12px;
-  scrollbar-color: var(--black) var(--black-transparent-50);
+  scrollbar-color: var(--dark-gray) var(--black-transparent-50);
   scrollbar-width: thin;
 }
 
@@ -312,4 +312,9 @@ waiting-taglist {
   font-family: var(--hand-font);
   font-size: 40px;
   color: var(--white);
+}
+
+.leave,
+.start {
+  user-select: none;
 }

@@ -41,6 +41,41 @@ export class AppComponent {
   pageStates = PageStates;
   state = this.pageStates.Landing;
 
+  // function to dynamically change font size based on container
+  changeFontSize = (ref: ElementRef) => {
+    const isOverflown = (element: any) => {
+      return (
+        element &&
+        (element.scrollHeight > element.clientHeight ||
+          element.scrollWidth > element.clientWidth)
+      );
+    };
+    let fontSize = parseInt(
+      getComputedStyle(ref.nativeElement).getPropertyValue('font-size')
+    );
+    let overflow = isOverflown(ref.nativeElement);
+
+    if (overflow) {
+      // shrink text
+      for (let i = fontSize; i > 1; --i) {
+        if (overflow) {
+          --fontSize;
+          ref.nativeElement.style.fontSize = fontSize + 'px';
+        }
+        overflow = isOverflown(ref.nativeElement);
+      }
+    } else {
+      // grow text
+      while (!overflow) {
+        ++fontSize;
+        ref.nativeElement.style.fontSize = fontSize + 'px';
+        overflow = isOverflown(ref.nativeElement);
+      }
+      --fontSize;
+      ref.nativeElement.style.fontSize = fontSize + 'px';
+    }
+  };
+
   ngOnInit(): void {
     // handle reconnecting from a disconnect
   }

@@ -1,0 +1,53 @@
+.button-panel {
+  position: fixed;
+  bottom: 10px;
+  left: 0px;
+  background-color: var(--black-transparent-50);
+  border-radius: 0 5px 5px 0;
+  border: 1px solid var(--black);
+  z-index: 5;
+}
+
+.leave-button,
+.too-big-button {
+  padding: 6px;
+  font-family: var(--control-font);
+  font-size: 20px;
+  border-radius: 8px;
+  text-align: center;
+  color: white;
+  text-shadow: rgba(0, 0, 0, 0.5) 1px 1px 0px;
+  cursor: pointer;
+  transition: all 0.2s ease 0s;
+  font-weight: bolder;
+  text-transform: uppercase;
+  margin: 8px;
+  width: 160px;
+  box-sizing: border-box;
+}
+
+.leave-button {
+  background: var(--red);
+}
+
+.leave-button:hover {
+  background: var(--dark-red);
+}
+
+.too-big-button {
+  background: var(--purple);
+}
+
+.too-big-button:hover {
+  background: var(--dark-purple);
+}
+
+.leave,
+.too-big {
+  user-select: none;
+}
+
+::ng-deep .mdc-dialog__surface {
+  background-color: var(--black-transparent-75) !important;
+  border: 3px solid var(--black);
+}

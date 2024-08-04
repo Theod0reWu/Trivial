@@ -7,6 +7,7 @@
   [categories]="categoryTitles"
   [prices]="prices"
   [gameData]="gameData"
+  [changeFontSize]="changeFontSize"
 />
 } @else if (gameData.state === 'podium') {
 <final-scores-view
@@ -24,5 +25,15 @@
   [players]="players"
   [clue]="gameData.current_clue"
   [onMessage$]="clueObservable$"
+  [changeFontSize]="changeFontSize"
 />
+} @if (gameData.state !== 'podium') {
+<div class="button-panel">
+  <div class="too-big-button" (click)="openDialog(false)">
+    <div class="too-big">TOO BIG?</div>
+  </div>
+  <div class="leave-button" (click)="openDialog(true)">
+    <div class="leave">LEAVE GAME</div>
+  </div>
+</div>
 }
