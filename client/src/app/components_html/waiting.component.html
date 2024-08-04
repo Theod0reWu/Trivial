@@ -12,7 +12,7 @@
       {{ roomId }}
     </div>
   </div>
-  <div class="primary-view" [ngStyle]="{ opacity: primaryViewOpacity }">
+  <div class="primary-view">
     <div class="logo">
       <div class="logo-item logo-text">
         <img [ngSrc]="logoUrl" fill priority />
@@ -79,14 +79,5 @@
       </div>
     </div>
   </div>
-  <div class="players">
-    <div class="players-text">Current Contestants</div>
-    <div class="players-container">
-      @for (player of players; track player; let index = $index) {
-      <div class="player-card" id="player-{{ index }}">
-        {{ player["username"] }}
-      </div>
-      }
-    </div>
-  </div>
+  <players-list [players]="players" [displayState]="'waiting'" />
 </main>

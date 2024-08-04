@@ -91,7 +91,7 @@ export class AppComponent {
       });
 
       this.connectorService.pausedChange$.subscribe({
-        next: (value: any) => {
+        next: (value) => {
           if (value['action'] === 'start') {
             this.connectorService.gameData.answeringIndex = value['who'];
             if (!this.connectorService.gameData.answering) {
@@ -109,20 +109,29 @@ export class AppComponent {
       });
 
       this.connectorService.answeringChange$.subscribe({
-        next: (value: any) => {
+        next: (value) => {
           this.connectorService.gameData.answering = true;
           this.gameComponent.startAnswering(value['duration']);
         },
       });
 
       this.connectorService.responseChange$.subscribe({
-        next: (value: any) => {
+        next: (value) => {
           if ('end' in value) {
-            this.gameComponent.displayCorrectAnswer(value["answer"]);
+            this.gameComponent.displayCorrectAnswer(value['answer']);
           } else {
-            this.gameComponent.handleResponse(value["correct"], value["answer"]);
-          } 
-        }
+            this.gameComponent.handleResponse(
+              value['correct'],
+              value['answer']
+            );
+          }
+        },
+      });
+
+      this.connectorService.waitingChange$.subscribe({
+        next: (value) => {
+          this.state = this.pageStates.Waiting;
+        },
       });
     };
     this.connectorService.connectToRoom(callback);
@@ -138,6 +147,10 @@ export class AppComponent {
 
   handleAnswer(ans: string) {
     this.connectorService.sendAnswer(ans);
+  }
+
+  handleToWaiting() {
+    this.connectorService.sendToWaiting();
   }
 
   handleChangeState(data: any) {

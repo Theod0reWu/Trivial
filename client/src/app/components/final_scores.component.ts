@@ -20,6 +20,7 @@ import { Player } from '../api/GameData';
 export class FinalScoresComponent implements OnChanges {
   @Input() players!: Player[];
   @Input() isHost!: boolean;
+  @Input() gameState!: string;
   // players = [
   //   { username: 'winxler', score: 1000 },
   //   { username: 'winxler2', score: 900 },
@@ -43,6 +44,7 @@ export class FinalScoresComponent implements OnChanges {
   nonPodium: Player[] = [];
 
   @Output() leaveGame = new EventEmitter<object>();
+  @Output() toWaiting = new EventEmitter<object>();
   @Output() gameStateChange = new EventEmitter<any>();
 
   ngOnInit() {
@@ -67,5 +69,9 @@ export class FinalScoresComponent implements OnChanges {
 
   onClickLeaveGame() {
     this.leaveGame.emit();
+  }
+
+  onClickToWaiting() {
+    this.toWaiting.emit();
   }
 }

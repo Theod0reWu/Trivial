@@ -269,7 +269,7 @@ waiting-taglist {
   background: var(--black-transparent-50);
 }
 
-.players {
+:host ::ng-deep .players {
   z-index: 1;
   position: relative;
   /* margin-top: 75vh; */
@@ -277,10 +277,12 @@ waiting-taglist {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 60%;
+  width: 60vw;
+  min-width: 500px;
+  max-width: 2000px;
 }
 
-.players-text {
+:host ::ng-deep .players-text {
   margin-top: 80px;
   font-family: var(--standard-font);
   font-size: 25px;
@@ -295,7 +297,7 @@ waiting-taglist {
   border-top: 3px solid black;
 }
 
-.players-container {
+:host ::ng-deep .players-container {
   background: var(--black-transparent-50);
   /* min-height: 150px; */
   display: grid;
@@ -307,12 +309,12 @@ waiting-taglist {
   border: 3px solid black;
 }
 
-.player-card {
+:host ::ng-deep .player-card {
   background-color: var(--dark-blue);
   padding: 20px;
   text-align: center;
-  /* border: 1px solid #333; */
-  height: 60px;
+  overflow-x: hidden;
+  /* height: 64px; */
   box-sizing: border-box;
   font-family: var(--hand-font);
   font-size: 40px;

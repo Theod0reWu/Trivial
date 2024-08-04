@@ -259,8 +259,15 @@ async def start_game(sid, data):
     
     await send_picker(room_id)
     await send_board_data(room_id)
+    await send_player_cash(room_id)
     await sio.emit("picked", game_manager.get_picked_clues(room_id), room=room_id)
     await send_game_state(room_id, "board")
+
+@sio.event
+async def to_waiting(sid, data):
+    room_id, session_id = data["room_id"], data["session_id"]
+    if (room_manager.is_host(room_id, session_id)):
+        await sio.emit("switch_waiting", room=room_id)
 
 ### in-game events ####
 

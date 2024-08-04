@@ -6,7 +6,9 @@ import {
   HostListener,
   Input,
   Output,
+  QueryList,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -14,6 +16,7 @@ import { PageStates } from '../app.component';
 import { Category, WaitingTaglist } from './waiting_taglist.component';
 import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
 import { LoadingComponent } from './loading.component';
+import { PlayersListComponent } from './player_list.component';
 import { Player } from '../api/GameData';
 
 @Component({
@@ -25,6 +28,7 @@ import { Player } from '../api/GameData';
     WaitingTaglist,
     MatTooltipModule,
     LoadingComponent,
+    PlayersListComponent,
   ],
   templateUrl: '../components_html/waiting.component.html',
   styleUrl: '../components_css/waiting.component.css',
@@ -39,8 +43,6 @@ export class WaitingComponent implements AfterViewInit {
 
   @Output() hostGameEvent = new EventEmitter<object>();
   @ViewChild('tooltip') tooltip!: MatTooltip;
-  primaryViewOpacity = 1;
-  minPrimaryViewOpacity = 0.2;
 
   roomCodeTooltip = 'Copy to clipboard';
 

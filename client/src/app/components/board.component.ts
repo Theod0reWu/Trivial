@@ -8,13 +8,14 @@ import {
 import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule } from '@angular/common';
 import { Player, GameData } from '../api/GameData';
+import { PlayersListComponent } from './player_list.component';
 
 const FLICKER_INTERVAL = 200;
 
 @Component({
   selector: 'board-view',
   standalone: true,
-  imports: [NgForOf, NgClass, CommonModule],
+  imports: [NgForOf, NgClass, CommonModule, PlayersListComponent],
   templateUrl: '../components_html/board.component.html',
   styleUrl: '../components_css/board.component.css',
 })

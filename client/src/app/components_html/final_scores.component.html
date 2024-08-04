@@ -3,7 +3,7 @@
     <div class="leave-button" (click)="onClickLeaveGame()">
       <div class="leave">RETURN TO HOME</div>
     </div>
-    <div class="restart-button" *ngIf="isHost">
+    <div class="restart-button" *ngIf="isHost" (click)="onClickToWaiting()">
       <div class="restart">START A NEW GAME</div>
     </div>
   </div>
