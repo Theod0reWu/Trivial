@@ -50,6 +50,7 @@ export class BoardComponent implements AfterViewInit {
 
   intervalId: any = null;
   chosenClue: HTMLElement;
+  grid_subscription: any;
 
   range(to: number): number[] {
     let x = [];
@@ -90,8 +91,12 @@ export class BoardComponent implements AfterViewInit {
           Math.min(fontSize, MAX_FONT_SIZE) + 'px';
       });
     };
-    this.gridItems.changes.subscribe(changeFontSizes);
+    this.grid_subscription = this.gridItems.changes.subscribe(changeFontSizes);
     changeFontSizes();
+  }
+
+  ngOnDestroy(): void {
+    this.grid_subscription.unsubscribe();
   }
 
   getCategoryIndex(index: number) {
