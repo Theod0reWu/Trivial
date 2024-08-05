@@ -31,7 +31,7 @@ class GameManager(object):
         super(GameManager, self).__init__()
         self.rooms = db.collection('Rooms')
 
-    def init_game(self, room_id: str, num_categories: int, num_clues: int):
+    def init_game(self, room_id: str, num_categories: int, num_clues: int) -> None:
         '''
             Expects room_id to already exist in firebase from room_manager
         '''
@@ -45,7 +45,7 @@ class GameManager(object):
         
         room_ref.update(data)
 
-    async def init_game_async(self, room_id: str, num_categories: int, num_clues: int, given_categories: list[str]):
+    async def init_game_async(self, room_id: str, num_categories: int, num_clues: int, given_categories: list[str]) -> None:
         room_ref = self.rooms.document(room_id)
         room_data = room_ref.get().to_dict()
         game = Game(room_data["curr_connections"], len(room_data["curr_connections"]),num_categories, num_clues, given_categories)
@@ -59,19 +59,21 @@ class GameManager(object):
 
         room_ref.update(data)
 
-    def start_game(self, room_id: str):
-        room_ref = self.rooms.document(room_id)
-        room_ref.update({"state": GameState.BOARD.value})
+    def start_game(self, room_id: str) -> None:
+        self.set_game_state(room_id, GameState.BOARD)
 
-    def end_game(self, room_id: str):
-        room_ref = self.rooms.document(room_id)
-        room_ref.update({"state": GameState.DONE.value})
+    def end_game(self, room_id: str) -> None:
+        self.set_game_state(room_id, GameState.DONE)
 
-    def get_game_state(self, room_id: str):
+    def get_game_state(self, room_id: str) -> str:
         room_ref = self.rooms.document(room_id)
         return room_ref.get().to_dict()["state"]
+    
+    def set_game_state(self, room_id: str, state: GameState) -> None:
+        room_ref = self.rooms.document(room_id)
+        room_ref.update({"state": state.value})
 
-    def get_board_info(self, room_id: str):
+    def get_board_info(self, room_id: str) -> dict:
         '''
             Returns the category titles and prices of the board
         '''
@@ -87,7 +89,7 @@ class GameManager(object):
             "num_clues": room_data["num_clues"]
         }
 
-    def get_player_cash(self, room_id: str, player_ids: list[str]):
+    def get_player_cash(self, room_id: str, player_ids: list[str]) -> list[int]:
         '''
             player_id: list of session ids of players in room_id
             returns ordered list of player cash (int)
@@ -96,7 +98,7 @@ class GameManager(object):
         room_data = room_ref.get().to_dict()["player_cash"]
         return [room_data[i] for i in player_ids]
 
-    def get_picker(self, room_id: str):
+    def get_picker(self, room_id: str) -> str:
         '''
             Returns the session_id of the picker
         '''
@@ -104,7 +106,7 @@ class GameManager(object):
         room_data = room_ref.get().to_dict()
         return room_data["picker"]
 
-    def pick(self, session_id: str, room_id:str, category_idx: str, clue_idx: str):
+    def pick(self, session_id: str, room_id:str, category_idx: str, clue_idx: str) -> str | None:
         '''
             Picks the clue located at category_idx and clue_idx
         '''
@@ -124,30 +126,30 @@ class GameManager(object):
             room_ref.update({
                 "picked."+category_idx + "." + clue_idx: True,
                 "picking.category_idx":category_idx, "picking.clue_idx": clue_idx, 
-                "state": "clue",
+                "state": GameState.CLUE.value,
                 "answered": []
                 })
             return clue
 
-    def init_buzz_in_timer(self, room_id: str, duration: float):
+    def init_buzz_in_timer(self, room_id: str, duration: float) -> any:
         return self.init_timer(room_id, BUZZ_IN_TIMER_NAME, duration)
 
-    def init_answer_timer(self, room_id: str, duration: float):
+    def init_answer_timer(self, room_id: str, duration: float) -> any:
         return self.init_timer(room_id, ANSWER_TIMER_NAME, duration)
 
-    def init_timer(self, room_id: str, timer_name: str, duration: float):
+    def init_timer(self, room_id: str, timer_name: str, duration: float) -> any:
         room_ref = self.rooms.document(room_id)
         timer = create_timer(duration)
         room_ref.update({timer_name: timer})
         return timer
 
-    def check_buzz_in_timer(self, time: float, room_id:str):
+    def check_buzz_in_timer(self, time: float, room_id:str) -> tuple[bool, int]:
         return self.check_timer(time, room_id, BUZZ_IN_TIMER_NAME)
 
-    def check_answer_timer(self, time: float, room_id:str):
+    def check_answer_timer(self, time: float, room_id:str) -> tuple[bool, int]:
         return self.check_timer(time, room_id, ANSWER_TIMER_NAME)
 
-    def check_timer(self, time: float, room_id: str, timer_name: str):
+    def check_timer(self, time: float, room_id: str, timer_name: str) -> tuple[bool, int]:
         '''
             Two cases:
             1. timer is active (no pause), continue the timer until the end
@@ -167,11 +169,11 @@ class GameManager(object):
             room_ref.update({timer_name+".num_running": firestore.Increment(-1)})
             return False, 1
 
-    def get_timer(self, room_id: str, timer_name: str):
+    def get_timer(self, room_id: str, timer_name: str) -> str:
         room_ref = self.rooms.document(room_id)
         return room_ref.get()[timer_name]
 
-    def pause_buzz_in_timer(self, room_id: str):
+    def pause_buzz_in_timer(self, room_id: str) -> None:
         '''
             Increments the number of running timers by one in expectation what one will be started
         '''
@@ -182,7 +184,7 @@ class GameManager(object):
             BUZZ_IN_TIMER_NAME + ".num_running": firestore.Increment(1)
             })
 
-    def restart_buzz_in_timer(self, room_id: str):
+    def restart_buzz_in_timer(self, room_id: str) -> int:
         room_ref = self.rooms.document(room_id)
         room_data = room_ref.get().to_dict()
         timer_data = room_data[BUZZ_IN_TIMER_NAME]
@@ -193,7 +195,7 @@ class GameManager(object):
             })
         return duration
 
-    def handle_buzz_in(self, room_id:str, session_id: str):
+    def handle_buzz_in(self, room_id:str, session_id: str) -> bool:
         '''
             Returns true is the session_id player successfully buzzed-in for a clue in room_id
             and false otherwise
@@ -206,23 +208,25 @@ class GameManager(object):
             return False
         room_data["answered"].append(session_id)
         room_ref.update({"answered": room_data["answered"], "answering": session_id})
+        self.set_game_state(room_id, GameState.ANSWERING)
         return True
 
-    def reset_clue(self, room_id: str):
+    def reset_clue(self, room_id: str) -> None:
         room_ref = self.rooms.document(room_id)
         room_ref.update({"answered": []})
 
-    def get_picked_clues(self, room_id: str, room_data = None):
+    def get_picked_clues(self, room_id: str, room_data = None) -> tuple[list[list[bool]], dict]:
         if (room_data is None):
             room_ref = self.rooms.document(room_id)
             room_data = room_ref.get().to_dict()
         return room_data["picked"], room_data
 
-    def stop_answering(self, room_id: str):
+    def stop_answering(self, room_id: str) -> None:
         room_ref = self.rooms.document(room_id)
         room_ref.update({"answering": None})
+        self.set_game_state(room_id, GameState.CLUE)
     
-    def handle_answer(self, room_id: str, session_id: str, answer: str, threshold = .94):
+    def handle_answer(self, room_id: str, session_id: str, answer: str, threshold = .94) -> bool:
         '''
             Ensures that the person who buzzed in is the one answering
 
@@ -266,7 +270,7 @@ class GameManager(object):
                 })
         return correct
 
-    def get_correct_ans(self, room_id: str, room_data = None):
+    def get_correct_ans(self, room_id: str, room_data = None) -> tuple[str, dict]:
         if (room_data is None):
             room_ref = self.rooms.document(room_id)
             room_data = room_ref.get().to_dict()
@@ -274,7 +278,7 @@ class GameManager(object):
         board_item = room_data["board_data"][picking["category_idx"]][int(picking["clue_idx"])]
         return board_item["answer"], room_data
 
-    def deduct_points(self, room_id: str, session_id: str):
+    def deduct_points(self, room_id: str, session_id: str) -> bool:
         '''
             Deducts points from the picked question from the given session_id
 
@@ -289,7 +293,7 @@ class GameManager(object):
                 })
         return len(room_data["curr_connections"]) == len(room_data["answered"])
 
-    def check_game_over(self, room_id: str):
+    def check_game_over(self, room_id: str) -> bool:
         room_ref = self.rooms.document(room_id)
         room_data = room_ref.get().to_dict()
         room_data["num_finished"] += 1

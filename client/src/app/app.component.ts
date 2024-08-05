@@ -97,7 +97,7 @@ export class AppComponent {
           if (value === 'board') {
             this.state = this.pageStates.InGame;
             this.connectorService.loading = false;
-          } else if (value === 'generating') {
+          } else if (value === 'loading') {
             this.state = this.pageStates.Loading;
             this.loadingMessage =
               '<b>Hang tight!</b> Generating your clues. This may take a while.';
@@ -210,9 +210,9 @@ export class AppComponent {
         this.connectorService.gameData.numCategories = data.numCategories;
         this.connectorService.gameData.numClues = data.numClues;
         this.loadingMessage = data.loadingMessage;
-        this.connectorService.gameData.givenCategories= [];
+        this.connectorService.gameData.givenCategories = [];
         for (let i of data.categories) {
-          this.connectorService.gameData.givenCategories.push(i["name"]);
+          this.connectorService.gameData.givenCategories.push(i['name']);
         }
 
         this.connectorService.startGame(
