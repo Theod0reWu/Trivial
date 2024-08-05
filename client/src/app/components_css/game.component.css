@@ -49,5 +49,5 @@
 
 ::ng-deep .mdc-dialog__surface {
   background-color: var(--black-transparent-75) !important;
-  border: 3px solid var(--black);
+  border: 3px solid var(--white);
 }
