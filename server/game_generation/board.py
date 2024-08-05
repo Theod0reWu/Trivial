@@ -55,6 +55,7 @@ class Board(object):
 		self.clue_gen_json = CluePromptGenerator(make_json=True)
 		self.answer_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/answer_json.txt'))
 		self.title_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/category_title_json.txt'))
+		# self.title_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/title_no_ans_json.txt'))
 
 	def clear_picked(self):
 		self.picked = [[False for i in range(self.clues_per_category)] for i in range(self.num_categories)]
@@ -111,9 +112,8 @@ class Board(object):
 			answers[i] = backup_ans
 		return answers, information
 
-	def refresh(self, category_tree, model, fact_model = None, min_price = 200, max_price = 1000):
+	def refresh(self, category_tree, model, fact_model = None, min_price = 200, price_incr = 200):
 		self.clear_picked()
-		price_incr = round((max_price - min_price) / (self.clues_per_category - 1)) if self.clues_per_category > 1 else 0
 		self.items = []
 
 		# generate categories
