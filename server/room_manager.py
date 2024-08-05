@@ -118,9 +118,5 @@ class RoomManager:
     def get_rooms(self) -> dict:
         return {doc.id: doc.to_dict() for doc in self.rooms.stream()}
 
-    def is_valid_room(self, room_id: str) -> bool:
-        rooms = self.get_rooms()
-        return room_id in rooms
-
 
         

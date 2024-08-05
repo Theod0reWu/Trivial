@@ -66,14 +66,14 @@ class Board(object):
 				page = None
 				try:
 					page = wikipedia.page(result, auto_suggest = False)
-					# print(result, page.title)
+					print("gemini:", answers[i], "wikipedia search:", result, "wikipedia page:", page.title)
 					answers[i] = page.title
 				except wikipedia.exceptions.DisambiguationError as e:
 					# currently the disambiguation error will just select the next best option from suggestions
 					# This is only done from the first result
 					if (i == 0):
 						backup_page = wikipedia.page(e.options[0], auto_suggest = False)
-						backup_ans = e.options[0]
+						backup_ans = backup_page.title
 					continue
 
 				#backup is chosen if none of the search results resulted in pages

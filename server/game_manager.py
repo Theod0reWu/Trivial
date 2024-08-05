@@ -27,8 +27,6 @@ class GameManager(object):
             clue
                 -players should be looking at a clue
     """
-
-    keys = ["state", "categories", "clues"]
     def __init__(self, ):
         super(GameManager, self).__init__()
         self.rooms = db.collection('Rooms')
@@ -92,7 +90,7 @@ class GameManager(object):
     def get_player_cash(self, room_id: str, player_ids: list[str]):
         '''
             player_id: list of session ids of players in room_id
-            returns ordered list of player cash
+            returns ordered list of player cash (int)
         '''
         room_ref = self.rooms.document(room_id)
         room_data = room_ref.get().to_dict()["player_cash"]
@@ -299,9 +297,3 @@ class GameManager(object):
         else:
             room_ref.update(room_data)
             return False
-
-    # Create a callback on_snapshot function to capture changes
-    def on_snapshot(doc_snapshot, changes, read_time):
-        for doc in doc_snapshot:
-            print(f"Received document snapshot: {doc.id}")
-        callback_done.set()

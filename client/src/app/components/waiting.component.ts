@@ -49,11 +49,7 @@ export class WaitingComponent implements AfterViewInit {
   logoUrl = '/assets/img/trivial.png';
   logoBackdropUrl = '/assets/img/question.gif';
 
-  categories: Category[] = [
-    { name: 'Science' },
-    { name: 'History' },
-    { name: 'Literature' },
-  ];
+  categories: Category[] = [];
 
   numCategories = 6;
   numQuestions = 5;
@@ -96,6 +92,7 @@ export class WaitingComponent implements AfterViewInit {
       state: PageStates.Loading,
       numClues: this.numQuestions,
       numCategories: this.numCategories,
+      categories: this.categories,
       loadingMessage:
         '<b>Hang tight!</b> Generating your clues. This may take a while.',
     });

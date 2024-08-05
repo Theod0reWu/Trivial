@@ -27,12 +27,12 @@ def get_response(model, prompt):
 	try:
 		# print(response.candidates[0].content.parts[0].text)
 		return response.candidates[0].content.parts[0].text
-	except:
+	except Exception as e:
+		print("gemini error:",e)
 		print(response)
-		print(response.prompt_feedback)
+		print("feedback:",response.prompt_feedback.blockReason, "|")
 
 async def get_response_async(model, prompt):
-	print(prompt)
 	response = None
 	while response == None:
 		try:
@@ -47,7 +47,7 @@ async def get_response_async(model, prompt):
 		# print(response.candidates[0].content.parts[0].text)
 		return response.candidates[0].content.parts[0].text
 	except Exception as e:
-		print(e)
+		print("gemini error:",e)
 		print(response)
 		print(response.prompt_feedback)
 

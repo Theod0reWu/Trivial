@@ -1,3 +1,3 @@
-For the trivia category "{category}" with relevant answers: {answers}. Come up with a relevant title using clever wordplay and use thematic contextual information if possible. Don't use a colon in the title.
+For the trivia category "{category}" with relevant answers: {answers}. Come up with a relevant title using clever wordplay. Use thematic contextual information if possible. Ensure the title is no longer than 10 words. Don't include an explanation of the category. Try not to use a colon in the title.
 
 Return the title directly.
