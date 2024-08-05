@@ -11,6 +11,7 @@ export interface Player {
 export class GameData {
 	numCategories: number = 0;
 	numClues: number = 0;
+	givenCategories: string[];
 	state: string = '';
 
 	categoryTitles: string[];

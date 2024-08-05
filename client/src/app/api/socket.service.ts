@@ -72,13 +72,15 @@ export class SocketService {
     roomId: string,
     sessionId: string,
     numCategories: number,
-    numClues: number
+    numClues: number,
+    givenCategories: string[]
   ): void {
     this.socket.emit('start_game', {
       room_id: roomId,
       session_id: sessionId,
       num_categories: numCategories,
       num_clues: numClues,
+      given_categories: givenCategories
     });
   }
 

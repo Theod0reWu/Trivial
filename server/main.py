@@ -250,11 +250,11 @@ async def get_categories(sid, data):
 
 @sio.event
 async def start_game(sid, data):
-    room_id, session_id, num_categories, num_clues = data["room_id"], data["session_id"], data["num_categories"], data["num_clues"]
+    room_id, session_id, num_categories, num_clues, given_categories = data["room_id"], data["session_id"], data["num_categories"], data["num_clues"], data["given_categories"]
     if (room_manager.is_host(room_id, session_id)):
         await send_game_state(room_id, "generating")
         # game_manager.init_game(room_id, num_categories, num_clues)
-        await game_manager.init_game_async(room_id, num_categories, num_clues)
+        await game_manager.init_game_async(room_id, num_categories, num_clues, given_categories)
         game_manager.start_game(room_id)
     
     await send_picker(room_id)
@@ -351,7 +351,7 @@ async def buzz_in(sid, data):
 
 @sio.event
 async def answer_clue(sid, data):
-    room_id, session_id, answer = data["room_id"], data["session_id"], data["answer"]
+    room_id, session_id, answer = data["room_id"], data["session_id"], data["answer"].strip()
 
     good = False
     try:

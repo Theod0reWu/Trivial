@@ -125,7 +125,7 @@ export class ClueComponent {
 
   onSubmitAnswer() {
     // console.log('Form Data: ', this.form.value);
-    this.onAnswer.emit(this.form.value['answer']);
+    this.onAnswer.emit(this.form.value['answer'].trim());
   }
 
   BannerType = BannerStates;

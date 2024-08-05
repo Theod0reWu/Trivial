@@ -9,7 +9,7 @@ import concurrent.futures
 from concurrent.futures import ProcessPoolExecutor
 
 from game_generation.game import Game, GameState
-from game_generation.gemini import get_similarity
+from game_generation.gemini import get_similarity, verify_answer
 from timer import create_timer, CHECK_FREQUENCY
 
 BUZZ_IN_TIMER_NAME = "buzz_in_timer"
@@ -45,10 +45,10 @@ class GameManager(object):
         
         room_ref.update(data)
 
-    async def init_game_async(self, room_id: str, num_categories: int, num_clues: int):
+    async def init_game_async(self, room_id: str, num_categories: int, num_clues: int, given_categories: list[str]):
         room_ref = self.rooms.document(room_id)
         room_data = room_ref.get().to_dict()
-        game = Game(room_data["curr_connections"], len(room_data["curr_connections"]),num_categories, num_clues)
+        game = Game(room_data["curr_connections"], len(room_data["curr_connections"]),num_categories, num_clues, given_categories)
 
         process = multiprocessing.Process(target=game.generate_board())
         process.start()
@@ -222,7 +222,7 @@ class GameManager(object):
         room_ref = self.rooms.document(room_id)
         room_ref.update({"answering": None})
     
-    def handle_answer(self, room_id: str, session_id: str, answer: str, threshold = .95):
+    def handle_answer(self, room_id: str, session_id: str, answer: str, threshold = .94):
         '''
             Ensures that the person who buzzed in is the one answering
 
@@ -245,8 +245,9 @@ class GameManager(object):
 
         right_answer = board_item["answer"]
 
-        similarity_score = get_similarity(right_answer, answer) >= threshold
-        correct = similarity_score >= threshold
+        # similarity_score = get_similarity(right_answer, answer) >= threshold
+        # correct = similarity_score >= threshold
+        correct = verify_answer(right_answer, answer, threshold)
 
         if (correct):
             room_ref.update({

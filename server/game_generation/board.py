@@ -1,6 +1,7 @@
 import google.generativeai as genai
 import numpy as np
 import os
+import random
 
 from . import prompt
 from . import boarditem
@@ -14,6 +15,11 @@ from .gemini import (get_and_parse_categories, get_and_parse_answers, get_and_pa
 import wikipedia
 from wikipedia.exceptions import DisambiguationError, PageError
 
+def remove_parenthesis(data: str):
+	if ("(" in data):
+		return data[:data.index("(")]
+	return data
+
 class Board(object):
 	"""
 		The board class containing one trivia board
@@ -25,7 +31,10 @@ class Board(object):
 		super(Board, self).__init__()
 		self.num_categories = categories
 		self.clues_per_category = clues_per_category
-		self.given_categories = given_categories
+		if (given_categories is None):
+			self.given_categories = []
+		else:
+			self.given_categories = given_categories
 
 		self.category_titles = [] # title of category for board display
 		self.all_categories = [] # actual category
@@ -50,12 +59,28 @@ class Board(object):
 	def clear_picked(self):
 		self.picked = [[False for i in range(self.clues_per_category)] for i in range(self.num_categories)]
 
+	def info_from_page(page, summary = True, sections = 1):
+		sections = min(max(0, len(page.sections) - 4), sections)
+		section_names = random.sample(page.sections[:-4], sections)
+		print(page.sections)
+		info = ""
+		for i in range(sections):
+			section_name = section_names[i]
+			info += page.section(section_name) + " "
+		return  info + page.summary
+
 	def get_wikipedia_info(self, answers, category):
 		information = []
 		for i in range(len(answers)):
 			# search wikipedia for a relevant page (if the answer is not specific enough try it with the category)
 			num_search_results = 3
-			search = wikipedia.search(answers[i], results = num_search_results)
+			search = None
+			while (search is None):
+				try:
+					search = wikipedia.search(answers[i], results = num_search_results)
+				except wikipedia.exceptions.WikipediaException as e:
+					print(e)
+
 			if (len(search) == 0):
 				search = wikipedia.search(answers[i] + " " + categories[i], results = num_search_results)
 			backup_page, backup_ans = None, None
@@ -67,22 +92,22 @@ class Board(object):
 				try:
 					page = wikipedia.page(result, auto_suggest = False)
 					print("gemini:", answers[i], "wikipedia search:", result, "wikipedia page:", page.title)
-					answers[i] = page.title
+					answers[i] = remove_parenthesis(page.title)
 				except wikipedia.exceptions.DisambiguationError as e:
 					# currently the disambiguation error will just select the next best option from suggestions
 					# This is only done from the first result
 					if (i == 0):
 						backup_page = wikipedia.page(e.options[0], auto_suggest = False)
-						backup_ans = backup_page.title
+						backup_ans = remove_parenthesis(backup_page.title)
 					continue
 
 				#backup is chosen if none of the search results resulted in pages
 				if (page is not None):
-					information.append("Answer: " + answers[i] + "\n Information: " + "\"" + page.summary + "\"")
+					information.append("Answer: " + answers[i] + "\n Information: " + "\"" + Board.info_from_page(page) + "\"")
 					break
 
 		if (len(information) < i):
-			information.append("Answer: " + backup_ans + "\n Information: " + "\"" + backup_page.summary + "\"")
+			information.append("Answer: " + backup_ans + "\n Information: " + "\"" + Board.info_from_page(backup_page) + "\"")
 			answers[i] = backup_ans
 		return answers, information
 
@@ -92,17 +117,26 @@ class Board(object):
 		self.items = []
 
 		# generate categories
-		self.all_categories = [category_tree.get_random_topic(model, 2) for i in range(self.num_categories)]
+		if (len(self.given_categories) < self.num_categories):
+			self.all_categories = [category_tree.get_random_topic(model, 2) for i in range(self.num_categories - len(self.given_categories))]
+			self.all_categories.extend(self.given_categories)
+		else:
+			self.all_categories = random.sample(self.given_categories, k=self.num_categories)
 
 		# generate answers
 		answers = []
 		for i in range(self.num_categories):
-			answers.append(get_and_parse_ast(model, self.answer_json.generate_prompt(num=self.clues_per_category, category=self.all_categories[i])))
+			ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=self.clues_per_category, category=self.all_categories[i]))
+			if (ans_output is None):
+				self.all_categories[i] = category_tree.get_random_topic(model, 2)
+				ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=self.clues_per_category, category=self.all_categories[i]))
+			answers.append(ans_output)
 		print(self.all_categories)
 		print(answers)
 
 		for i in range(self.num_categories):
 			title = get_and_parse_ast(model, self.title_json.generate_prompt(category=self.all_categories[i], answers=", ".join(answers[i])))
+			print(title)
 			self.category_titles.append(title)
 
 			ans = answers[i]

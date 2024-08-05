@@ -62,12 +62,13 @@ export class ConnectorService {
     return this.apiService.validRoom(roomId);
   }
 
-  startGame(numCategories: number, numClues: number): void {
+  startGame(numCategories: number, numClues: number, givenCategories: string[]): void {
     this.socketService.startGame(
       this.roomId,
       this.sessionId,
       numCategories,
-      numClues
+      numClues,
+      givenCategories
     );
     this.loading = true;
   }

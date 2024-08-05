@@ -28,14 +28,14 @@ class Game(object):
 	"""
 		
 	"""
-	def __init__(self, player_ids, num_players: int, num_categories: int, num_clues: int, use_json = True):
+	def __init__(self, player_ids, num_players: int, num_categories: int, num_clues: int, given_categories: list[str] = [], use_json = True):
 		super(Game, self).__init__()
 		self.num_players = num_players
 		self.num_categories = num_categories
 		self.num_clues = num_clues
 		self.num_finished = 0
 
-		self.board = Board(num_categories, num_clues)
+		self.board = Board(num_categories, num_clues, given_categories)
 
 		self.player_cash = {i:0 for i in player_ids}
 		self.answered = []#{i:False for i in player_ids}

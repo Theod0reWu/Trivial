@@ -20,7 +20,7 @@ def get_response(model, prompt):
 	response = None
 	while response == None:
 		try:
-			response = model.generate_content(prompt)
+			response = model.generate_content(prompt, safety_settings = safety_settings)
 		except ResourceExhausted:
 			time.sleep(1)
 
@@ -29,8 +29,9 @@ def get_response(model, prompt):
 		return response.candidates[0].content.parts[0].text
 	except Exception as e:
 		print("gemini error:",e)
+		print(prompt)
 		print(response)
-		print("feedback:",response.prompt_feedback.blockReason, "|")
+		print("feedback:",response.prompt_feedback, "|")
 
 async def get_response_async(model, prompt):
 	response = None
@@ -166,3 +167,39 @@ def get_similarity(answer: str, guess:str):
 			    content=answer,
 			    task_type="SEMANTIC_SIMILARITY")
 	return np.dot(ans_emb['embedding'], guess_emb['embedding'])
+
+def levenshtein_distance(token1, token2):
+	# source: https://blog.paperspace.com/implementing-levenshtein-distance-word-autocomplete-autocorrect/
+    distances = np.zeros((len(token1) + 1, len(token2) + 1))
+
+    for t1 in range(len(token1) + 1):
+        distances[t1][0] = t1
+
+    for t2 in range(len(token2) + 1):
+        distances[0][t2] = t2
+        
+    a = 0
+    b = 0
+    c = 0
+    
+    for t1 in range(1, len(token1) + 1):
+        for t2 in range(1, len(token2) + 1):
+            if (token1[t1-1] == token2[t2-1]):
+                distances[t1][t2] = distances[t1 - 1][t2 - 1]
+            else:
+                a = distances[t1][t2 - 1]
+                b = distances[t1 - 1][t2]
+                c = distances[t1 - 1][t2 - 1]
+                
+                if (a <= b and a <= c):
+                    distances[t1][t2] = a + 1
+                elif (b <= a and b <= c):
+                    distances[t1][t2] = b + 1
+                else:
+                    distances[t1][t2] = c + 1
+    return distances[len(token1)][len(token2)]
+
+def verify_answer(answer, guess, threshold = .94, distance = 1):
+	answer = answer.lower()
+	guess = guess.lower()
+	return levenshtein_distance(answer, guess) <= distance or get_similarity(answer, guess) >= threshold

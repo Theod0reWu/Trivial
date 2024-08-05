@@ -210,10 +210,15 @@ export class AppComponent {
         this.connectorService.gameData.numCategories = data.numCategories;
         this.connectorService.gameData.numClues = data.numClues;
         this.loadingMessage = data.loadingMessage;
+        this.connectorService.gameData.givenCategories= [];
+        for (let i of data.categories) {
+          this.connectorService.gameData.givenCategories.push(i["name"]);
+        }
 
         this.connectorService.startGame(
           this.connectorService.gameData.numCategories,
-          this.connectorService.gameData.numClues
+          this.connectorService.gameData.numClues,
+          this.connectorService.gameData.givenCategories
         );
         break;
       }
