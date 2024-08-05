@@ -56,8 +56,8 @@ class Board(object):
 		self.answer_gen_json = AnswerPromptGenerator(make_json=True)
 		self.clue_gen_json = CluePromptGenerator(make_json=True)
 		self.answer_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/answer_json.txt'))
-		self.title_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/category_title_json.txt'))
-		# self.title_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/title_no_ans_json.txt'))
+		# self.title_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/category_title_json.txt'))
+		self.title_json = TopicGenerator(os.path.join(os.path.dirname(__file__),'prompts/title_no_ans_json.txt'))
 
 	def clear_picked(self):
 		self.picked = [[False for i in range(self.clues_per_category)] for i in range(self.num_categories)]
@@ -72,9 +72,9 @@ class Board(object):
 
 	def info_from_page(page, summary = True, num_sections = 1):
 		valid_sections = Board.get_valid_page_sections(page)
-		section_names = random.sample(valid_sections, num_sections)
+		section_names = random.sample(valid_sections, min(len(valid_sections), num_sections))
 		info = ""
-		for i in range(num_sections):
+		for i in range(len(section_names)):
 			section_name = section_names[i]
 			section_text = page.section(section_name)
 			if ( section_text is not None):
