@@ -62,12 +62,19 @@ class Board(object):
 	def clear_picked(self):
 		self.picked = [[False for i in range(self.clues_per_category)] for i in range(self.num_categories)]
 
-	def info_from_page(page, summary = True, sections = 1):
-		sections = min(max(0, len(page.sections) - 4), sections)
-		section_names = random.sample(page.sections[:-4], sections)
-		print(page.sections)
+	INVALID_SECTIONS = ['See also', 'References', 'Works cited', 'Further reading', 'External links']
+	def get_valid_page_sections(page):
+		sections = []
+		for section in page.sections:
+			if (section not in Board.INVALID_SECTIONS):
+				sections.append(section)
+		return sections
+
+	def info_from_page(page, summary = True, num_sections = 1):
+		valid_sections = Board.get_valid_page_sections(page)
+		section_names = random.sample(valid_sections, num_sections)
 		info = ""
-		for i in range(sections):
+		for i in range(num_sections):
 			section_name = section_names[i]
 			section_text = page.section(section_name)
 			if ( section_text is not None):
