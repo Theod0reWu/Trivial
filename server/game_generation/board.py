@@ -15,6 +15,8 @@ from .gemini import (get_and_parse_categories, get_and_parse_answers, get_and_pa
 import wikipedia
 from wikipedia.exceptions import DisambiguationError, PageError
 
+CATEGORY_LEVEL = 2
+
 def remove_parenthesis(data: str):
 	if ("(" in data):
 		return data[:data.index("(")]
@@ -67,7 +69,9 @@ class Board(object):
 		info = ""
 		for i in range(sections):
 			section_name = section_names[i]
-			info += page.section(section_name) + " "
+			section_text = page.section(section_name)
+			if ( section_text is not None):
+				info += section_text + " "
 		return  info + page.summary
 
 	def get_wikipedia_info(self, answers, category):
@@ -112,26 +116,32 @@ class Board(object):
 			answers[i] = backup_ans
 		return answers, information
 
+	def generate_answers(self, model, category_tree):
+		num_to_get = min(self.clues_per_category * 8, 100)
+		answers = []
+		for i in range(self.num_categories):
+			ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=num_to_get, category=self.all_categories[i]))
+			if (ans_output is None):
+				self.all_categories[i] = category_tree.get_random_topic(model, CATEGORY_LEVEL)
+				ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=num_to_get, category=self.all_categories[i]))
+			print("got answers:", len(ans_output))
+			answers.append(random.sample(ans_output, self.clues_per_category))
+		return answers
+
 	def refresh(self, category_tree, model, fact_model = None, min_price = 200, price_incr = 200):
 		self.clear_picked()
 		self.items = []
 
 		# generate categories
 		if (len(self.given_categories) < self.num_categories):
-			self.all_categories = [category_tree.get_random_topic(model, 2) for i in range(self.num_categories - len(self.given_categories))]
+			self.all_categories = [category_tree.get_random_topic(model, CATEGORY_LEVEL) for i in range(self.num_categories - len(self.given_categories))]
 			self.all_categories.extend(self.given_categories)
 		else:
 			self.all_categories = random.sample(self.given_categories, k=self.num_categories)
+		print(self.all_categories)
 
 		# generate answers
-		answers = []
-		for i in range(self.num_categories):
-			ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=self.clues_per_category, category=self.all_categories[i]))
-			if (ans_output is None):
-				self.all_categories[i] = category_tree.get_random_topic(model, 2)
-				ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=self.clues_per_category, category=self.all_categories[i]))
-			answers.append(ans_output)
-		print(self.all_categories)
+		answers = self.generate_answers(model, category_tree)
 		print(answers)
 
 		for i in range(self.num_categories):
