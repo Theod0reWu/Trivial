@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 *.json
 /server/node_modules
+/server/game_generation/test_data

@@ -1,0 +1,12 @@
+mammals
+reptiles
+amphibians
+birds
+fish
+insects
+arachnids
+dogs
+cats
+horses
+wildlife
+invertebrates

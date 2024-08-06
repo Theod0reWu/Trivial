@@ -23,7 +23,12 @@ model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
 fact_model = genai.GenerativeModel('gemini-1.5-flash', generation_config = config)
 
 
-game = Game(1, 2, 3)
-game.generate_board()
+# game = Game([0], 1, 2, 3)
+# game.generate_board()
 
-print(game.to_dict())
+# print(game.to_dict())
+
+board = Board(2, 3)
+board.refresh()
+
+print(board.to_dict())

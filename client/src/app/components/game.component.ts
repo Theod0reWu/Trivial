@@ -4,6 +4,7 @@ import {
   Output,
   EventEmitter,
   ViewChild,
+  ElementRef,
 } from '@angular/core';
 // import { NgOptimizedImage } from '@angular/common';
 import { PageStates } from '../app.component';
@@ -24,12 +25,16 @@ export class GameComponent {
   @Input() numRows!: number;
   @Input() categoryTitles!: string[];
   @Input() players!: Player[];
+  @Input() isHost!: boolean;
   @Input() prices!: number[];
   @Input() gameData!: GameData;
+  @Input() changeFontSize!: (ref: ElementRef) => void;
 
+  @Output() hostGameEvent = new EventEmitter<object>();
   @Output() chosenClue = new EventEmitter<any>();
   @Output() onBuzzIn = new EventEmitter<void>();
   @Output() onAnswer = new EventEmitter<string>();
+  @Output() onToWaiting = new EventEmitter<string>();
 
   @ViewChild(BoardComponent) boardComponent!: BoardComponent;
   @ViewChild(ClueComponent) clueComponent!: ClueComponent;
@@ -66,7 +71,7 @@ export class GameComponent {
 
   otherAnswering(): void {
     this.clueComponent.answeringText =
-      this.players[this.gameData.answeringIndex].username + ' is answering.';
+      this.players[this.gameData.answeringIndex].username + ' is answering...';
     this.clueComponent.banner = this.clueComponent.BannerType.AltAnswering;
   }
 
@@ -86,17 +91,30 @@ export class GameComponent {
     this.onAnswer.emit(ans);
   }
 
+  handleToWaiting(): void {
+    this.onToWaiting.emit();
+  }
+
+  handleLeaveGame(event: any) {
+    this.hostGameEvent.emit({ state: PageStates.Landing });
+  }
+
   handleResponse(correct: boolean, text: string): void {
     if (correct) {
       this.clueComponent.banner = this.clueComponent.BannerType.Green;
     } else {
       this.clueComponent.banner = this.clueComponent.BannerType.Red;
     }
-    this.clueComponent.bannerText = this.players[this.gameData.answeringIndex].username + ": Who/What is " + text;
+    this.clueComponent.bannerText =
+      this.players[this.gameData.answeringIndex].username +
+      ': Who/What is ' +
+      text +
+      '?';
   }
 
   displayCorrectAnswer(text: string): void {
     this.clueComponent.banner = this.clueComponent.BannerType.Green;
-    this.clueComponent.bannerText = "We were looking for" + ": Who/What is " + text;
+    this.clueComponent.bannerText =
+      'We were looking for' + ': Who/What is ' + text + '?';
   }
 }

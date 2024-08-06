@@ -10,6 +10,7 @@ from socketio import AsyncServer, ASGIApp
 from socketio.exceptions import ConnectionRefusedError
 
 from room_manager import RoomManager
+from game_generation.game import GameState
 from session_manager import SessionManager
 from game_manager import GameManager
 from config import Settings
@@ -114,8 +115,8 @@ async def is_host(session_id: str):
     Socket.io events
 '''
 
-def getRoom(sid):
-    return list(set(sio.manager.get_rooms(sid, "/")).difference({sid}))[0]
+# def getRoom(sid):
+#     return list(set(sio.manager.get_rooms(sid, "/")).difference({sid}))[0]
 
 def get_ordered_players(players, session_info = False):
     if (not session_info):
@@ -129,7 +130,7 @@ async def send_players(room_id):
     usernames = [i["username"] for i in get_ordered_players(room["curr_connections"])]
     await sio.emit("players", usernames, room=room_id)
 
-async def send_game_state(room_id: str, state = None):
+async def send_game_state(room_id: str, state: str | None = None):
     if (state is None):
         state = game_manager.get_game_state(room_id)
     await sio.emit("game_state", state, room=room_id)
@@ -250,17 +251,25 @@ async def get_categories(sid, data):
 
 @sio.event
 async def start_game(sid, data):
-    room_id, session_id, num_categories, num_clues = data["room_id"], data["session_id"], data["num_categories"], data["num_clues"]
+    room_id, session_id, num_categories, num_clues, given_categories = data["room_id"], data["session_id"], data["num_categories"], data["num_clues"], data["given_categories"]
     if (room_manager.is_host(room_id, session_id)):
-        await send_game_state(room_id, "generating")
-        # game_manager.init_game(room_id, num_categories, num_clues)
-        await game_manager.init_game_async(room_id, num_categories, num_clues)
-        game_manager.start_game(room_id)
+        game_manager.set_game_state(room_id, GameState.LOADING)
+        await send_game_state(room_id, GameState.LOADING.value)
+        await game_manager.init_game_async(room_id, num_categories, num_clues, given_categories)
     
     await send_picker(room_id)
     await send_board_data(room_id)
+    await send_player_cash(room_id)
     await sio.emit("picked", game_manager.get_picked_clues(room_id), room=room_id)
-    await send_game_state(room_id, "board")
+    await send_game_state(room_id, GameState.BOARD.value)
+    game_manager.start_game(room_id)
+
+@sio.event
+async def to_waiting(sid, data):
+    room_id, session_id = data["room_id"], data["session_id"]
+    if (room_manager.is_host(room_id, session_id)):
+        game_manager.set_game_state(room_id, GameState.PREGAME)
+        await sio.emit("switch_waiting", room=room_id)
 
 ### in-game events ####
 
@@ -270,9 +279,14 @@ async def finish_clue(room_id: str, display_ans: bool = True):
         answer, room_data = game_manager.get_correct_ans(room_id)
         await sio.emit("response", {"correct": True, "answer": answer, "end": True}, room=room_id);
         await sio.sleep(settings.response_show_time)
-
-    await sio.emit("picked", game_manager.get_picked_clues(room_id, room_data)[0], room=room_id)
-    await sio.emit("game_state", "board", room=room_id)
+    # end game when all clues have been answered
+    if (game_manager.check_game_over(room_id)):
+        game_manager.end_game(room_id)
+        await send_game_state(room_id, GameState.DONE.value)
+    else:
+        await sio.emit("picked", game_manager.get_picked_clues(room_id, room_data)[0], room=room_id)
+        game_manager.set_game_state(room_id, GameState.BOARD)
+        await send_game_state(room_id, GameState.BOARD.value)
 
 async def end_answering(room_id: str, session_id: str = None):
     # if a session_id is given this means someone buzzed in and never answered/answered wrong
@@ -307,7 +321,7 @@ async def board_choice(sid, data):
     # start the timer for hitting the buzzer
     game_manager.init_buzz_in_timer(room_id, settings.buzz_in_time)
     await sio.emit("clue", {"clue": clue, "duration": settings.buzz_in_time}, room=room_id)
-    await sio.emit("game_state", "clue", room=room_id)
+    await send_game_state(room_id, GameState.CLUE.value)
 
     await run_timer(settings.buzz_in_time, game_manager.check_buzz_in_timer, finish_clue, {"room_id": room_id}, {"room_id": room_id, "display_ans": True})
     
@@ -340,7 +354,7 @@ async def buzz_in(sid, data):
 
 @sio.event
 async def answer_clue(sid, data):
-    room_id, session_id, answer = data["room_id"], data["session_id"], data["answer"]
+    room_id, session_id, answer = data["room_id"], data["session_id"], data["answer"].strip()
 
     good = False
     try:
@@ -361,7 +375,6 @@ async def answer_clue(sid, data):
     else:
         # show the incorrect response
         await sio.emit("response", {"correct": False, "answer": answer}, room=room_id);
-        await send_player_cash(room_id)
         await sio.sleep(settings.response_show_time)
 
         # restart the timer

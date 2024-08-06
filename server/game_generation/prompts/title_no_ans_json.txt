@@ -1,0 +1,5 @@
+For the trivia category "{category}", come up with a relevant title using clever wordplay.  Come up with a relevant title using clever wordplay that describes the category along with the answers. If it is possible consider thematic contextual information in the construction of the title. Don't include an explanation of the category. The title should be kept as short as possible and should only contain one phrase.
+
+Don't use the words "trivia" or "quiz" in your title.
+
+You should only return a string which is the title.

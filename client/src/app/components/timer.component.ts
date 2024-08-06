@@ -25,6 +25,8 @@ export class TimerComponent {
   interval: any;
   active = false;
 
+  message_subscription: any;
+
   // keep these cutoff for each timer section to cover the same amount of time
   cutoffs = [0, 0.2, 0.4, 0.6, 0.8, 0.6, 0.4, 0.2, 0];
 
@@ -33,13 +35,17 @@ export class TimerComponent {
   endColor = [20, 20, 20];
 
   ngAfterViewInit(): void {
-    this.onMessage$.subscribe({
+    this.message_subscription = this.onMessage$.subscribe({
       next: (value) => {
         if (value['action'] === 'start' && !this.active) {
           this.start(value['duration']);
         }
       },
     });
+  }
+
+  ngOnDestroy(): void {
+    this.message_subscription.unsubscribe();
   }
 
   start(duration: number) {

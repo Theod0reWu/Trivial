@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, take, lastValueFrom } from 'rxjs';
 import { SocketService } from './socket.service';
 import { ApiService } from './api.service';
-import { GameData, Player} from './GameData';
+import { GameData, Player } from './GameData';
 
 @Injectable({
   providedIn: 'root',
@@ -33,6 +33,7 @@ export class ConnectorService {
   pausedChange$: Observable<any>;
   answeringChange$: Observable<any>;
   responseChange$: Observable<any>;
+  waitingChange$: Observable<any>;
 
   loading = false;
 
@@ -61,30 +62,40 @@ export class ConnectorService {
     return this.apiService.validRoom(roomId);
   }
 
-  startGame(numCategories: number, numClues: number): void {
+  startGame(numCategories: number, numClues: number, givenCategories: string[]): void {
     this.socketService.startGame(
       this.roomId,
       this.sessionId,
       numCategories,
-      numClues
+      numClues,
+      givenCategories
     );
     this.loading = true;
   }
 
   sendBoardChoice(category: number, clue: number): void {
-  	this.socketService.sendBoardChoice(this.roomId, this.sessionId, category, clue);
+    this.socketService.sendBoardChoice(
+      this.roomId,
+      this.sessionId,
+      category,
+      clue
+    );
   }
 
   sendBuzzIn(): void {
-  	this.socketService.sendBuzzIn(this.roomId, this.sessionId);
+    this.socketService.sendBuzzIn(this.roomId, this.sessionId);
   }
 
   sendAnswer(answer: string): void {
-  	this.socketService.sendAnswer(this.roomId, this.sessionId, answer);
+    this.socketService.sendAnswer(this.roomId, this.sessionId, answer);
+  }
+
+  sendToWaiting(): void {
+    this.socketService.sendToWaiting(this.roomId, this.sessionId);
   }
 
   setupSocketEvents(): void {
-  	// setup for when players join a room
+    // setup for when players join a room
     this.playerChange$ = this.socketService.onPlayerChange();
     this.playerChange$.subscribe({
       next: (result) => {
@@ -103,11 +114,11 @@ export class ConnectorService {
     });
 
     this.socketService.onPlayerCash().subscribe({
-    	next: (value) => {
-    		for (let c = 0; c < value.length; ++c) {
-    			this.players[c].score = value[c];
-    		}
-    	}
+      next: (value) => {
+        for (let c = 0; c < value.length; ++c) {
+          this.players[c].score = value[c];
+        }
+      },
     });
 
     // setup for when a new host needs to be elected after original leaves
@@ -119,9 +130,9 @@ export class ConnectorService {
     });
 
     this.socketService.onPicker().subscribe({
-    	next: (value) => {
-    		this.gameData.isPicker = value;
-    	}
+      next: (value) => {
+        this.gameData.isPicker = value;
+      },
     });
 
     // setup for game state is being emitted
@@ -134,17 +145,17 @@ export class ConnectorService {
 
     // setup for when board data is being transmitted (category titles and cost of clues)
     this.socketService.onBoardData().subscribe({
-    	next: (value) => {
-    		this.gameData.numClues = value["num_clues"];
-    		this.gameData.numCategories = value["num_categories"];
-    		this.gameData.categoryTitles = value["category_titles"];
-    		this.gameData.prices = [];
-    		for (let i = 0; i < this.gameData.numClues; ++i){
-    			for (let e = 0; e < this.gameData.numCategories; ++e) {
-    				this.gameData.prices.push(value["prices"][i]);
-    			}
-    		}
-    	}
+      next: (value) => {
+        this.gameData.numClues = value['num_clues'];
+        this.gameData.numCategories = value['num_categories'];
+        this.gameData.categoryTitles = value['category_titles'];
+        this.gameData.prices = [];
+        for (let i = 0; i < this.gameData.numClues; ++i) {
+          for (let e = 0; e < this.gameData.numCategories; ++e) {
+            this.gameData.prices.push(value['prices'][i]);
+          }
+        }
+      },
     });
 
     this.pickingChange$ = this.socketService.onPicking();
@@ -152,17 +163,18 @@ export class ConnectorService {
     this.pausedChange$ = this.socketService.onPaused();
     this.answeringChange$ = this.socketService.onAnswering();
     this.responseChange$ = this.socketService.onResponse();
+    this.waitingChange$ = this.socketService.onSwitchWaiting();
 
     this.socketService.onPickerIndex().subscribe({
-    	next: (value) => {
-    		this.gameData.pickerIndex = value;
-    	}
+      next: (value) => {
+        this.gameData.pickerIndex = value;
+      },
     });
 
     this.socketService.onPicked().subscribe({
-    	next: (value) => {
-    		this.gameData.picked = value;
-    	}
+      next: (value) => {
+        this.gameData.picked = value;
+      },
     });
   }
 

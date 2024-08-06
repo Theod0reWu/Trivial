@@ -1,15 +1,11 @@
 main {
   display: flex;
-  /* justify-content: center; */
   align-items: center;
   flex-direction: column;
-  /* width: 100vw; */
-  /* height: 75vh; */
-  /* position: fixed; */
 }
 
 .primary-view {
-  /* height: 75vh; */
+  margin-bottom: 80px;
   width: 100%;
   position: sticky;
   display: flex;
@@ -187,7 +183,7 @@ label {
   overflow-y: scroll;
   background-color: var(--black-transparent-50);
   padding-top: 12px;
-  scrollbar-color: var(--black) var(--black-transparent-50);
+  scrollbar-color: var(--dark-gray) var(--black-transparent-50);
   scrollbar-width: thin;
 }
 
@@ -269,19 +265,19 @@ waiting-taglist {
   background: var(--black-transparent-50);
 }
 
-.players {
+:host ::ng-deep .players {
   z-index: 1;
   position: relative;
-  /* margin-top: 75vh; */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 60%;
+  width: 60vw;
+  min-width: 500px;
+  max-width: 2000px;
 }
 
-.players-text {
-  margin-top: 80px;
+:host ::ng-deep .players-text {
   font-family: var(--standard-font);
   font-size: 25px;
   color: var(--white);
@@ -295,9 +291,8 @@ waiting-taglist {
   border-top: 3px solid black;
 }
 
-.players-container {
+:host ::ng-deep .players-container {
   background: var(--black-transparent-50);
-  /* min-height: 150px; */
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
@@ -307,14 +302,19 @@ waiting-taglist {
   border: 3px solid black;
 }
 
-.player-card {
+:host ::ng-deep .player-card {
   background-color: var(--dark-blue);
   padding: 20px;
   text-align: center;
-  /* border: 1px solid #333; */
-  height: 60px;
+  overflow: hidden;
+  text-wrap: nowrap;
   box-sizing: border-box;
   font-family: var(--hand-font);
   font-size: 40px;
   color: var(--white);
+}
+
+.leave,
+.start {
+  user-select: none;
 }

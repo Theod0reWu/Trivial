@@ -20,6 +20,8 @@ main {
   align-items: center;
   height: 100px;
   padding-top: 50px;
+  text-align: center;
+  line-height: normal;
 }
 
 .standings {
@@ -182,6 +184,7 @@ main {
 .place {
   border-radius: 5px;
   box-shadow: 0 4px 8px var(--black-transparent-50);
+  overflow-x: hidden;
 }
 
 .non-podium-place {
@@ -205,14 +208,15 @@ main {
 
 .button-panel {
   position: absolute;
-  top: 50px;
-  left: 50px;
+  top: 235px;
+  left: 0px;
   display: flex;
   flex-direction: column;
   align-items: center;
   background-color: var(--black-transparent-50);
   border-radius: 5px;
   border: 1px solid var(--black);
+  z-index: 5;
 }
 
 .leave-button,

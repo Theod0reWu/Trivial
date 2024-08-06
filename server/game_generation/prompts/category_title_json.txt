@@ -1,0 +1,3 @@
+For the trivia category "{category}" with relevant answers: {answers}. Come up with a relevant title using clever wordplay that describes the category along with the answers. If it is possible consider thematic contextual information in the construction of the title. Don't include an explanation of the category. The title should be kept as short as possible and should only contain one phrase. Ensure the title is not longer than 8 words. Ensure that the any part of the answers: {answers} is not directly in the title.
+
+You should only return a string which is the title.

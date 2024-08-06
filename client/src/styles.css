@@ -5,6 +5,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Audiowide&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Audiowide&family=Chango&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Arima:wght@100..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&family=Audiowide&family=Chango&display=swap");
 
 html {
   height: 100%;
@@ -38,6 +40,8 @@ body {
   --dark-gray: #505050;
   --blue: #0057ff;
   --dark-blue: #030084;
+  --navy: #131537;
+  --dark-navy: #10102c;
   --gold: #eba152;
   --gold-transparent-20: rgba(235, 161, 82, 0.2);
   --snow: #cdecf2;
@@ -52,6 +56,8 @@ body {
   --label-font: "Caveat", cursive;
   --robot-font: "Audiowide", Helvetica, sans-serif;
   --congrats-font: "Chango", sans-serif;
+  --about-font-fancy: "Arima", system-ui;
+  --about-font: "Arimo", sans-serif;
 }
 
 html,

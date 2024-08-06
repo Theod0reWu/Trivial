@@ -1,0 +1,20 @@
+<h1 mat-dialog-title>{{ data.title }}</h1>
+<mat-dialog-content class="mat-typography">
+  <h2>{{ data.content }}</h2>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  @if (data.onClickLeaveGame !== undefined) {
+  <button
+    class="leave"
+    mat-button
+    mat-dialog-close
+    cdkFocusInitial
+    (click)="data.onClickLeaveGame()"
+  >
+    LEAVE
+  </button>
+  <button class="cancel" mat-button mat-dialog-close>DON'T LEAVE</button>
+  } @else {
+  <button class="cancel" mat-button mat-dialog-close>CLOSE</button>
+  }
+</mat-dialog-actions>

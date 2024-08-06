@@ -1,0 +1,42 @@
+<div class="players">
+  <div class="players-text" *ngIf="displayState === 'waiting'">
+    Current Contestants
+  </div>
+  @if (displayState === "waiting") {
+  <div class="players-container">
+    @for (player of players; track player; let index = $index) {
+    <div class="player-card" id="player-{{ index }}" #username>
+      {{ player["username"] }}
+    </div>
+    }
+  </div>
+  } @else if (displayState === "board") {
+  <div class="players-container">
+    @for (player of players; track player; let index = $index) {
+    <div
+      class="player-card"
+      id="player={{ index }}"
+      [ngStyle]="{
+        'outline-color': index === pickerIndex ? 'green' : 'var(--dark-blue)'
+      }"
+    >
+      <div class="player-score" #score>
+        {{ player["score"] | currency : "USD" : "symbol" : "0.0-0" }}
+      </div>
+      <div class="player-name" #username>{{ player["username"] }}</div>
+    </div>
+    }
+  </div>
+  } @else if (displayState === "clue") {
+  <div class="players-container">
+    @for (player of players; track player; let index = $index) {
+    <div class="player-card">
+      <div class="player-score" #score>
+        {{ player["score"] | currency : "USD" : "symbol" : "0.0-0" }}
+      </div>
+      <div class="player-name" #username>{{ player["username"] }}</div>
+    </div>
+    }
+  </div>
+  }
+</div>

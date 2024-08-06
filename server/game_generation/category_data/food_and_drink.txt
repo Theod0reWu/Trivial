@@ -1,0 +1,10 @@
+beverages
+cuisines
+ingredients
+cooking
+cheese
+desserts
+produce
+snacks
+seafood
+wine

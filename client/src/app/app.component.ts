@@ -1,11 +1,23 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Inject,
+  ViewChild,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LandingComponent } from './components/landing.component';
+import { AboutComponent } from './components/about.component';
 import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
 import { LoadingComponent } from './components/loading.component';
 import { ConnectorService } from './api/connector.service';
-import { GameData } from './api/GameData';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+} from '@angular/material/dialog';
+import { NgIf } from '@angular/common';
 
 export enum PageStates {
   Landing,
@@ -21,16 +33,18 @@ export enum PageStates {
   imports: [
     RouterOutlet,
     LandingComponent,
+    AboutComponent,
     WaitingComponent,
     GameComponent,
     LoadingComponent,
+    NgIf,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
 export class AppComponent {
   constructor(
-    private elementRef: ElementRef,
+    public dialog: MatDialog,
     public connectorService: ConnectorService
   ) {}
   @ViewChild(GameComponent) gameComponent: GameComponent;
@@ -40,6 +54,60 @@ export class AppComponent {
 
   pageStates = PageStates;
   state = this.pageStates.Landing;
+
+  // function to dynamically change font size based on container
+  changeFontSize = (ref: ElementRef) => {
+    const isOverflown = (element: any) => {
+      return (
+        element &&
+        (element.scrollHeight > element.clientHeight ||
+          element.scrollWidth > element.clientWidth)
+      );
+    };
+    let fontSize = parseInt(
+      getComputedStyle(ref.nativeElement).getPropertyValue('font-size')
+    );
+    let overflow = isOverflown(ref.nativeElement);
+
+    if (overflow) {
+      // shrink text
+      for (let i = fontSize; i > 1; --i) {
+        if (overflow) {
+          --fontSize;
+          ref.nativeElement.style.fontSize = fontSize + 'px';
+        }
+        overflow = isOverflown(ref.nativeElement);
+      }
+    } else {
+      // grow text
+      while (!overflow) {
+        ++fontSize;
+        ref.nativeElement.style.fontSize = fontSize + 'px';
+        overflow = isOverflown(ref.nativeElement);
+      }
+      --fontSize;
+      ref.nativeElement.style.fontSize = fontSize + 'px';
+    }
+  };
+
+  // open modal
+  openDialog(isLeaving: boolean) {
+    const data = isLeaving
+      ? {
+          onClickLeaveGame: () =>
+            this.handleChangeState({ state: PageStates.Landing }),
+          title: 'Are you sure you want to leave?',
+          content: 'NOTE: All player data for this game session will be lost!',
+        }
+      : {
+          onClickLeaveGame: undefined,
+          title: 'Screen size too big?',
+          content: 'Use Ctrl-/Cmd- to zoom out!',
+        };
+    const dialogRef = this.dialog.open(InGameModal, {
+      data: data,
+    });
+  }
 
   ngOnInit(): void {
     // handle reconnecting from a disconnect
@@ -62,7 +130,7 @@ export class AppComponent {
           if (value === 'board') {
             this.state = this.pageStates.InGame;
             this.connectorService.loading = false;
-          } else if (value === 'generating') {
+          } else if (value === 'loading') {
             this.state = this.pageStates.Loading;
             this.loadingMessage =
               '<b>Hang tight!</b> Generating your clues. This may take a while.';
@@ -91,7 +159,7 @@ export class AppComponent {
       });
 
       this.connectorService.pausedChange$.subscribe({
-        next: (value: any) => {
+        next: (value) => {
           if (value['action'] === 'start') {
             this.connectorService.gameData.answeringIndex = value['who'];
             if (!this.connectorService.gameData.answering) {
@@ -109,20 +177,29 @@ export class AppComponent {
       });
 
       this.connectorService.answeringChange$.subscribe({
-        next: (value: any) => {
+        next: (value) => {
           this.connectorService.gameData.answering = true;
           this.gameComponent.startAnswering(value['duration']);
         },
       });
 
       this.connectorService.responseChange$.subscribe({
-        next: (value: any) => {
+        next: (value) => {
           if ('end' in value) {
-            this.gameComponent.displayCorrectAnswer(value["answer"]);
+            this.gameComponent.displayCorrectAnswer(value['answer']);
           } else {
-            this.gameComponent.handleResponse(value["correct"], value["answer"]);
-          } 
-        }
+            this.gameComponent.handleResponse(
+              value['correct'],
+              value['answer']
+            );
+          }
+        },
+      });
+
+      this.connectorService.waitingChange$.subscribe({
+        next: (value) => {
+          this.state = this.pageStates.Waiting;
+        },
       });
     };
     this.connectorService.connectToRoom(callback);
@@ -140,6 +217,10 @@ export class AppComponent {
     this.connectorService.sendAnswer(ans);
   }
 
+  handleToWaiting() {
+    this.connectorService.sendToWaiting();
+  }
+
   handleChangeState(data: any) {
     switch (data.state) {
       case PageStates.Landing: {
@@ -152,6 +233,10 @@ export class AppComponent {
         }, 10);
         break;
       }
+      case PageStates.About: {
+        this.state = this.pageStates.About;
+        break;
+      }
       case PageStates.Waiting: {
         this.updateAndConnect(data);
         this.state = this.pageStates.Waiting;
@@ -162,14 +247,37 @@ export class AppComponent {
         this.connectorService.gameData.numCategories = data.numCategories;
         this.connectorService.gameData.numClues = data.numClues;
         this.loadingMessage = data.loadingMessage;
+        this.connectorService.gameData.givenCategories = [];
+        for (let i of data.categories) {
+          this.connectorService.gameData.givenCategories.push(i['name']);
+        }
 
         this.connectorService.startGame(
           this.connectorService.gameData.numCategories,
-          this.connectorService.gameData.numClues
+          this.connectorService.gameData.numClues,
+          this.connectorService.gameData.givenCategories
         );
         break;
       }
     }
     window.scrollTo(0, 0);
   }
+}
+
+@Component({
+  selector: 'in-game-modal',
+  imports: [MatDialogModule],
+  templateUrl: './components_html/modal.component.html',
+  styleUrl: './components_css/modal.component.css',
+  standalone: true,
+})
+export class InGameModal {
+  constructor(
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      onClickLeaveGame: () => void;
+      title: string;
+      content: string;
+    }
+  ) {}
 }

@@ -7,6 +7,15 @@
   [categories]="categoryTitles"
   [prices]="prices"
   [gameData]="gameData"
+  [changeFontSize]="changeFontSize"
+/>
+} @else if (gameData.state === 'done') {
+<final-scores-view
+  (leaveGame)="handleLeaveGame($event)"
+  (toWaiting)="handleToWaiting()"
+  [players]="players"
+  [isHost]="isHost"
+  [gameState]="gameData.state"
 />
 } @else {
 <clue-view
@@ -16,5 +25,6 @@
   [players]="players"
   [clue]="gameData.current_clue"
   [onMessage$]="clueObservable$"
+  [changeFontSize]="changeFontSize"
 />
 }

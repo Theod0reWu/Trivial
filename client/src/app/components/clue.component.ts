@@ -5,7 +5,9 @@ import {
   HostListener,
   Input,
   Output,
+  QueryList,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule, NgIf } from '@angular/common';
@@ -14,6 +16,7 @@ import { TimerComponent } from './timer.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormGroup, FormControl } from '@angular/forms';
 import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
+import { PlayersListComponent } from './player_list.component';
 
 enum BannerStates {
   Empty = 'empty',
@@ -33,20 +36,16 @@ enum BannerStates {
     CommonModule,
     TimerComponent,
     ReactiveFormsModule,
+    PlayersListComponent,
   ],
   templateUrl: '../components_html/clue.component.html',
   styleUrl: '../components_css/clue.component.css',
 })
 export class ClueComponent {
-  public _clue!: string;
-
   @Input() players!: Player[];
   @Input() scores!: number[];
-  @Input() set clue(value: string) {
-    this._clue = value;
-    // dynamically set font size
-    this.changeFontSize();
-  }
+  @Input() changeFontSize!: (ref: ElementRef) => void;
+  @Input() clue!: string;
   @Input() onMessage$: Observable<any>;
 
   @Output() gameStateChange = new EventEmitter<boolean>();
@@ -54,8 +53,12 @@ export class ClueComponent {
   @Output() onAnswer: EventEmitter<string> = new EventEmitter<string>();
 
   @ViewChild('clueText') clueText!: ElementRef;
+  @ViewChildren('bannerDiv') bannerTexts!: QueryList<ElementRef>;
   @HostListener('window:resize', ['$event']) onResize(event: any) {
-    this.changeFontSize();
+    this.changeFontSize(this.clueText);
+    this.bannerTexts.toArray().forEach((child) => {
+      this.changeFontSize(child);
+    });
   }
 
   constructor() {
@@ -72,6 +75,8 @@ export class ClueComponent {
   progress_interval: any;
   timeout: any;
 
+  message_subsciption: any;
+
   public buzzedIn: boolean = false;
 
   // to control the timer
@@ -79,14 +84,25 @@ export class ClueComponent {
   public timerObservable$ = this.timerSubject.asObservable();
 
   ngAfterViewInit(): void {
-    this.onMessage$.subscribe({
+    this.message_subsciption = this.onMessage$.subscribe({
       next: (value) => {
         if (value['action'] === 'startProgressBar') {
           this.startProgressBar(value['duration']);
         }
       },
     });
-    this.changeFontSize();
+    this.changeFontSize(this.clueText);
+    const changeFontSizes = () => {
+      this.bannerTexts.toArray().forEach((child) => {
+        this.changeFontSize(child);
+      });
+    };
+    this.bannerTexts.changes.subscribe(changeFontSizes);
+    changeFontSizes();
+  }
+
+  ngOnDestroy(): void {
+    this.message_subsciption.unsubscribe();
   }
 
   sendBuzzIn(): void {
@@ -128,49 +144,7 @@ export class ClueComponent {
 
   onSubmitAnswer() {
     // console.log('Form Data: ', this.form.value);
-    this.onAnswer.emit(this.form.value['answer']);
-  }
-
-  isOverflown(element: any) {
-    return (
-      element &&
-      (element.scrollHeight > element.clientHeight ||
-        element.scrollWidth > element.clientWidth)
-    );
-  }
-
-  changeFontSize() {
-    if (!this.clueText) return;
-    // console.log(
-    //   getComputedStyle(this.clueText.nativeElement).getPropertyValue(
-    //     'font-size'
-    //   )
-    // );
-    let fontSize = parseInt(
-      getComputedStyle(this.clueText.nativeElement).getPropertyValue(
-        'font-size'
-      )
-    );
-    let overflow = this.isOverflown(this.clueText.nativeElement);
-
-    if (overflow) {
-      // shrink text
-      for (let i = fontSize; i > 0; --i) {
-        overflow = this.isOverflown(this.clueText.nativeElement);
-        if (overflow) {
-          --fontSize;
-          this.clueText.nativeElement.style.fontSize = fontSize + 'px';
-        }
-      }
-    } else {
-      // grow text
-      while (!overflow) {
-        overflow = this.isOverflown(this.clueText.nativeElement);
-        ++fontSize;
-        this.clueText.nativeElement.style.fontSize = fontSize + 'px';
-      }
-      --fontSize;
-    }
+    this.onAnswer.emit(this.form.value['answer'].trim());
   }
 
   BannerType = BannerStates;

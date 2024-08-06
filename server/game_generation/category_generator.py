@@ -1,8 +1,12 @@
-from .gemini import get_and_parse_topics, get_and_parse_ast, get_and_parse_ast_async
+from .gemini import get_and_parse_topics, get_and_parse_ast, get_and_parse_ast_async, get_similarity
 from .prompt import TopicGenerator
 
 import random
 import os
+
+import wikipedia
+
+DIR_NAME = 'category_data/'
 
 class CategoryTree(object):
 	"""
@@ -10,7 +14,7 @@ class CategoryTree(object):
 
 		A depth of 3 is ideal for generating broad enough categories for the purposes of trivia. (might even be too specific in some cases)
 	"""
-	def __init__(self, start = "general", load_path =  os.path.join(os.path.dirname(__file__), 'category_data/')):
+	def __init__(self, start = "general", load_path =  os.path.join(os.path.dirname(__file__), DIR_NAME)):
 		super(CategoryTree, self).__init__()
 		self.root = CategoryNode(0, None, "general")
 		self.total_topics = 1
@@ -39,27 +43,28 @@ class CategoryTree(object):
 		level_at = 0
 		node_at = self.root
 		while (level_at < level):
-			new = node_at.make_children(model, prompt_gen)
-			self.total_topics += new
-			if (new > 0 and node_at.level + 1 > self.depth):
-				self.depth = node_at.level + 1
+			self.ensure_children(model, node_at)
 			node_at = random.choice(node_at.children)
 			level_at += 1
 		return node_at.topic
 
-	async def get_random_topic_async(self, model, level):
-		# decide which prompt_generator to use based on response type of the model
+	def ensure_children(self, model, node):
 		prompt_gen = self.prompt_gen
 		if (model._generation_config["response_mime_type"] == 'application/json'):
 			prompt_gen = self.prompt_gen_json
 
+		if (not node.has_children()):
+			new = node.make_children(model, prompt_gen)
+			self.total_topics += new
+			if (new > 0 and node.level + 1 > self.depth):
+				self.depth = node.level + 1
+
+	async def get_random_topic_async(self, model, level):
+		# decide which prompt_generator to use based on response type of the model
 		level_at = 0
 		node_at = self.root
 		while (level_at < level):
-			new = await node_at.make_children_async(model, prompt_gen)
-			self.total_topics += new
-			if (new > 0 and node_at.level + 1 > self.depth):
-				self.depth = node_at.level + 1
+			self.ensure_children(model, node_at)
 			node_at = random.choice(node_at.children)
 			level_at += 1
 		return node_at.topic
@@ -73,16 +78,11 @@ class CategoryTree(object):
 		node_at = self.root
 		prev_node = None
 		while (level_at < level):
-			new = node_at.make_children(model, prompt_gen)
-			self.total_topics += new
-			if (new > 0 and node_at.level + 1 > self.depth):
-				self.depth = node_at.level + 1
-
+			self.ensure_children(model, node_at)
 			prev_node = node_at
 			node_at = random.choice(node_at.children)
 			level_at += 1
 
-		# print(len(prev_node.children), num)
 		chosen = random.sample(prev_node.children, k = num)
 		return {"parent":prev_node.topic, "children":[i.topic for i in chosen]}
 
@@ -95,18 +95,41 @@ class CategoryTree(object):
 		node_at = self.root
 		prev_node = None
 		while (level_at < level):
-			new = await node_at.make_children_async(model, prompt_gen)
-			self.total_topics += new
-			if (new > 0 and node_at.level + 1 > self.depth):
-				self.depth = node_at.level + 1
-
+			self.ensure_children(model, node_at)
 			prev_node = node_at
 			node_at = random.choice(node_at.children)
 			level_at += 1
 
-		# print(len(prev_node.children), num)
 		chosen = random.sample(prev_node.children, k = num)
 		return {"parent":prev_node.topic, "children":[i.topic for i in chosen]}
+
+	def get_answers_as_topics(self, model, category_node, num_answers: int):
+		prompt_gen = self.prompt_gen
+		if (model._generation_config["response_mime_type"] == 'application/json'):
+			prompt_gen = self.prompt_gen_json
+
+		answers = []
+		self.ensure_children(model, category_node)
+		num_children = len(category_node.children)
+
+		chosen_nodes = []
+		if (num_answers <= num_children):
+			chosen_nodes = random.sample(category_node.children, k = num_answers)
+		else:
+			needed = num_answers - num_children
+			at_child = 0
+			while(needed > 0):
+				child = category_node.children[at_child]
+				self.ensure_children(child)
+				if (needed <= len(child.children)):
+					chosen_nodes = random.sample(child.children, k = needed)
+					needed = 0
+				else:
+					for i in child.children:
+						chosen_nodes.append(i)
+					needed -= len(child.children)
+			for i in category_node.children[at_child + 1:]:
+				chosen_nodes.append(i)
 
 	def node_savename(self, topic : str):
 		return os.path.join(self.load_path, topic + ".txt").replace(" ", "_")	
@@ -150,6 +173,7 @@ class CategoryNode(object):
 				- Creates the children nodes for the current node
 				- calls the model to generate the "sub" categories
 	"""
+	WIKI_THRESHOLD = .9
 	def __init__(self, level, parent, topic):
 		super(CategoryNode, self).__init__()
 		self.parent = parent
@@ -157,6 +181,13 @@ class CategoryNode(object):
 		self.topic = topic
 
 		self.children = []
+		self.wikipediable = None
+
+	def on_wikipedia(self):
+		if (self.wikipediable is None):
+			search = wikipedia.search(topic, results = 1)
+			self.wikipediable = get_similarity(search[0], self.topic) >= self.WIKI_THRESHOLD
+		return self.wikipediable
 
 	def has_children(self):
 		return len(self.children) != 0
@@ -198,27 +229,4 @@ class CategoryNode(object):
 		child_str = [str(c) for c in self.children]
 		out += ", ".join(child_str)
 		out += "]"
-		return out
-
-class CategoryGenerator(object):
-	def __init__(self, model):
-		self.start = 'general'
-		self.level = -1
-		self.topics = []
-		self.topic_prompt = TopicGenerator()
-		self.model = model
-
-		# populate the first layer
-		self.topics.append(get_and_parse_topics(self.model, self.topic_prompt.generate_prompt(category = self.start)))
-
-	def get_random_topic(level : int):
-		level_at = 0
-		rand_choices = [random.randint(0, len(self.topics[0]))]
-		while (level_at < level):
-			return
-
-	def __repr__(self):
-		out = ''
-		for i in range(self.level + 1):
-			out += "level " + str(i) + ": " + ", ".join(self.topics[i]) + "\n"
 		return out

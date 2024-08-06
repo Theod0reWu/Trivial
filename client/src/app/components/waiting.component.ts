@@ -6,7 +6,9 @@ import {
   HostListener,
   Input,
   Output,
+  QueryList,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -14,6 +16,7 @@ import { PageStates } from '../app.component';
 import { Category, WaitingTaglist } from './waiting_taglist.component';
 import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
 import { LoadingComponent } from './loading.component';
+import { PlayersListComponent } from './player_list.component';
 import { Player } from '../api/GameData';
 
 @Component({
@@ -25,6 +28,7 @@ import { Player } from '../api/GameData';
     WaitingTaglist,
     MatTooltipModule,
     LoadingComponent,
+    PlayersListComponent,
   ],
   templateUrl: '../components_html/waiting.component.html',
   styleUrl: '../components_css/waiting.component.css',
@@ -33,25 +37,19 @@ export class WaitingComponent implements AfterViewInit {
   constructor(private clipboard: Clipboard) {}
   @Input() bgOverlay!: ElementRef;
   @Input() roomId!: string;
-  // @Input() players!: Array<Record<string, string>>;
   @Input() players!: Player[];
   @Input() isHost!: boolean;
+  @Input() changeFontSize!: (ref: ElementRef) => void;
 
   @Output() hostGameEvent = new EventEmitter<object>();
   @ViewChild('tooltip') tooltip!: MatTooltip;
-  primaryViewOpacity = 1;
-  minPrimaryViewOpacity = 0.2;
 
   roomCodeTooltip = 'Copy to clipboard';
 
   logoUrl = '/assets/img/trivial.png';
   logoBackdropUrl = '/assets/img/question.gif';
 
-  categories: Category[] = [
-    { name: 'Science' },
-    { name: 'History' },
-    { name: 'Literature' },
-  ];
+  categories: Category[] = [];
 
   numCategories = 6;
   numQuestions = 5;
@@ -66,6 +64,9 @@ export class WaitingComponent implements AfterViewInit {
     setTimeout(() => {
       this.bgOverlay.nativeElement.classList.add('bg-rendered');
     }, 10);
+
+    let bgAudio = document.getElementById("bgAudio") as HTMLAudioElement;
+    bgAudio.volume = .1;
   }
 
   onClickLeaveGame() {
@@ -94,6 +95,7 @@ export class WaitingComponent implements AfterViewInit {
       state: PageStates.Loading,
       numClues: this.numQuestions,
       numCategories: this.numCategories,
+      categories: this.categories,
       loadingMessage:
         '<b>Hang tight!</b> Generating your clues. This may take a while.',
     });

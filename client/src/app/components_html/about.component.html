@@ -1,0 +1,132 @@
+<main>
+  <div class="about">
+    <div class="leave-button" (click)="onClickBack()">
+      <div class="leave">BACK</div>
+    </div>
+    <div class="about-container">
+      <div class="about-header">
+        <div class="about-header-container">
+          <h1>Welcome to TRIVIAL!</h1>
+          <h2 class="about-text-fancy">The Ultimate Trivia Showdown!</h2>
+          <hr />
+          <h3 class="about-text-fancy">
+            Think you know it all? Prove it! Compete against friends or family
+            in a fast-paced battle of wits and win big. <br />
+            Do you have what it takes to become the Trivial champion?
+          </h3>
+        </div>
+      </div>
+      <div class="about-content">
+        <div class="about-content-container">
+          <div class="how-to-play about-text">
+            <h2 class="about-text-fancy">How to play</h2>
+            <p>First host or join a game</p>
+            <div class="host-join">
+              <div class="host">
+                <span>To host a game:</span>
+                <ol>
+                  <li>Enter your username</li>
+                  <li>Click HOST GAME</li>
+                  <li>Click on the room code to copy it</li>
+                  <li>Share the room code with your friends!</li>
+                </ol>
+              </div>
+              <div class="join">
+                <span>To join a game:</span>
+                <ol>
+                  <li>Enter your username</li>
+                  <li>Click JOIN GAME</li>
+                  <li>Enter the room code of an existing room</li>
+                  <li>Click JOIN!</li>
+                </ol>
+              </div>
+            </div>
+            <p>
+              Once the host starts the game your trivia board will start
+              generating
+            </p>
+            <div class="tutorial-img">
+              <img [ngSrc]="tutorialBoardURL" fill priority />
+            </div>
+            <p>
+              Once the board has been generated a player is then selected to
+              choose a category and price. That player is highlighted in green.
+              (Note you can scroll up to bring the players into view)
+            </p>
+            <div class="tutorial-img">
+              <img [ngSrc]="tutorialClueURL" fill priority />
+            </div>
+            <p>
+              The chosen clue is then displayed. Any player can buzz-in to
+              answer, but once someone buzzes in everyone else must wait for
+              them to finish answering before being able to buzz-in again.
+              Incorrect answers are penalized, while a correct answer wins you
+              the price! The timer for the clue appears at the bottom, and a
+              separate timer for answering appears when you buzz in.
+            </p>
+            <p>
+              This continues until there are no more clues left. The player with
+              the highest number of points wins!
+            </p>
+          </div>
+          <div class="faq">
+            <h2 class="about-text-fancy">FAQ:</h2>
+            <div class="question-answer">
+              <h6>
+                Everything looks too big for my screen, how can I adjust it?
+              </h6>
+              <p>Use Ctrl-/Cmd- to zoom out!</p>
+            </div>
+            <div class="question-answer">
+              <h6>How can I see the players in my room and their scores?</h6>
+              <p>
+                You can scroll up to reveal the players and scroll down to hide
+                them.
+              </p>
+            </div>
+            <div class="question-answer">
+              <h6>Why is my custom category not appearing on the board?</h6>
+              <p>
+                Gemini is having trouble creating trivia for your category, this
+                is likely due to an inappropriate category.
+              </p>
+            </div>
+            <div class="question-answer">
+              <h6>Why are the clue and answers not matching the category?</h6>
+              <p>
+                There is likely not enough information available to properly
+                create trivia for the category. Trivial uses Wikipedia as a
+                trusted source of information to create trivia for you.
+              </p>
+            </div>
+            <div class="question-answer">
+              <h6>Why does the board take so long to load?</h6>
+              <p>
+                Generating the board relies on the Gemini api generating a
+                response. The larger the board the more times we would need to
+                call Gemini. Keep in mind we are using the free version of
+                Gemini and bear with us!
+              </p>
+            </div>
+            <div class="question-answer">
+              <h6>Where did the music come from?</h6>
+              <p>
+                The music was made by Leonidas Kalpaxis. Follow him on
+                <a
+                  href="https://open.spotify.com/artist/7bvIh5Ju6Rtwd10Vnf5EhJ "
+                  target="_blank"
+                  >Spotify</a
+                >
+                or on
+                <a href="https://soundcloud.com/leondaki" target="_blank"
+                  >SoundCloud</a
+                >!
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bg-about"></div>
+</main>
