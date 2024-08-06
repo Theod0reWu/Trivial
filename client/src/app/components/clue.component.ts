@@ -108,7 +108,6 @@ export class ClueComponent {
   sendBuzzIn(): void {
     if (!this.buzzedIn) {
       this.onBuzzIn.emit();
-      this.buzzedIn = true;
     }
   }
 

@@ -204,7 +204,7 @@ class GameManager(object):
         room_data = room_ref.get().to_dict()
 
         # ensure player is in the room and that the player hasn't answered yet
-        if (not session_id in room_data["curr_connections"] or session_id in room_data["answered"]):
+        if (not session_id in room_data["curr_connections"] or session_id in room_data["answered"] or room_data["answering"] is not None):
             return False
         room_data["answered"].append(session_id)
         room_ref.update({"answered": room_data["answered"], "answering": session_id})

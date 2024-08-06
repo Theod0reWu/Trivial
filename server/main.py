@@ -23,6 +23,9 @@ from uuid import uuid4
 import json
 import asyncio
 import time
+import os
+
+ENVIRON_FRONTEND = "FRONTEND_URL"
 
 @lru_cache
 def get_settings():
@@ -39,6 +42,9 @@ app = FastAPI()
 origins = [
     "http://localhost:4200", #frontend url
 ]
+if (ENVIRON_FRONTEND in os.environ):
+    origins.append(os.environ[ENVIRON_FRONTEND])
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -349,7 +355,7 @@ async def buzz_in(sid, data):
     game_manager.init_answer_timer(room_id, settings.answer_time)
     await sio.emit("answering", {"duration": settings.answer_time}, to=buzzer_sid)
 
-    await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": settings.answer_time}, room=room_id)
+    await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": settings.answer_time}, room=room_id, skip_sid=sid)
     await run_timer(settings.answer_time, game_manager.check_answer_timer, end_answering, {"room_id": room_id}, {"room_id": room_id, "session_id": session_id})
 
 @sio.event
