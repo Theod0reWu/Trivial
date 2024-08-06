@@ -4,13 +4,10 @@ import {
   ElementRef,
   EventEmitter,
   Input,
-  OnChanges,
   Output,
   Renderer2,
-  SimpleChanges,
   ViewChild,
 } from '@angular/core';
-import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule } from '@angular/common';
 import { Player } from '../api/GameData';
 import * as confetti from 'canvas-confetti';
@@ -26,24 +23,7 @@ export class FinalScoresComponent implements AfterViewInit {
   @Input() players!: Player[];
   @Input() isHost!: boolean;
   @Input() gameState!: string;
-  // players = [
-  //   { username: 'winxler', score: 1000 },
-  //   { username: 'winxler2', score: 900 },
-  //   { username: 'winxler3', score: 800 },
-  //   { username: 'winxler4', score: 700 },
-  //   { username: 'winxler5', score: 600 },
-  //   { username: 'winxler6', score: 500 },
-  //   { username: 'winxler6', score: 500 },
-  //   { username: 'winxler6', score: 500 },
-  //   { username: 'winxler6', score: 500 },
-  //   { username: 'winxler6', score: 500 },
-  //   { username: 'winxler6', score: 500 },
-  //   { username: 'winxler6', score: 500 },
-  //   { username: 'winxler6', score: 500 },
-  //   { username: 'winxler6', score: 500 },
-  //   { username: 'winxler7', score: 400 },
-  //   { username: 'winxler8', score: 11000 },
-  // ];
+
   sortedPlayers: Player[] = [];
   podium: Player[] = [];
   nonPodium: Player[] = [];
@@ -82,32 +62,36 @@ export class FinalScoresComponent implements AfterViewInit {
   }
 
   celebrate() {
-    // const duration = 5000;
-
     const canvas = this.renderer2.createElement('canvas');
 
     this.renderer2.appendChild(this.mainElement.nativeElement, canvas);
 
     const myConfetti = confetti.create(canvas, {
       resize: true, // will fit all screen sizes
+      // disableForReducedMotion: true,
     });
 
-    // myConfetti({
-    //   particleCount: 150,
-    //   spread: 180,
-    //   origin: { y: 0.6 },
-    //   colors: ['#FF4500', '#008080', '#FFD700'],
-    // });
-
-    // setTimeout(() => myConfetti.reset(), duration);
-
-    var duration = 15 * 1000;
+    const duration = 15 * 1000;
     var animationEnd = Date.now() + duration;
-    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+    const fireworksDefaults = {
+      startVelocity: 30,
+      spread: 360,
+      ticks: 60,
+      zIndex: 0,
+    };
+    const starsDefaults = {
+      spread: 360,
+      ticks: 50,
+      gravity: 0,
+      decay: 0.94,
+      startVelocity: 30,
+      colors: ['FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8'],
+      origin: { y: 0.3 },
+    };
 
-    function randomInRange(min: number, max: number) {
+    var randomInRange = (min: number, max: number) => {
       return Math.random() * (max - min) + min;
-    }
+    };
 
     var interval: any = setInterval(function () {
       var timeLeft = animationEnd - Date.now();
@@ -116,18 +100,37 @@ export class FinalScoresComponent implements AfterViewInit {
         return clearInterval(interval);
       }
 
-      var particleCount = 50 * (timeLeft / duration);
+      var particleCount = 75 * (timeLeft / duration);
       // since particles fall down, start a bit higher than random
       myConfetti({
-        ...defaults,
+        ...fireworksDefaults,
         particleCount,
         origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
       });
       myConfetti({
-        ...defaults,
+        ...fireworksDefaults,
         particleCount,
         origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
       });
     }, 250);
+
+    var shootStars = () => {
+      myConfetti({
+        ...starsDefaults,
+        particleCount: 50,
+        scalar: 1.2,
+        shapes: ['star'],
+      });
+
+      myConfetti({
+        ...starsDefaults,
+        particleCount: 10,
+        scalar: 0.75,
+        shapes: ['circle'],
+      });
+    };
+    for (var i = 400; i <= 800; i += 100) {
+      setTimeout(shootStars, i);
+    }
   }
 }
