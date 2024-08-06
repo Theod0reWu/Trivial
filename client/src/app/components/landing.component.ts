@@ -104,4 +104,8 @@ export class LandingComponent {
       });
     }
   }
+
+  onClickAbout() {
+    this.hostGameEvent.emit({ state: PageStates.About });
+  }
 }

@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LandingComponent } from './components/landing.component';
+import { AboutComponent } from './components/about.component';
 import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
 import { LoadingComponent } from './components/loading.component';
@@ -32,6 +33,7 @@ export enum PageStates {
   imports: [
     RouterOutlet,
     LandingComponent,
+    AboutComponent,
     WaitingComponent,
     GameComponent,
     LoadingComponent,
@@ -109,7 +111,6 @@ export class AppComponent {
 
   ngOnInit(): void {
     // handle reconnecting from a disconnect
-    
   }
 
   updateAndConnect(data: any): void {
@@ -230,6 +231,10 @@ export class AppComponent {
         setTimeout(() => {
           this.bgOverlay.nativeElement.classList.remove('bg-rendered');
         }, 10);
+        break;
+      }
+      case PageStates.About: {
+        this.state = this.pageStates.About;
         break;
       }
       case PageStates.Waiting: {

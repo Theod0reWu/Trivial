@@ -1,5 +1,7 @@
 @if (state == pageStates.Landing) {
 <landing-view (hostGameEvent)="handleChangeState($event)" />
+} @else if (state == pageStates.About) {
+<about-view (hostGameEvent)="handleChangeState($event)" />
 } @else if (state == pageStates.Waiting) {
 <waiting-view
   (hostGameEvent)="handleChangeState($event)"
