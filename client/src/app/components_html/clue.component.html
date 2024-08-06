@@ -8,12 +8,12 @@
       *ngIf="banner === BannerType.Green || banner === BannerType.Red"
     >
       <div class="banner" [style.background-color]="banner">
-        <div class="banner-text">{{ bannerText }}</div>
+        <div class="banner-text" #bannerDiv>{{ bannerText }}</div>
       </div>
     </div>
     <div class="altanswering" *ngIf="banner === BannerType.AltAnswering">
       <div class="answering-outer">
-        <div class="answering-text">{{ answeringText }}</div>
+        <div class="answering-text" #bannerDiv>{{ answeringText }}</div>
       </div>
     </div>
     <div class="answering" *ngIf="banner === BannerType.Answering">

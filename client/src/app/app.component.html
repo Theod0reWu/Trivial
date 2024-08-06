@@ -28,6 +28,18 @@
   [changeFontSize]="changeFontSize"
 />
 }
+<div class="button-panel">
+  <div class="too-big-button" (click)="openDialog(false)">
+    <div class="too-big">TOO BIG?</div>
+  </div>
+  <div
+    class="leave-button"
+    (click)="openDialog(true)"
+    *ngIf="state === pageStates.InGame || state === pageStates.Loading"
+  >
+    <div class="leave">LEAVE GAME</div>
+  </div>
+</div>
 <div class="bg"></div>
 <div class="bg-overlay" #bgOver></div>
 <router-outlet />

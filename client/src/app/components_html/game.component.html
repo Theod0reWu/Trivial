@@ -27,13 +27,4 @@
   [onMessage$]="clueObservable$"
   [changeFontSize]="changeFontSize"
 />
-} @if (gameData.state !== 'done') {
-<div class="button-panel">
-  <div class="too-big-button" (click)="openDialog(false)">
-    <div class="too-big">TOO BIG?</div>
-  </div>
-  <div class="leave-button" (click)="openDialog(true)">
-    <div class="leave">LEAVE GAME</div>
-  </div>
-</div>
 }

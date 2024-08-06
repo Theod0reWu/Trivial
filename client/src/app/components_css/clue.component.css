@@ -226,3 +226,9 @@ textarea:focus,
 input:focus {
   outline: none;
 }
+
+.banner-text,
+.answering-text {
+  height: 100%;
+  width: 100%;
+}

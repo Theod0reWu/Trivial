@@ -5,7 +5,6 @@ import {
   EventEmitter,
   ViewChild,
   ElementRef,
-  Inject,
 } from '@angular/core';
 // import { NgOptimizedImage } from '@angular/common';
 import { PageStates } from '../app.component';
@@ -14,21 +13,14 @@ import { ClueComponent } from './clue.component';
 import { FinalScoresComponent } from './final_scores.component';
 import { Player, GameData } from '../api/GameData';
 import { Observable, Subject, ReplaySubject } from 'rxjs';
-import {
-  MAT_DIALOG_DATA,
-  MatDialog,
-  MatDialogModule,
-} from '@angular/material/dialog';
 
 @Component({
   selector: 'game-view',
   standalone: true,
   imports: [BoardComponent, ClueComponent, FinalScoresComponent],
   templateUrl: '../components_html/game.component.html',
-  styleUrl: '../components_css/game.component.css',
 })
 export class GameComponent {
-  constructor(public dialog: MatDialog) {}
   @Input() numCols!: number;
   @Input() numRows!: number;
   @Input() categoryTitles!: string[];
@@ -125,47 +117,4 @@ export class GameComponent {
     this.clueComponent.bannerText =
       'We were looking for' + ': Who/What is ' + text + '?';
   }
-
-  onClickLeaveGame() {
-    this.hostGameEvent.emit({ state: PageStates.Landing });
-  }
-
-  openDialog(isLeaving: boolean) {
-    const data = isLeaving
-      ? {
-          onClickLeaveGame: () => this.onClickLeaveGame(),
-          title: 'Are you sure you want to leave?',
-          content: 'NOTE: All player data for this game session will be lost!',
-        }
-      : {
-          onClickLeaveGame: undefined,
-          title: 'Screen size too big?',
-          content: 'Use Ctrl-/Cmd- to zoom out!',
-        };
-    const dialogRef = this.dialog.open(InGameModal, {
-      data: data,
-    });
-
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   console.log(`Dialog result: ${result}`);
-    // });
-  }
-}
-
-@Component({
-  selector: 'in-game-modal',
-  imports: [MatDialogModule],
-  templateUrl: '../components_html/modal.component.html',
-  styleUrl: '../components_css/modal.component.css',
-  standalone: true,
-})
-export class InGameModal {
-  constructor(
-    @Inject(MAT_DIALOG_DATA)
-    public data: {
-      onClickLeaveGame: () => void;
-      title: string;
-      content: string;
-    }
-  ) {}
 }

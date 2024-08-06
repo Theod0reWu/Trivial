@@ -5,7 +5,9 @@ import {
   HostListener,
   Input,
   Output,
+  QueryList,
   ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule, NgIf } from '@angular/common';
@@ -51,8 +53,12 @@ export class ClueComponent {
   @Output() onAnswer: EventEmitter<string> = new EventEmitter<string>();
 
   @ViewChild('clueText') clueText!: ElementRef;
+  @ViewChildren('bannerDiv') bannerTexts!: QueryList<ElementRef>;
   @HostListener('window:resize', ['$event']) onResize(event: any) {
     this.changeFontSize(this.clueText);
+    this.bannerTexts.toArray().forEach((child) => {
+      this.changeFontSize(child);
+    });
   }
 
   constructor() {
@@ -84,6 +90,13 @@ export class ClueComponent {
       },
     });
     this.changeFontSize(this.clueText);
+    const changeFontSizes = () => {
+      this.bannerTexts.toArray().forEach((child) => {
+        this.changeFontSize(child);
+      });
+    };
+    this.bannerTexts.changes.subscribe(changeFontSizes);
+    changeFontSizes();
   }
 
   sendBuzzIn(): void {

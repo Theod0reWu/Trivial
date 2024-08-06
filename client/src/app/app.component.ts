@@ -1,11 +1,22 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Inject,
+  ViewChild,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LandingComponent } from './components/landing.component';
 import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
 import { LoadingComponent } from './components/loading.component';
 import { ConnectorService } from './api/connector.service';
-import { GameData } from './api/GameData';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogModule,
+} from '@angular/material/dialog';
+import { NgIf } from '@angular/common';
 
 export enum PageStates {
   Landing,
@@ -24,13 +35,14 @@ export enum PageStates {
     WaitingComponent,
     GameComponent,
     LoadingComponent,
+    NgIf,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
 })
 export class AppComponent {
   constructor(
-    private elementRef: ElementRef,
+    public dialog: MatDialog,
     public connectorService: ConnectorService
   ) {}
   @ViewChild(GameComponent) gameComponent: GameComponent;
@@ -75,6 +87,25 @@ export class AppComponent {
       ref.nativeElement.style.fontSize = fontSize + 'px';
     }
   };
+
+  // open modal
+  openDialog(isLeaving: boolean) {
+    const data = isLeaving
+      ? {
+          onClickLeaveGame: () =>
+            this.handleChangeState({ state: PageStates.Landing }),
+          title: 'Are you sure you want to leave?',
+          content: 'NOTE: All player data for this game session will be lost!',
+        }
+      : {
+          onClickLeaveGame: undefined,
+          title: 'Screen size too big?',
+          content: 'Use Ctrl-/Cmd- to zoom out!',
+        };
+    const dialogRef = this.dialog.open(InGameModal, {
+      data: data,
+    });
+  }
 
   ngOnInit(): void {
     // handle reconnecting from a disconnect
@@ -225,4 +256,22 @@ export class AppComponent {
     }
     window.scrollTo(0, 0);
   }
+}
+
+@Component({
+  selector: 'in-game-modal',
+  imports: [MatDialogModule],
+  templateUrl: './components_html/modal.component.html',
+  styleUrl: './components_css/modal.component.css',
+  standalone: true,
+})
+export class InGameModal {
+  constructor(
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      onClickLeaveGame: () => void;
+      title: string;
+      content: string;
+    }
+  ) {}
 }
