@@ -64,6 +64,9 @@ export class WaitingComponent implements AfterViewInit {
     setTimeout(() => {
       this.bgOverlay.nativeElement.classList.add('bg-rendered');
     }, 10);
+
+    let bgAudio = document.getElementById("bgAudio") as HTMLAudioElement;
+    bgAudio.volume = .1;
   }
 
   onClickLeaveGame() {
