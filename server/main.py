@@ -375,7 +375,6 @@ async def answer_clue(sid, data):
     else:
         # show the incorrect response
         await sio.emit("response", {"correct": False, "answer": answer}, room=room_id);
-        await send_player_cash(room_id)
         await sio.sleep(settings.response_show_time)
 
         # restart the timer

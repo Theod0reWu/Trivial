@@ -13,20 +13,30 @@ safety_settings = {
     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
 }
 
+MAX_RETRIES = 30
+
 '''
 	Returns the first candidate response from the model 
 '''
-def get_response(model, prompt):
-	response = None
+def get_response(model, prompt, times_tried = 0):
+	response, count = None, 0
 	while response == None:
 		try:
 			response = model.generate_content(prompt, safety_settings = safety_settings)
 		except ResourceExhausted:
 			time.sleep(1)
+		count += 1
+		if (count > MAX_RETRIES):
+			return None
 
 	try:
 		# print(response.candidates[0].content.parts[0].text)
 		return response.candidates[0].content.parts[0].text
+	except IndexError as e:
+		if (times_tried == 0):
+			return get_response(model, prompt, 1)
+		else:
+			return None
 	except Exception as e:
 		print("gemini error:",e)
 		print(prompt)
@@ -150,6 +160,12 @@ def get_and_parse_ast(model, prompt):
 		print(e)
 		print("Error with this prompt:", prompt)
 		print("Prompt gave this response:", response)
+	except SyntaxError as e:
+		if ("'[' was never closed" in str(e)):
+			var = ast.literal_eval(response + "]")
+		else:
+			print("syntax error:", str(e), "|")
+			return None
 	return var
 
 async def get_and_parse_ast_async(model, prompt):

@@ -109,6 +109,7 @@ export class AppComponent {
 
   ngOnInit(): void {
     // handle reconnecting from a disconnect
+    
   }
 
   updateAndConnect(data: any): void {

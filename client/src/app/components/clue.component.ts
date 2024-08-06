@@ -75,6 +75,8 @@ export class ClueComponent {
   progress_interval: any;
   timeout: any;
 
+  message_subsciption: any;
+
   public buzzedIn: boolean = false;
 
   // to control the timer
@@ -82,7 +84,7 @@ export class ClueComponent {
   public timerObservable$ = this.timerSubject.asObservable();
 
   ngAfterViewInit(): void {
-    this.onMessage$.subscribe({
+    this.message_subsciption = this.onMessage$.subscribe({
       next: (value) => {
         if (value['action'] === 'startProgressBar') {
           this.startProgressBar(value['duration']);
@@ -97,6 +99,10 @@ export class ClueComponent {
     };
     this.bannerTexts.changes.subscribe(changeFontSizes);
     changeFontSizes();
+  }
+
+  ngOnDestroy(): void {
+    this.message_subsciption.unsubscribe();
   }
 
   sendBuzzIn(): void {
