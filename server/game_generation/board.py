@@ -135,7 +135,12 @@ class Board(object):
 			answers.append(random.sample(ans_output, self.clues_per_category))
 		return answers
 
-	def refresh(self, category_tree, model, fact_model = None, min_price = 200, price_incr = 200):
+	def generate_clues(self, model, answers, information):
+		clue_prompt = self.clue_gen_json.generate_prompt(num = self.clues_per_category, answers = ", ".join(answers), information = "\n\n".join(information))
+		clues = get_and_parse_ast(model, clue_prompt)
+		return clues
+
+	def refresh(self, category_tree, model, min_price = 200, price_incr = 200):
 		self.clear_picked()
 		self.items = []
 
@@ -159,13 +164,13 @@ class Board(object):
 			ans = answers[i]
 			ans, information = self.get_wikipedia_info(ans, self.all_categories[i])
 
-			clue_prompt = self.clue_gen_json.generate_prompt(num = self.clues_per_category, answers = ", ".join(ans), information = "\n\n".join(information))
-			clues = []
-			if (fact_model is None):
-				clues = get_and_parse_ast(model, clue_prompt)
-			else:
-				clues = get_and_parse_ast(fact_model, clue_prompt)
-			print(clues)
+			max_tries = 3
+			clues = None
+			for i in range(max_tries):
+				clues = self.generate_clues(model, ans, information)
+				if (clues is not None):
+					break
+			print("clues:", clues)
 
 			items = []
 			for e in range(self.clues_per_category):

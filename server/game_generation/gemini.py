@@ -13,7 +13,13 @@ safety_settings = {
     HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_ONLY_HIGH,
 }
 
+safety_settings = {
+    HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_NONE,
+    HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_NONE,
+}
+
 MAX_RETRIES = 30
+MAX_RECURSE = 3
 
 '''
 	Returns the first candidate response from the model 
@@ -33,13 +39,15 @@ def get_response(model, prompt, times_tried = 0):
 		# print(response.candidates[0].content.parts[0].text)
 		return response.candidates[0].content.parts[0].text
 	except IndexError as e:
-		if (times_tried == 0):
-			return get_response(model, prompt, 1)
+		if (times_tried < MAX_RECURSE):
+			return get_response(model, prompt, times_tried + 1)
 		else:
+			print("Retry failed. Tried", times_tried, "times")
+			print(e)
 			return None
 	except Exception as e:
 		print("gemini error:",e)
-		print(prompt)
+		print(prompt[:100])
 		print(response)
 		print("feedback:",response.prompt_feedback, "|")
 
@@ -158,7 +166,7 @@ def get_and_parse_ast(model, prompt):
 		var = ast.literal_eval(response)
 	except ValueError as e:
 		print(e)
-		print("Error with this prompt:", prompt)
+		print("Error with this prompt:", prompt[:100])
 		print("Prompt gave this response:", response)
 	except SyntaxError as e:
 		if ("'[' was never closed" in str(e)):
