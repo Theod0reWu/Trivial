@@ -80,10 +80,12 @@ export class AppComponent {
       }
     } else {
       // grow text
-      while (!overflow) {
+      let count = 0;
+      while (!overflow && count < 100) {
         ++fontSize;
         ref.nativeElement.style.fontSize = fontSize + 'px';
         overflow = isOverflown(ref.nativeElement);
+        count += 1
       }
       --fontSize;
       ref.nativeElement.style.fontSize = fontSize + 'px';
