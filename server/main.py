@@ -23,6 +23,10 @@ from uuid import uuid4
 import json
 import asyncio
 import time
+import os
+import sys
+
+ENVIRON_FRONTEND = "FRONTEND_URL"
 
 @lru_cache
 def get_settings():
@@ -39,6 +43,9 @@ app = FastAPI()
 origins = [
     "http://localhost:4200", #frontend url
 ]
+if (ENVIRON_FRONTEND in os.environ):
+    origins.append(os.environ[ENVIRON_FRONTEND])
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -114,9 +121,6 @@ async def is_host(session_id: str):
 '''
     Socket.io events
 '''
-
-# def getRoom(sid):
-#     return list(set(sio.manager.get_rooms(sid, "/")).difference({sid}))[0]
 
 def get_ordered_players(players, session_info = False):
     if (not session_info):
@@ -200,6 +204,10 @@ async def disconnect(sid):
     print('disconnect ', sid)
 
 @sio.event
+async def reconnect(sid, data):
+    print(sid, data)
+
+@sio.event
 async def join_room(sid, data):
     room_id = data["room_id"]
     session_id = data['session_id']
@@ -210,8 +218,8 @@ async def join_room(sid, data):
     print(f"User {username} joined room {room_id}")
 
     # Send a status response to the client
-    await sio.emit("join_room_status", {"status": "success"}, room=room_id)
     await send_players(room_id)
+    await sio.emit("join_room_status", {"status": "success"}, room=room_id)
 
 @sio.event
 async def rejoin_room(sid, data):
@@ -347,9 +355,9 @@ async def buzz_in(sid, data):
     #pause timer and let everyone know someone will be answering
     game_manager.pause_buzz_in_timer(room_id)
     game_manager.init_answer_timer(room_id, settings.answer_time)
-    await sio.emit("answering", {"duration": settings.answer_time}, to=buzzer_sid)
+    await sio.emit("answering", {"duration": settings.answer_time, "who": buzzer_index}, to=buzzer_sid)
 
-    await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": settings.answer_time}, room=room_id)
+    await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": settings.answer_time}, room=room_id, skip_sid=sid)
     await run_timer(settings.answer_time, game_manager.check_answer_timer, end_answering, {"room_id": room_id}, {"room_id": room_id, "session_id": session_id})
 
 @sio.event
@@ -381,4 +389,5 @@ async def answer_clue(sid, data):
         await end_answering(room_id, session_id)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)
+    # uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)
+    uvicorn.run(app, host = "0.0.0.0", port = int(sys.argv[1]), log_level='debug', access_log=True)

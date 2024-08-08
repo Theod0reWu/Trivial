@@ -77,6 +77,8 @@ export class GameComponent {
 
   startAnswering(duration: number): void {
     this.clueComponent.banner = this.clueComponent.BannerType.Answering;
+    this.clueComponent.startAnsweringTimer(duration)
+    this.clueComponent.buzzedIn = true;
   }
 
   startAnsweringTimer(duration: number): void {

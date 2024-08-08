@@ -3,20 +3,15 @@
     <div class="clue">
       <div class="clue-text" #clueText>{{ clue }}</div>
     </div>
-    <div
-      class="colored-banner"
-      *ngIf="banner === BannerType.Green || banner === BannerType.Red"
-    >
+    @if (banner === BannerType.Green || banner === BannerType.Red) {
       <div class="banner" [style.background-color]="banner">
         <div class="banner-text" #bannerDiv>{{ bannerText }}</div>
       </div>
-    </div>
-    <div class="altanswering" *ngIf="banner === BannerType.AltAnswering">
+    } @else if (banner === BannerType.AltAnswering) {
       <div class="answering-outer">
         <div class="answering-text" #bannerDiv>{{ answeringText }}</div>
       </div>
-    </div>
-    <div class="answering" *ngIf="banner === BannerType.Answering">
+    } @else if (banner === BannerType.Answering) {
       <div class="answering-form">
         <div class="who-or-what">Who/What is:</div>
         <form
@@ -35,8 +30,7 @@
           {{ myInput.focus() }}
         </form>
       </div>
-    </div>
-    <div class="empty" *ngIf="banner === BannerType.Empty">
+    } @else if (banner === BannerType.Empty) {
       <div class="button-panel">
         <div
           class="button"
@@ -48,7 +42,7 @@
           Buzz In
         </div>
       </div>
-    </div>
+    }
     <timer
       *ngIf="
         banner === BannerType.AltAnswering || banner === BannerType.Answering

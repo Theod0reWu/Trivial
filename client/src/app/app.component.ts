@@ -80,10 +80,12 @@ export class AppComponent {
       }
     } else {
       // grow text
-      while (!overflow) {
+      let count = 0;
+      while (!overflow && count < 100) {
         ++fontSize;
         ref.nativeElement.style.fontSize = fontSize + 'px';
         overflow = isOverflown(ref.nativeElement);
+        count += 1
       }
       --fontSize;
       ref.nativeElement.style.fontSize = fontSize + 'px';
@@ -179,7 +181,9 @@ export class AppComponent {
       this.connectorService.answeringChange$.subscribe({
         next: (value) => {
           this.connectorService.gameData.answering = true;
+          this.gameComponent.pauseProgressBar();
           this.gameComponent.startAnswering(value['duration']);
+          this.connectorService.gameData.answeringIndex = value['who'];
         },
       });
 
