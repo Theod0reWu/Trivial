@@ -37,7 +37,10 @@
   <div
     class="leave-button"
     (click)="openDialog(true)"
-    *ngIf="state === pageStates.InGame || state === pageStates.Loading"
+    *ngIf="
+      connectorService.gameData?.state !== 'done' &&
+      (state === pageStates.InGame || state === pageStates.Loading)
+    "
   >
     <div class="leave">LEAVE GAME</div>
   </div>

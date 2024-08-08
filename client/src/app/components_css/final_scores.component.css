@@ -252,3 +252,9 @@ main {
 .restart-button:hover {
   background: var(--dark-purple);
 }
+
+canvas {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+}
