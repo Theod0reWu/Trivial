@@ -40,7 +40,10 @@ class GameManager(object):
 
         game = Game(room_data["curr_connections"], len(room_data["curr_connections"]),num_categories, num_clues)
         game.generate_board()
-        data = game.to_dict()
+        try:
+            data = game.to_dict()
+        except:
+            print(game.board.items)
         # data = Game.test_dict(room["curr_connections"])
         
         room_ref.update(data)

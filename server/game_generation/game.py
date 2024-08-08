@@ -5,6 +5,7 @@ from enum import Enum
 import os
 import asyncio
 import random
+import traceback
 
 import google.generativeai as genai
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
@@ -26,7 +27,7 @@ def array_to_dict(arr):
     return data
 
 class Game(object):
-	MAX_RETRIES = 10
+	MAX_RETRIES = 4
 	def __init__(self, player_ids, num_players: int, num_categories: int, num_clues: int, given_categories: list[str] = [], use_json = True):
 		super(Game, self).__init__()
 		self.num_players = num_players
@@ -66,8 +67,15 @@ class Game(object):
 			try:
 				self.board.refresh(self.category_tree, self.model)
 				break
-			except:
+			except Exception as e:
+				print(e)
+				print(traceback.format_exc())
 				count += 1
+
+			# try with custom categories twice
+			if (count > 2):
+				self.board.given_categories = []
+		# self.board.refresh(self.category_tree, self.model)
 
 	async def generate_board_async(self):
 	    await self.board.refresh_async(self.category_tree, self.model)

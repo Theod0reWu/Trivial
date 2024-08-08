@@ -121,9 +121,6 @@ async def is_host(session_id: str):
     Socket.io events
 '''
 
-# def getRoom(sid):
-#     return list(set(sio.manager.get_rooms(sid, "/")).difference({sid}))[0]
-
 def get_ordered_players(players, session_info = False):
     if (not session_info):
         return sorted(session_manager.get_sessions(players), key=lambda s: s["timestamp"])
@@ -206,6 +203,10 @@ async def disconnect(sid):
     print('disconnect ', sid)
 
 @sio.event
+async def reconnect(sid, data):
+    print(sid, data)
+
+@sio.event
 async def join_room(sid, data):
     room_id = data["room_id"]
     session_id = data['session_id']
@@ -216,8 +217,8 @@ async def join_room(sid, data):
     print(f"User {username} joined room {room_id}")
 
     # Send a status response to the client
-    await sio.emit("join_room_status", {"status": "success"}, room=room_id)
     await send_players(room_id)
+    await sio.emit("join_room_status", {"status": "success"}, room=room_id)
 
 @sio.event
 async def rejoin_room(sid, data):

@@ -137,6 +137,8 @@ class Board(object):
 
 	def generate_answers_single_category(self, model, category):
 		ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=self.extra_ans, category=category))
+		if (ans_output is None):
+			return ans_output
 		return random.sample(ans_output, self.clues_per_category)
 
 	def generate_clues(self, model, answers, information):
@@ -166,14 +168,14 @@ class Board(object):
 		answers, information = self.get_wikipedia_info(answers, category)
 
 		# generate the clues 
-		max_tries = 3
+		max_tries = 1
 		clues = None
 		for i in range(max_tries):
 			clues = self.generate_clues(model, answers, information)
 			if (clues is not None):
 				break
 		if (clues is None or answers is None):
-			return generate_column(model, category_tree, given_categories, column_at)
+			return self.generate_column(model, category_tree, given_categories, column_at)
 		return category, answers, clues
 
 
@@ -181,7 +183,10 @@ class Board(object):
 		self.clear_picked()
 		self.items = []
 
-		given_categories = random.sample(self.given_categories, k=min(len(self.given_categories), self.num_categories))
+		given_categories = None
+		if (self.given_categories is not None):
+			given_categories = random.sample(self.given_categories, k=min(len(self.given_categories), self.num_categories))
+		
 		for column_at in range(self.num_categories):
 			category, answers, clues = self.generate_column(model, category_tree, given_categories, column_at)
 

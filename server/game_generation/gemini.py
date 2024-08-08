@@ -5,6 +5,7 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import time
 import ast
 import asyncio
+import traceback
 
 import numpy as np
 
@@ -166,6 +167,7 @@ def get_and_parse_ast(model, prompt):
 		var = ast.literal_eval(response)
 	except ValueError as e:
 		print(e)
+		# print(traceback.format_exc())
 		print("Error with this prompt:", prompt[:100])
 		print("Prompt gave this response:", response)
 	except SyntaxError as e:
