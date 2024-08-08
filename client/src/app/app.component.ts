@@ -181,7 +181,9 @@ export class AppComponent {
       this.connectorService.answeringChange$.subscribe({
         next: (value) => {
           this.connectorService.gameData.answering = true;
+          this.gameComponent.pauseProgressBar();
           this.gameComponent.startAnswering(value['duration']);
+          this.connectorService.gameData.answeringIndex = value['who'];
         },
       });
 

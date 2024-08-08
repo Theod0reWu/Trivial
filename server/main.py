@@ -354,7 +354,7 @@ async def buzz_in(sid, data):
     #pause timer and let everyone know someone will be answering
     game_manager.pause_buzz_in_timer(room_id)
     game_manager.init_answer_timer(room_id, settings.answer_time)
-    await sio.emit("answering", {"duration": settings.answer_time}, to=buzzer_sid)
+    await sio.emit("answering", {"duration": settings.answer_time, "who": buzzer_index}, to=buzzer_sid)
 
     await sio.emit("paused", {"action": "start", "who": buzzer_index, "duration": settings.answer_time}, room=room_id, skip_sid=sid)
     await run_timer(settings.answer_time, game_manager.check_answer_timer, end_answering, {"room_id": room_id}, {"room_id": room_id, "session_id": session_id})
