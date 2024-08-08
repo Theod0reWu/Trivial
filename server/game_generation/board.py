@@ -33,6 +33,7 @@ class Board(object):
 		super(Board, self).__init__()
 		self.num_categories = categories
 		self.clues_per_category = clues_per_category
+		self.extra_ans = min(self.clues_per_category * 8, 100)
 		if (given_categories is None):
 			self.given_categories = []
 		else:
@@ -94,7 +95,7 @@ class Board(object):
 					print(e)
 
 			if (len(search) == 0):
-				search = wikipedia.search(answers[i] + " " + categories[i], results = num_search_results)
+				search = wikipedia.search(answers[i] + " " + category, results = num_search_results)
 			backup_page, backup_ans = None, None
 			for e in range(num_search_results):
 				result = search[e]
@@ -103,7 +104,7 @@ class Board(object):
 				page = None
 				try:
 					page = wikipedia.page(result, auto_suggest = False)
-					print("gemini:", answers[i], "wikipedia search:", result, "wikipedia page:", page.title)
+					# print("gemini:", answers[i], "wikipedia search:", result, "wikipedia page:", page.title)
 					answers[i] = remove_parenthesis(page.title)
 				except wikipedia.exceptions.DisambiguationError as e:
 					# currently the disambiguation error will just select the next best option from suggestions
@@ -117,10 +118,9 @@ class Board(object):
 				if (page is not None):
 					information.append("Answer: " + answers[i] + "\n Information: " + "\"" + Board.info_from_page(page) + "\"")
 					break
-
-		if (len(information) < i):
-			information.append("Answer: " + backup_ans + "\n Information: " + "\"" + Board.info_from_page(backup_page) + "\"")
-			answers[i] = backup_ans
+			if (len(information) < i):
+				information.append("Answer: " + backup_ans + "\n Information: " + "\"" + Board.info_from_page(backup_page) + "\"")
+				answers[i] = backup_ans
 		return answers, information
 
 	def generate_answers(self, model, category_tree):
@@ -135,12 +135,65 @@ class Board(object):
 			answers.append(random.sample(ans_output, self.clues_per_category))
 		return answers
 
+	def generate_answers_single_category(self, model, category):
+		ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=self.extra_ans, category=category))
+		return random.sample(ans_output, self.clues_per_category)
+
 	def generate_clues(self, model, answers, information):
 		clue_prompt = self.clue_gen_json.generate_prompt(num = self.clues_per_category, answers = ", ".join(answers), information = "\n\n".join(information))
 		clues = get_and_parse_ast(model, clue_prompt)
 		return clues
 
+	def get_a_category(self,  model, category_tree, given_categories=None, column_at=None):
+		category = None
+		if (column_at is not None and given_categories is not None and column_at < len(given_categories)):
+			category = given_categories[column_at]
+		else:
+			category = category_tree.get_random_topic(model, CATEGORY_LEVEL)
+		return category
+
+	def generate_column(self, model, category_tree, given_categories, column_at):
+		# first generate the category
+		category = self.get_a_category(model, category_tree, given_categories, column_at)
+
+		# next generate answers for the category
+		answers = self.generate_answers_single_category(model, category)
+		while (answers is None): # if category is bad generate a new category
+			category = self.get_a_category(model, category_tree)
+			answers = self.generate_answers_single_category(model, category)
+
+		# gather info from wikipedia
+		answers, information = self.get_wikipedia_info(answers, category)
+
+		# generate the clues 
+		max_tries = 3
+		clues = None
+		for i in range(max_tries):
+			clues = self.generate_clues(model, answers, information)
+			if (clues is not None):
+				break
+		if (clues is None or answers is None):
+			return generate_column(model, category_tree, given_categories, column_at)
+		return category, answers, clues
+
+
 	def refresh(self, category_tree, model, min_price = 200, price_incr = 200):
+		self.clear_picked()
+		self.items = []
+
+		given_categories = random.sample(self.given_categories, k=min(len(self.given_categories), self.num_categories))
+		for column_at in range(self.num_categories):
+			category, answers, clues = self.generate_column(model, category_tree, given_categories, column_at)
+
+			title = get_and_parse_ast(model, self.title_json.generate_prompt(category=category, answers=", ".join(answers)))
+			self.category_titles.append(title)
+
+			items = []
+			for e in range(self.clues_per_category):
+				items.append(BoardItem(clues[e], answers[e], min_price + price_incr * e))
+			self.items.append(items)
+
+	def refresh_v2(self, category_tree, model, min_price = 200, price_incr = 200):
 		self.clear_picked()
 		self.items = []
 
