@@ -24,6 +24,7 @@ import json
 import asyncio
 import time
 import os
+import sys
 
 ENVIRON_FRONTEND = "FRONTEND_URL"
 
@@ -388,4 +389,5 @@ async def answer_clue(sid, data):
         await end_answering(room_id, session_id)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)
+    # uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)
+    uvicorn.run(app, host = "0.0.0.0", port = int(sys.argv[1]), log_level='debug', access_log=True)
