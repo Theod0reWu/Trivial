@@ -99,6 +99,7 @@ async def create_session(request: Request):
 @app.get("/api/get_session/")
 async def get_session(request: Request):
     session_id = request.cookies.get("session_id")
+    print(session_id, "DEBUGGGG")
     if not session_id or not session_manager.get_session_id_exists(session_id):
         response = Response(content=json.dumps({"session_id": None, "room_id": None, "reconnect": False}), media_type="application/json")
         response.delete_cookie(key="session_id", httponly=True)
@@ -148,7 +149,7 @@ async def send_board_data(room_id:str):
 
 async def send_player_cash(room_id: str):
     room = room_manager.get_room_by_id(room_id)
-    if (not room):
+    if (not room or "player_cash" not in room):
         return
     session_id = [i["session_id"] for i in get_ordered_players(room["curr_connections"])]
     cash = game_manager.get_player_cash(room_id, session_id)

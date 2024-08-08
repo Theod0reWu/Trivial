@@ -62,7 +62,11 @@ export class ConnectorService {
     return this.apiService.validRoom(roomId);
   }
 
-  startGame(numCategories: number, numClues: number, givenCategories: string[]): void {
+  startGame(
+    numCategories: number,
+    numClues: number,
+    givenCategories: string[]
+  ): void {
     this.socketService.startGame(
       this.roomId,
       this.sessionId,
@@ -225,5 +229,24 @@ export class ConnectorService {
     this.socketService.leaveRoom(this.roomId, this.sessionId);
     this.socketService.disconnectSocket();
     this.reset();
+  }
+
+  reconnect(): void {
+    console.log(this.sessionId);
+    let room_id: string | null;
+    let reconnect: boolean;
+    this.apiService.getSession().subscribe({
+      next: (result) => {
+        this.sessionId = result['session_id'];
+        room_id = result['room_id'];
+        reconnect = result['reconnect'];
+        console.log(result);
+      },
+      error: (err) => {},
+      complete: () => {
+        if (this.sessionId && reconnect) {
+        }
+      },
+    });
   }
 }

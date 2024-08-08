@@ -85,7 +85,7 @@ export class AppComponent {
         ++fontSize;
         ref.nativeElement.style.fontSize = fontSize + 'px';
         overflow = isOverflown(ref.nativeElement);
-        count += 1
+        count += 1;
       }
       --fontSize;
       ref.nativeElement.style.fontSize = fontSize + 'px';
@@ -113,6 +113,7 @@ export class AppComponent {
 
   ngOnInit(): void {
     // handle reconnecting from a disconnect
+    this.connectorService.reconnect();
   }
 
   updateAndConnect(data: any): void {
