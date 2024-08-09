@@ -165,7 +165,7 @@ export class AppComponent {
           } else if (value === 'clue') {
             this.state = this.pageStates.InGame;
           } else if (value === 'done') {
-            if (this.connectorService.reconnecting){
+            if (this.connectorService.reconnecting) {
               this.state = this.pageStates.Waiting;
             }
           }

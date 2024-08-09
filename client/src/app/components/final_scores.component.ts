@@ -33,7 +33,7 @@ export class FinalScoresComponent implements AfterViewInit {
   @Output() gameStateChange = new EventEmitter<any>();
 
   @ViewChild('main') mainElement!: ElementRef;
-  constructor(private renderer2: Renderer2, private elementRef: ElementRef) {}
+  constructor(private renderer2: Renderer2) {}
 
   ngOnInit() {
     this.updatePlayers();
