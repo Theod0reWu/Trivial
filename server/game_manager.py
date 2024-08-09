@@ -138,6 +138,11 @@ class GameManager(object):
                 })
             return clue
 
+    def get_clue(room_data: dict):
+        category_idx, clue_idx = room_data["picking"]["category_idx"], room_data["picking"]["clue_idx"]
+        clue = room_data["board_data"][category_idx][int(clue_idx)]["clue"]
+        return clue
+
     def init_buzz_in_timer(self, room_id: str, duration: float) -> any:
         return self.init_timer(room_id, BUZZ_IN_TIMER_NAME, duration)
 

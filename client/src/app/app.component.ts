@@ -138,8 +138,6 @@ export class AppComponent {
         data.username
         data.roomId
     */
-    console.log(data);
-
     //update connector
     this.connectorService.setHost(data.host);
     this.connectorService.setUsername(data.username);
@@ -159,6 +157,13 @@ export class AppComponent {
             this.connectorService.loading = true;
           } else if (value === 'pregame') {
             this.state = this.pageStates.Waiting;
+          } else if (value === 'clue') {
+            this.state = this.pageStates.InGame;
+          } else if (value === 'done') {
+            if (this.connectorService.reconnecting){
+              this.state = this.pageStates.Waiting;
+              this.connectorService.reconnecting = false;
+            }
           }
         },
       });
