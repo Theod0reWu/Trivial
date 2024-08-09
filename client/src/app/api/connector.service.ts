@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, take, lastValueFrom } from 'rxjs';
+import { Observable, take, lastValueFrom, Subject} from 'rxjs';
 import { SocketService } from './socket.service';
 import { ApiService } from './api.service';
 import { GameData, Player } from './GameData';
@@ -17,6 +17,7 @@ export class ConnectorService {
   host: boolean = false; // should be true for the host and false for everyone else
   sessionId: string = '';
   username: string = '';
+  reconnecting: boolean = false;
 
   hostChange$: Observable<any>;
   playerChange$: Observable<any>;
@@ -214,6 +215,9 @@ export class ConnectorService {
         this.setupSocketEvents();
 
         callback();
+        if (this.reconnecting){
+          this.reconnectSocket();
+        }
       },
     });
     return true;
@@ -231,22 +235,26 @@ export class ConnectorService {
     this.reset();
   }
 
-  reconnect(): void {
-    console.log(this.sessionId);
-    let room_id: string | null;
-    let reconnect: boolean;
+  reconnect(reconnector: Subject<any>): void {
     this.apiService.getSession().subscribe({
       next: (result) => {
         this.sessionId = result['session_id'];
-        room_id = result['room_id'];
-        reconnect = result['reconnect'];
-        console.log(result);
+        this.roomId = result['room_id'];
+        this.reconnecting = result['reconnect'];
+        this.host = false;
+        this.username = result["username"];
       },
       error: (err) => {},
       complete: () => {
-        if (this.sessionId && reconnect) {
+        if (this.reconnecting){
+          this.socketService.initSocket(this.sessionId);
         }
+        reconnector.next({"reconnect": this.reconnecting});
       },
     });
+  }
+
+  reconnectSocket(): void {
+    this.socketService.reconnect(this.roomId, this.sessionId);
   }
 }

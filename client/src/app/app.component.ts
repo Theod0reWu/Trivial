@@ -12,6 +12,7 @@ import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
 import { LoadingComponent } from './components/loading.component';
 import { ConnectorService } from './api/connector.service';
+import { Observable, Subject} from 'rxjs';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -113,13 +114,31 @@ export class AppComponent {
 
   ngOnInit(): void {
     // handle reconnecting from a disconnect
-    this.connectorService.reconnect();
+    let reconnector = new Subject();
+    this.connectorService.reconnect(reconnector);
+    reconnector.asObservable().subscribe({
+      next: (value: any) => {
+        if (value["reconnect"]){
+          this.updateAndConnect({
+            host: this.connectorService.host,
+            username: this.connectorService.username,
+            roomId: this.connectorService.roomId
+          });
+        }
+      }
+    });
   }
 
   updateAndConnect(data: any): void {
     /*
       Updates the member variables based on data from the landing page and establishes the connecter
+
+      Requires
+        data.host
+        data.username
+        data.roomId
     */
+    console.log(data);
 
     //update connector
     this.connectorService.setHost(data.host);
@@ -138,6 +157,8 @@ export class AppComponent {
             this.loadingMessage =
               '<b>Hang tight!</b> Generating your clues. This may take a while.';
             this.connectorService.loading = true;
+          } else if (value === 'pregame') {
+            this.state = this.pageStates.Waiting;
           }
         },
       });

@@ -99,12 +99,19 @@ async def create_session(request: Request):
 @app.get("/api/get_session/")
 async def get_session(request: Request):
     session_id = request.cookies.get("session_id")
-    print(session_id, "DEBUGGGG")
     if not session_id or not session_manager.get_session_id_exists(session_id):
         response = Response(content=json.dumps({"session_id": None, "room_id": None, "reconnect": False}), media_type="application/json")
         response.delete_cookie(key="session_id", httponly=True)
         return response
-    return {"session_id": session_id, "room_id": session_manager.get_session(session_id)["room_id"], "reconnect": True}
+    session_data = session_manager.get_session(session_id)
+    room_id = session_data["room_id"]
+    room_data = room_manager.get_room_by_id(room_id)
+    return { 
+        "session_id": session_id, 
+        "room_id": room_id, 
+        "reconnect": True,
+        "username": session_data["username"]
+        }
 
 @app.get("/api/create_room_id")
 async def create_room_id():
@@ -135,27 +142,37 @@ async def send_players(room_id):
     usernames = [i["username"] for i in get_ordered_players(room["curr_connections"])]
     await sio.emit("players", usernames, room=room_id)
 
-async def send_game_state(room_id: str, state: str | None = None):
+async def send_game_state(room_id: str, state: str | None = None, sid: str | None = None):
     if (state is None):
         state = game_manager.get_game_state(room_id)
-    await sio.emit("game_state", state, room=room_id)
+    if (sid is not None):
+        await sio.emit("game_state", state, to=sid)
+    else:
+        await sio.emit("game_state", state, room=room_id)
 
-async def send_board_data(room_id:str):
+async def send_board_data(room_id:str, room_data: dict|None = None, sid: str|None = None):
     '''
         Sends the list of category titles
         And a list of the prices of clues
     '''
-    await sio.emit("board_data", game_manager.get_board_info(room_id))
+    if (sid is not None):
+        await sio.emit("board_data", game_manager.get_board_info(room_id, room_data), to=sid)
+    else:
+        await sio.emit("board_data", game_manager.get_board_info(room_id, room_data), room=room_id)
 
-async def send_player_cash(room_id: str):
-    room = room_manager.get_room_by_id(room_id)
-    if (not room or "player_cash" not in room):
+async def send_player_cash(room_id: str, room_data: dict|None = None, sid: str|None = None):
+    if (room_data is None):
+        room_data = room_manager.get_room_by_id(room_id)
+    if (not room_data or "player_cash" not in room_data):
         return
-    session_id = [i["session_id"] for i in get_ordered_players(room["curr_connections"])]
-    cash = game_manager.get_player_cash(room_id, session_id)
-    await sio.emit("player_cash", cash, room=room_id)
+    session_id = [i["session_id"] for i in get_ordered_players(room_data["curr_connections"])]
+    cash = game_manager.get_player_cash(room_id, session_id, room_data)
+    if (sid is not None):
+        await sio.emit("player_cash", cash, to=sid)
+    else:
+        await sio.emit("player_cash", cash, room=room_id)
 
-async def send_picker(room_id: str, picker_session_id = None):
+async def send_picker(room_id: str, picker_session_id: str|None = None):
     '''
         sends to the sid of the person who will pick
         also sends the index of the person to pick
@@ -163,12 +180,21 @@ async def send_picker(room_id: str, picker_session_id = None):
     if (not picker_session_id):
         picker_session_id = game_manager.get_picker(room_id)
     sid = session_manager.get_sid(picker_session_id)
-    await sio.emit("picker", True, room=room_id, to=sid)
+    await sio.emit("picker", True, to=sid)
     await sio.emit("picker", False, room=room_id, skip_sid=sid)
     room = room_manager.get_room_by_id(room_id)
     players = [i["session_id"] for i in get_ordered_players(room["curr_connections"])]
     await sio.emit("picker_index", players.index(picker_session_id), room=room_id)
 
+async def send_picker_sid(room_id: str, sid: str, room_data: dict|None = None):
+    '''
+        Assumes that player with sid is not the picker (reconnecting players are no longer picker)
+    '''
+    if (room_data is None):
+        room_data = room_manager.get_room_by_id(room_id)
+    picker_session_id = game_manager.get_picker(room_id, room_data)
+    players = [i["session_id"] for i in get_ordered_players(room_data["curr_connections"])]
+    await sio.emit("picker_index", players.index(picker_session_id), to=sid)
 
 async def handle_leaving_room(room_id: str, session_id: str):
     '''
@@ -206,7 +232,15 @@ async def disconnect(sid):
 
 @sio.event
 async def reconnect(sid, data):
-    print(sid, data)
+    print("reconnecting", sid, data)
+    room_id, session_id = data["room_id"], data["session_id"]
+    room_data = room_manager.get_room_by_id(room_id)
+    if (room_data["state"] == GameState.BOARD.value):
+        await send_picker_sid(room_id, sid, room_data)
+        await send_board_data(room_id, room_data, sid)
+        await send_player_cash(room_id, sid)
+        await sio.emit("picked", game_manager.get_picked_clues(room_id), to=sid)
+    await send_game_state(room_id, room_data["state"], sid)
 
 @sio.event
 async def join_room(sid, data):
@@ -265,7 +299,8 @@ async def start_game(sid, data):
         game_manager.set_game_state(room_id, GameState.LOADING)
         await send_game_state(room_id, GameState.LOADING.value)
         await game_manager.init_game_async(room_id, num_categories, num_clues, given_categories)
-    
+    else:
+        return
     await send_picker(room_id)
     await send_board_data(room_id)
     await send_player_cash(room_id)

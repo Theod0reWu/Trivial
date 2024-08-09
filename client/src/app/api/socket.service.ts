@@ -36,6 +36,10 @@ export class SocketService {
     this.socket.emit('leave_room', { room_id: roomId, session_id: sessionId });
   }
 
+  reconnect(roomId: string, sessionId: string): void {
+    this.socket.emit('reconnect', { room_id: roomId, session_id: sessionId });
+  }
+
   sendBoardChoice(
     roomId: string,
     sessionId: string,
