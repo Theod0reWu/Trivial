@@ -80,6 +80,10 @@ To reconnect from a disconnect:
 #     rooms = room_manager.get_rooms()
 #     return {"rooms": rooms}
 
+@app.get("/")
+async def get():
+    return {"message": "Hello World!"}
+
 @app.get("/api/valid_room")
 async def valid_room(room_id):
     return room_manager.is_valid_room(room_id)
@@ -456,4 +460,4 @@ async def answer_clue(sid, data):
 
 if __name__ == "__main__":
     # uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)
-    uvicorn.run(app, host = "0.0.0.0", port=int(os.environ.get("PORT", 8000), log_level='debug', access_log=True)
+    uvicorn.run(app, host = "0.0.0.0", port=int(os.environ.get("PORT", 8000)), log_level='debug', access_log=True)
