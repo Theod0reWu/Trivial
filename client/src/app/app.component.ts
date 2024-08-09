@@ -12,7 +12,7 @@ import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
 import { LoadingComponent } from './components/loading.component';
 import { ConnectorService } from './api/connector.service';
-import { Observable, Subject} from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -118,14 +118,14 @@ export class AppComponent {
     this.connectorService.reconnect(reconnector);
     reconnector.asObservable().subscribe({
       next: (value: any) => {
-        if (value["reconnect"]){
+        if (value['reconnect']) {
           this.updateAndConnect({
             host: this.connectorService.host,
             username: this.connectorService.username,
-            roomId: this.connectorService.roomId
+            roomId: this.connectorService.roomId,
           });
         }
-      }
+      },
     });
   }
 
@@ -153,6 +153,11 @@ export class AppComponent {
             this.state = this.pageStates.InGame;
             this.connectorService.loading = false;
           } else if (value === 'loading') {
+            if (
+              !this.bgOverlay.nativeElement.classList.contains('bg-rendered')
+            ) {
+              this.bgOverlay.nativeElement.classList.add('bg-rendered');
+            }
             this.state = this.pageStates.Loading;
             this.loadingMessage =
               '<b>Hang tight!</b> Generating your clues. This may take a while.';
