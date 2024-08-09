@@ -42,6 +42,8 @@ app = FastAPI()
 # Cors middleware setup
 origins = [
     "http://localhost:4200", #frontend url
+    "https://trivial-ai.vercel.app/",
+    "https://trivial-challenge.vercel.app/"
 ]
 if (ENVIRON_FRONTEND in os.environ):
     origins.append(os.environ[ENVIRON_FRONTEND])
@@ -454,4 +456,4 @@ async def answer_clue(sid, data):
 
 if __name__ == "__main__":
     # uvicorn.run(app, host = "localhost", port = 8000, log_level='debug', access_log=True)
-    uvicorn.run(app, host = "0.0.0.0", port = int(sys.argv[1]), log_level='debug', access_log=True)
+    uvicorn.run(app, host = "0.0.0.0", port=int(os.environ.get("PORT", 8000), log_level='debug', access_log=True)
