@@ -63,6 +63,11 @@ class Board(object):
 	def clear_picked(self):
 		self.picked = [[False for i in range(self.clues_per_category)] for i in range(self.num_categories)]
 
+	def clear_data(self):
+		self.category_titles = []
+		self.all_categories = []
+		self.items = []
+
 	INVALID_SECTIONS = ['See also', 'References', 'Works cited', 'Further reading', 'External links']
 	def get_valid_page_sections(page):
 		sections = []
@@ -181,7 +186,7 @@ class Board(object):
 
 	def refresh(self, category_tree, model, min_price = 200, price_incr = 200):
 		self.clear_picked()
-		self.items = []
+		self.clear_data()
 
 		given_categories = None
 		if (self.given_categories is not None):

@@ -41,6 +41,11 @@ export class LoadingComponent implements OnInit {
     });
   }
 
+  ngAfterViewInit() {
+    let bgAudio = document.getElementById("bgAudio") as HTMLAudioElement;
+    bgAudio.volume = .08;
+  }
+
   getRandomFacts(facts: string[], count: number): string[] {
     const shuffled = [...facts];
     for (let i = shuffled.length - 1; i > 0; i--) {
