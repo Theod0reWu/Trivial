@@ -222,6 +222,10 @@ async def connect(sid, environ, auth):
     session = session_manager.get_session(session_id)
     if not session:
         raise ConnectionRefusedError('authentication failed')
+    else:
+        room_data = room_manager.get_room_by_id(session['room_id'])
+        if room_data and session_id in room_data['curr_connections']:
+            raise ConnectionRefusedError('user already in room')
     session_manager.update_session(session_id, sid)
 
 @sio.event

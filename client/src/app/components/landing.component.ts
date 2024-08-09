@@ -32,6 +32,7 @@ import { ApiService } from '../api/api.service';
 })
 export class LandingComponent {
   constructor(private apiService: ApiService) {}
+  @Input() reconnecting!: boolean;
 
   @Output() hostGameEvent = new EventEmitter<object>();
   username: string = '';

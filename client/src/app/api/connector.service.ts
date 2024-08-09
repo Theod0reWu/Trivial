@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, take, lastValueFrom, Subject} from 'rxjs';
+import { Observable, take, lastValueFrom, Subject } from 'rxjs';
 import { SocketService } from './socket.service';
 import { ApiService } from './api.service';
 import { GameData, Player } from './GameData';
@@ -215,7 +215,7 @@ export class ConnectorService {
         this.setupSocketEvents();
 
         callback();
-        if (this.reconnecting){
+        if (this.reconnecting) {
           this.reconnectSocket();
         }
       },
@@ -242,14 +242,14 @@ export class ConnectorService {
         this.roomId = result['room_id'];
         this.reconnecting = result['reconnect'];
         this.host = false;
-        this.username = result["username"];
+        this.username = result['username'];
       },
       error: (err) => {},
       complete: () => {
-        if (this.reconnecting){
+        if (this.reconnecting) {
           this.socketService.initSocket(this.sessionId);
         }
-        reconnector.next({"reconnect": this.reconnecting});
+        reconnector.next({ reconnect: this.reconnecting });
       },
     });
   }

@@ -9,7 +9,7 @@
   </div>
   <div style="height: 200px">
     <div class="control-panel">
-      <div class="control-panel-container">
+      <div class="control-panel-container" *ngIf="!reconnecting">
         <input
           placeholder="Username"
           class="username"
@@ -45,6 +45,9 @@
         <div class="info">
           <i class="bi bi-info-circle icon-info" (click)="onClickAbout()"></i>
         </div>
+      </div>
+      <div class="control-panel-container" *ngIf="reconnecting">
+        <div class="reconnecting-text">Reconnecting...</div>
       </div>
     </div>
   </div>
