@@ -167,9 +167,9 @@ export class AppComponent {
           } else if (value === 'done') {
             if (this.connectorService.reconnecting){
               this.state = this.pageStates.Waiting;
-              this.connectorService.reconnecting = false;
             }
           }
+          this.connectorService.reconnecting = false;
         },
       });
 

@@ -135,11 +135,12 @@ def get_ordered_players(players, session_info = False):
         return sorted(session_manager.get_sessions(players), key=lambda s: s["timestamp"])
     return sorted(players, key=lambda s: s["timestamp"])   
 
-async def send_players(room_id):
-    room = room_manager.get_room_by_id(room_id)
-    if (not room):
+async def send_players(room_id: str, room_data: str|None = None):
+    if (room_data is None):
+        room_data = room_manager.get_room_by_id(room_id)
+    if (not room_data):
         return
-    usernames = [i["username"] for i in get_ordered_players(room["curr_connections"])]
+    usernames = [i["username"] for i in get_ordered_players(room_data["curr_connections"])]
     await sio.emit("players", usernames, room=room_id)
 
 async def send_game_state(room_id: str, state: str | None = None, sid: str | None = None):
@@ -186,6 +187,12 @@ async def send_picker(room_id: str, picker_session_id: str|None = None):
     players = [i["session_id"] for i in get_ordered_players(room["curr_connections"])]
     await sio.emit("picker_index", players.index(picker_session_id), room=room_id)
 
+async def send_picker_index(room_id: str, room_data: dict|None = None):
+    if (room_data is None):
+        room_data = room_manager.get_room_by_id(room_id)
+    players = [i["session_id"] for i in get_ordered_players(room_data["curr_connections"])]
+    await sio.emit("picker_index", players.index(game_manager.get_picker(room_id, room_data)), room=room_id)
+
 async def send_picker_sid(room_id: str, session_id: str, sid: str, room_data: dict|None = None):
     '''
         Assumes that player with sid is not the picker (reconnecting players are no longer picker)
@@ -206,8 +213,10 @@ async def handle_leaving_room(room_id: str, session_id: str):
         await sio.emit("host", to=host)
     if (picker):
         await send_picker(room_id, picker)
-    await send_players(room_id)
-    await send_player_cash(room_id)
+    room_data = room_manager.get_room_by_id(room_id)
+    await send_players(room_id, room_data)
+    await send_player_cash(room_id, room_data)
+    await send_picker_index(room_id, room_data)
     # needs handle sending player cash and if someone leaves in the clue game state
 
 async def send_timer(room_id: str, timer_name: str, timer_data: dict = None):
@@ -240,10 +249,13 @@ async def reconnect(sid, data):
     print("reconnecting", sid, data)
     room_id, session_id = data["room_id"], data["session_id"]
     room_data = room_manager.get_room_by_id(room_id)
-    if (room_data["state"] == GameState.BOARD.value or room_data["state"] == GameState.CLUE.value or room_data["state"] == GameState.ANSWERING):
-        await send_picker_sid(room_id, session_id, sid, room_data)
+    await send_players(room_id, room_data)
+    if (room_data["state"] != GameState.PREGAME.value):
+        await send_player_cash(room_id, room_data)
+    if (room_data["state"] == GameState.BOARD.value or room_data["state"] == GameState.CLUE.value or room_data["state"] == GameState.ANSWERING.value):
+        # await send_picker_sid(room_id, session_id, sid, room_data)
+        await send_picker(room_id)
         await send_board_data(room_id, room_data, sid)
-        await send_player_cash(room_id, sid)
         await sio.emit("picked", game_manager.get_picked_clues(room_id), to=sid)
         await send_game_state(room_id, GameState.BOARD.value, sid)
         return
@@ -253,7 +265,6 @@ async def reconnect(sid, data):
     #     await send_game_state(room_id, GameState.BOARD.value, sid)
     #     print("duration:",duration)
     #     await sio.emit("clue", {"clue": clue, "duration": duration}, to=sid)
-        
     await send_game_state(room_id, room_data["state"], sid)
 
 @sio.event
@@ -267,7 +278,9 @@ async def join_room(sid, data):
     print(f"User {username} joined room {room_id}")
 
     # Send a status response to the client
-    await send_players(room_id)
+    room_data = room_manager.get_room_by_id(room_id)
+    if (room_data["state"] == GameState.PREGAME.value):
+        await send_players(room_id)
     await sio.emit("join_room_status", {"status": "success"}, room=room_id)
 
 @sio.event
