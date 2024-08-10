@@ -120,7 +120,8 @@ main {
   margin: 30px 0 80px 0;
 }
 
-.how-to-play {
+.how-to-play,
+.custom-category-tips {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -178,4 +179,20 @@ main {
 
 a {
   color: var(--blue);
+}
+
+.tips {
+  text-align: left;
+}
+
+.tips b {
+  font-size: 18px;
+}
+
+.tips ul li {
+  margin-bottom: 10px;
+}
+
+h6 {
+  font-family: var(--about-font);
 }
