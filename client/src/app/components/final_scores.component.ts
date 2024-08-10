@@ -41,6 +41,8 @@ export class FinalScoresComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.celebrate();
+    let bgAudio = document.getElementById('bgAudio') as HTMLAudioElement;
+    bgAudio.volume = 0.2;
   }
 
   updatePlayers() {
