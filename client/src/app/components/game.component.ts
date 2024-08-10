@@ -12,7 +12,7 @@ import { BoardComponent } from './board.component';
 import { ClueComponent } from './clue.component';
 import { FinalScoresComponent } from './final_scores.component';
 import { Player, GameData } from '../api/GameData';
-import { Observable, Subject, ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 @Component({
   selector: 'game-view',
@@ -77,7 +77,7 @@ export class GameComponent {
 
   startAnswering(duration: number): void {
     this.clueComponent.banner = this.clueComponent.BannerType.Answering;
-    this.clueComponent.startAnsweringTimer(duration)
+    this.clueComponent.startAnsweringTimer(duration);
     this.clueComponent.buzzedIn = true;
   }
 

@@ -1,10 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  Input,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { NgxSpinnerModule, NgxSpinnerService } from 'ngx-spinner';
 import { HttpClient } from '@angular/common/http';
 import { MatTooltip, MatTooltipModule } from '@angular/material/tooltip';
@@ -39,6 +33,11 @@ export class LoadingComponent implements OnInit {
         }, 10000);
       },
     });
+  }
+
+  ngAfterViewInit() {
+    let bgAudio = document.getElementById('bgAudio') as HTMLAudioElement;
+    bgAudio.volume = 0.08;
   }
 
   getRandomFacts(facts: string[], count: number): string[] {

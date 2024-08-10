@@ -76,12 +76,13 @@ class GameManager(object):
         room_ref = self.rooms.document(room_id)
         room_ref.update({"state": state.value})
 
-    def get_board_info(self, room_id: str) -> dict:
+    def get_board_info(self, room_id: str, room_data: dict|None = None) -> dict:
         '''
             Returns the category titles and prices of the board
         '''
-        room_ref = self.rooms.document(room_id)
-        room_data = room_ref.get().to_dict()
+        if (room_data is None):
+            room_ref = self.rooms.document(room_id)
+            room_data = room_ref.get().to_dict()
         titles = room_data["category_titles"]
         prices = [i["price"] for i in room_data["board_data"]["0"]]
         # print(room_data)
@@ -92,21 +93,24 @@ class GameManager(object):
             "num_clues": room_data["num_clues"]
         }
 
-    def get_player_cash(self, room_id: str, player_ids: list[str]) -> list[int]:
+    def get_player_cash(self, room_id: str, player_ids: list[str], room_data: dict|None = None) -> list[int]:
         '''
             player_id: list of session ids of players in room_id
             returns ordered list of player cash (int)
         '''
-        room_ref = self.rooms.document(room_id)
-        room_data = room_ref.get().to_dict()["player_cash"]
-        return [room_data[i] for i in player_ids]
+        if (room_data is None):
+            room_ref = self.rooms.document(room_id)
+            room_data = room_ref.get().to_dict()
+        cash = room_data["player_cash"]
+        return [cash[i] for i in player_ids]
 
-    def get_picker(self, room_id: str) -> str:
+    def get_picker(self, room_id: str, room_data: dict|None = None) -> str:
         '''
             Returns the session_id of the picker
         '''
-        room_ref = self.rooms.document(room_id)
-        room_data = room_ref.get().to_dict()
+        if (room_data is None):
+            room_ref = self.rooms.document(room_id)
+            room_data = room_ref.get().to_dict()
         return room_data["picker"]
 
     def pick(self, session_id: str, room_id:str, category_idx: str, clue_idx: str) -> str | None:
@@ -133,6 +137,11 @@ class GameManager(object):
                 "answered": []
                 })
             return clue
+
+    def get_clue(room_data: dict):
+        category_idx, clue_idx = room_data["picking"]["category_idx"], room_data["picking"]["clue_idx"]
+        clue = room_data["board_data"][category_idx][int(clue_idx)]["clue"]
+        return clue
 
     def init_buzz_in_timer(self, room_id: str, duration: float) -> any:
         return self.init_timer(room_id, BUZZ_IN_TIMER_NAME, duration)

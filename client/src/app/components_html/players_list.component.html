@@ -4,7 +4,7 @@
   </div>
   @if (displayState === "waiting") {
   <div class="players-container">
-    @for (player of players; track player; let index = $index) {
+    @for (player of players; track index; let index = $index) {
     <div class="player-card" id="player-{{ index }}" #username>
       {{ player["username"] }}
     </div>
@@ -12,7 +12,7 @@
   </div>
   } @else if (displayState === "board") {
   <div class="players-container">
-    @for (player of players; track player; let index = $index) {
+    @for (player of players; track index; let index = $index) {
     <div
       class="player-card"
       id="player={{ index }}"
@@ -29,7 +29,7 @@
   </div>
   } @else if (displayState === "clue") {
   <div class="players-container">
-    @for (player of players; track player; let index = $index) {
+    @for (player of players; track index; let index = $index) {
     <div class="player-card">
       <div class="player-score" #score>
         {{ player["score"] | currency : "USD" : "symbol" : "0.0-0" }}

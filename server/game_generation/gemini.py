@@ -225,7 +225,7 @@ def levenshtein_distance(token1, token2):
                     distances[t1][t2] = c + 1
     return distances[len(token1)][len(token2)]
 
-def verify_answer(answer, guess, threshold = .94, distance = 1):
+def verify_answer(answer, guess, threshold = .94, distance = 2):
 	answer = answer.lower()
 	guess = guess.lower()
 	return levenshtein_distance(answer, guess) <= distance or get_similarity(answer, guess) >= threshold

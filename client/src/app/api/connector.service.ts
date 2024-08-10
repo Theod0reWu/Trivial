@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, take, lastValueFrom } from 'rxjs';
+import { Observable, take, lastValueFrom, Subject } from 'rxjs';
 import { SocketService } from './socket.service';
 import { ApiService } from './api.service';
 import { GameData, Player } from './GameData';
@@ -17,6 +17,7 @@ export class ConnectorService {
   host: boolean = false; // should be true for the host and false for everyone else
   sessionId: string = '';
   username: string = '';
+  reconnecting: boolean = false;
 
   hostChange$: Observable<any>;
   playerChange$: Observable<any>;
@@ -62,7 +63,11 @@ export class ConnectorService {
     return this.apiService.validRoom(roomId);
   }
 
-  startGame(numCategories: number, numClues: number, givenCategories: string[]): void {
+  startGame(
+    numCategories: number,
+    numClues: number,
+    givenCategories: string[]
+  ): void {
     this.socketService.startGame(
       this.roomId,
       this.sessionId,
@@ -210,6 +215,9 @@ export class ConnectorService {
         this.setupSocketEvents();
 
         callback();
+        if (this.reconnecting) {
+          this.reconnectSocket();
+        }
       },
     });
     return true;
@@ -219,11 +227,34 @@ export class ConnectorService {
     /*
 			disconnects from this.roomId and clears all the associated data (roomId and sessionId)
 		*/
-    if (this.roomId == '') {
+    if (this.roomId == '' || this.roomId == null) {
       return;
     }
     this.socketService.leaveRoom(this.roomId, this.sessionId);
     this.socketService.disconnectSocket();
     this.reset();
+  }
+
+  reconnect(reconnector: Subject<any>): void {
+    this.apiService.getSession().subscribe({
+      next: (result) => {
+        this.sessionId = result['session_id'];
+        this.roomId = result['room_id'];
+        this.reconnecting = result['reconnect'];
+        this.host = false;
+        this.username = result['username'];
+      },
+      error: (err) => {},
+      complete: () => {
+        if (this.reconnecting) {
+          this.socketService.initSocket(this.sessionId);
+        }
+        reconnector.next({ reconnect: this.reconnecting });
+      },
+    });
+  }
+
+  reconnectSocket(): void {
+    this.socketService.reconnect(this.roomId, this.sessionId);
   }
 }

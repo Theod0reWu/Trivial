@@ -9,7 +9,6 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
-import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule } from '@angular/common';
 import { Player, GameData } from '../api/GameData';
 import { PlayersListComponent } from './player_list.component';

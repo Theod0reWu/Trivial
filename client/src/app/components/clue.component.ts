@@ -4,18 +4,19 @@ import {
   EventEmitter,
   HostListener,
   Input,
+  OnChanges,
   Output,
   QueryList,
+  SimpleChanges,
   ViewChild,
   ViewChildren,
 } from '@angular/core';
-import { PageStates } from '../app.component';
 import { NgClass, NgForOf, CommonModule, NgIf } from '@angular/common';
 import { Player } from '../api/GameData';
 import { TimerComponent } from './timer.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormGroup, FormControl } from '@angular/forms';
-import { Observable, Subject, BehaviorSubject, ReplaySubject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 import { PlayersListComponent } from './player_list.component';
 
 enum BannerStates {
@@ -41,7 +42,7 @@ enum BannerStates {
   templateUrl: '../components_html/clue.component.html',
   styleUrl: '../components_css/clue.component.css',
 })
-export class ClueComponent {
+export class ClueComponent implements OnChanges {
   @Input() players!: Player[];
   @Input() scores!: number[];
   @Input() changeFontSize!: (ref: ElementRef) => void;
@@ -53,12 +54,25 @@ export class ClueComponent {
   @Output() onAnswer: EventEmitter<string> = new EventEmitter<string>();
 
   @ViewChild('clueText') clueText!: ElementRef;
+  @ViewChild('buzzer') buzzer!: ElementRef;
   @ViewChildren('bannerDiv') bannerTexts!: QueryList<ElementRef>;
   @HostListener('window:resize', ['$event']) onResize(event: any) {
     this.changeFontSize(this.clueText);
     this.bannerTexts.toArray().forEach((child) => {
       this.changeFontSize(child);
     });
+  }
+  @HostListener('document:keydown.space', ['$event']) handleSpaceKeyDown(
+    event: KeyboardEvent
+  ) {
+    this.sendBuzzIn();
+    if (this.buzzer)
+      this.buzzer.nativeElement.style.backgroundColor = 'var(--red)';
+  }
+  @HostListener('document:keyup.space', ['$event']) handleSpaceKeyUp(
+    event: KeyboardEvent
+  ) {
+    if (this.buzzer) this.buzzer.nativeElement.style.backgroundColor = null;
   }
 
   constructor() {
@@ -68,6 +82,14 @@ export class ClueComponent {
   }
 
   form: FormGroup;
+
+  BannerType = BannerStates;
+  banner = BannerStates.Empty;
+
+  bannerText = 'Who/What is Berlin?';
+  answeringText = 'Team 1 is answering';
+
+  timerFraction = 0.5;
 
   // variables for progress bar
   progress: number = 0;
@@ -146,11 +168,9 @@ export class ClueComponent {
     this.onAnswer.emit(this.form.value['answer'].trim());
   }
 
-  BannerType = BannerStates;
-  banner = BannerStates.Empty;
-
-  bannerText = 'Who/What is Berlin?';
-  answeringText = 'Team 1 is answering';
-
-  timerFraction = 0.5;
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['banner']) {
+      console.log(changes['banner']);
+    }
+  }
 }
