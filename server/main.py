@@ -98,8 +98,8 @@ async def create_session(request: Request):
         # session_id = str(uuid4())
         session_id = session_manager.create_session(room_id, username)
         response = Response(content=json.dumps({"session_id": session_id, "room_id": room_id, "reconnect": False}), media_type="application/json")
-        response.set_cookie(key="session_id", value=session_id, httponly=True)
-        return {"session_id": session_id, "room_id": room_id, "reconnect": False}
+        response.set_cookie(key="session_id", value=session_id, httponly=True, samesite='none', secure=True)
+        return response
     return {"session_id": session_id, "room_id": session_manager.get_session(session_id)["room_id"], "reconnect": True}
 
 @app.get("/api/get_session/")
@@ -107,7 +107,7 @@ async def get_session(request: Request):
     session_id = request.cookies.get("session_id")
     if not session_id or not session_manager.get_session_id_exists(session_id):
         response = Response(content=json.dumps({"session_id": None, "room_id": None, "reconnect": False}), media_type="application/json")
-        response.delete_cookie(key="session_id", httponly=True)
+        response.delete_cookie(key="session_id", httponly=True, samesite='none', secure=True)
         return response
     session_data = session_manager.get_session(session_id)
     room_id = session_data["room_id"]

@@ -6,5 +6,5 @@ class Settings(BaseSettings):
     # all time is in seconds
     picked_time: int = 3 # time that the board flickers over the picked item
     answer_time: int = 8 # time that a user gets to submit an answer
-    buzz_in_time: int = 15 # time that users get to buzz-in for a clue
+    buzz_in_time: int = 12 # time that users get to buzz-in for a clue
     response_show_time: int = 3 # time to show correct/incorrect reponses
