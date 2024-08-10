@@ -3,12 +3,9 @@ import {
   Component,
   ElementRef,
   EventEmitter,
-  HostListener,
   Input,
   Output,
-  QueryList,
   ViewChild,
-  ViewChildren,
 } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { Clipboard } from '@angular/cdk/clipboard';
@@ -65,8 +62,8 @@ export class WaitingComponent implements AfterViewInit {
       this.bgOverlay.nativeElement.classList.add('bg-rendered');
     }, 10);
 
-    let bgAudio = document.getElementById("bgAudio") as HTMLAudioElement;
-    bgAudio.volume = .1;
+    let bgAudio = document.getElementById('bgAudio') as HTMLAudioElement;
+    bgAudio.volume = 0.1;
   }
 
   onClickLeaveGame() {

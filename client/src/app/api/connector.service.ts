@@ -227,7 +227,7 @@ export class ConnectorService {
     /*
 			disconnects from this.roomId and clears all the associated data (roomId and sessionId)
 		*/
-    if (this.roomId == '') {
+    if (this.roomId == '' || this.roomId == null) {
       return;
     }
     this.socketService.leaveRoom(this.roomId, this.sessionId);

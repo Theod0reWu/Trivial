@@ -196,6 +196,8 @@ async def send_picker(room_id: str, picker_session_id: str|None = None):
 async def send_picker_index(room_id: str, room_data: dict|None = None):
     if (room_data is None):
         room_data = room_manager.get_room_by_id(room_id)
+    if (not room_data):
+        return
     players = [i["session_id"] for i in get_ordered_players(room_data["curr_connections"])]
     await sio.emit("picker_index", players.index(game_manager.get_picker(room_id, room_data)), room=room_id)
 

@@ -35,6 +35,7 @@ export class LandingComponent {
   @Input() reconnecting!: boolean;
 
   @Output() hostGameEvent = new EventEmitter<object>();
+
   username: string = '';
   roomCode: string = '';
   showPopup: boolean = false;

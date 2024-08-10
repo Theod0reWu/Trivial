@@ -4,44 +4,45 @@
       <div class="clue-text" #clueText>{{ clue }}</div>
     </div>
     @if (banner === BannerType.Green || banner === BannerType.Red) {
-      <div class="banner" [style.background-color]="banner">
-        <div class="banner-text" #bannerDiv>{{ bannerText }}</div>
-      </div>
+    <div class="banner" [style.background-color]="banner">
+      <div class="banner-text" #bannerDiv>{{ bannerText }}</div>
+    </div>
     } @else if (banner === BannerType.AltAnswering) {
-      <div class="answering-outer">
-        <div class="answering-text" #bannerDiv>{{ answeringText }}</div>
-      </div>
+    <div class="answering-outer">
+      <div class="answering-text" #bannerDiv>{{ answeringText }}</div>
+    </div>
     } @else if (banner === BannerType.Answering) {
-      <div class="answering-form">
-        <div class="who-or-what">Who/What is:</div>
-        <form
-          class="ans-form"
-          type="submit"
-          (ngSubmit)="onSubmitAnswer()"
-          [formGroup]="form"
-        >
-          <input
-            placeholder="your answer"
-            id="ansInput"
-            formControlName="answer"
-            autocomplete="off"
-            #myInput
-          />
-          {{ myInput.focus() }}
-        </form>
-      </div>
+    <div class="answering-form">
+      <div class="who-or-what">Who/What is:</div>
+      <form
+        class="ans-form"
+        type="submit"
+        (ngSubmit)="onSubmitAnswer()"
+        [formGroup]="form"
+      >
+        <input
+          placeholder="your answer"
+          id="ansInput"
+          formControlName="answer"
+          autocomplete="off"
+          #myInput
+        />
+        {{ myInput.focus() }}
+      </form>
+    </div>
     } @else if (banner === BannerType.Empty) {
-      <div class="button-panel">
-        <div
-          class="button"
-          (click)="sendBuzzIn()"
-          [ngStyle]="{
-            'background-color': buzzedIn ? 'var(--dangererer)' : 'var(--red)'
-          }"
-        >
-          Buzz In
-        </div>
+    <div class="button-panel">
+      <div
+        class="button"
+        (click)="sendBuzzIn()"
+        [ngStyle]="{
+          'background-color': buzzedIn ? 'var(--dangererer)' : null
+        }"
+        #buzzer
+      >
+        Buzz In
       </div>
+    </div>
     }
     <timer
       *ngIf="
