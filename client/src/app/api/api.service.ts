@@ -12,24 +12,25 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   createRoomId(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/create_room_id`);
+    return this.http.get(`${this.apiUrl}/api/create_room_id`, {responseType: 'text'});
   }
 
   getSession(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/get_session`);
+    return this.http.get(`${this.apiUrl}/api/get_session`, {responseType: 'text'});
   }
 
   createSession(room_id: string, username: string): Observable<any> {
     return this.http.get(
-      `${this.apiUrl}/api/create_session?room_id=${room_id}&username=${username}`
+      `${this.apiUrl}/api/create_session?room_id=${room_id}&username=${username}`,
+      {responseType: 'text'}
     );
   }
 
   validRoom(room_id: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/valid_room?room_id=${room_id}`);
+    return this.http.get(`${this.apiUrl}/api/valid_room?room_id=${room_id}`, {responseType: 'text'});
   }
 
   isHost(sessionId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/api/is_host?session_id=${sessionId}`);
+    return this.http.get(`${this.apiUrl}/api/is_host?session_id=${sessionId}`, {responseType: 'text'});
   }
 }
