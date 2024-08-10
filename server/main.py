@@ -42,8 +42,8 @@ app = FastAPI()
 # Cors middleware setup
 origins = [
     "http://localhost:4200", #frontend url
-    "https://trivial-ai.vercel.app/",
-    "https://trivial-challenge.vercel.app/"
+    "https://trivial-ai.vercel.app",
+    "https://trivial-challenge.vercel.app"
 ]
 if (ENVIRON_FRONTEND in os.environ):
     origins.append(os.environ[ENVIRON_FRONTEND])
