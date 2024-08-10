@@ -99,7 +99,7 @@ async def create_session(request: Request):
         session_id = session_manager.create_session(room_id, username)
         response = Response(content=json.dumps({"session_id": session_id, "room_id": room_id, "reconnect": False}), media_type="application/json")
         response.set_cookie(key="session_id", value=session_id, httponly=True)
-        return response
+        return {"session_id": session_id, "room_id": room_id, "reconnect": False}
     return {"session_id": session_id, "room_id": session_manager.get_session(session_id)["room_id"], "reconnect": True}
 
 @app.get("/api/get_session/")
