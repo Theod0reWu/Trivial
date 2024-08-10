@@ -1,12 +1,4 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  Output,
-  ViewChild,
-  ElementRef,
-} from '@angular/core';
-import { PageStates } from '../app.component';
+import { Component, Input } from '@angular/core';
 import { NgClass, NgForOf } from '@angular/common';
 import { Observable } from 'rxjs';
 

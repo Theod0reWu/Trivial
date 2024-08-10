@@ -12,6 +12,7 @@ import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
 import { LoadingComponent } from './components/loading.component';
 import { ConnectorService } from './api/connector.service';
+import { Observable, Subject } from 'rxjs';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
@@ -85,7 +86,7 @@ export class AppComponent {
         ++fontSize;
         ref.nativeElement.style.fontSize = fontSize + 'px';
         overflow = isOverflown(ref.nativeElement);
-        count += 1
+        count += 1;
       }
       --fontSize;
       ref.nativeElement.style.fontSize = fontSize + 'px';
@@ -113,13 +114,30 @@ export class AppComponent {
 
   ngOnInit(): void {
     // handle reconnecting from a disconnect
+    let reconnector = new Subject();
+    this.connectorService.reconnect(reconnector);
+    reconnector.asObservable().subscribe({
+      next: (value: any) => {
+        if (value['reconnect']) {
+          this.updateAndConnect({
+            host: this.connectorService.host,
+            username: this.connectorService.username,
+            roomId: this.connectorService.roomId,
+          });
+        }
+      },
+    });
   }
 
   updateAndConnect(data: any): void {
     /*
       Updates the member variables based on data from the landing page and establishes the connecter
-    */
 
+      Requires
+        data.host
+        data.username
+        data.roomId
+    */
     //update connector
     this.connectorService.setHost(data.host);
     this.connectorService.setUsername(data.username);
@@ -133,11 +151,25 @@ export class AppComponent {
             this.state = this.pageStates.InGame;
             this.connectorService.loading = false;
           } else if (value === 'loading') {
+            if (
+              !this.bgOverlay.nativeElement.classList.contains('bg-rendered')
+            ) {
+              this.bgOverlay.nativeElement.classList.add('bg-rendered');
+            }
             this.state = this.pageStates.Loading;
             this.loadingMessage =
               '<b>Hang tight!</b> Generating your clues. This may take a while.';
             this.connectorService.loading = true;
+          } else if (value === 'pregame') {
+            this.state = this.pageStates.Waiting;
+          } else if (value === 'clue') {
+            this.state = this.pageStates.InGame;
+          } else if (value === 'done') {
+            if (this.connectorService.reconnecting) {
+              this.state = this.pageStates.Waiting;
+            }
           }
+          this.connectorService.reconnecting = false;
         },
       });
 

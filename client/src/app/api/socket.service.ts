@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -10,7 +11,7 @@ export class SocketService {
 
   initSocket(sessionId: string) {
     // FastAPI server url
-    this.socket = io('http://localhost:8000', {
+    this.socket = io(environment.backendURL, {
       auth: { session_id: sessionId },
     });
     this.socket.on('error', (err) => {
@@ -34,6 +35,10 @@ export class SocketService {
   // Emit an event to leave a room
   leaveRoom(roomId: string, sessionId: string): void {
     this.socket.emit('leave_room', { room_id: roomId, session_id: sessionId });
+  }
+
+  reconnect(roomId: string, sessionId: string): void {
+    this.socket.emit('reconnect', { room_id: roomId, session_id: sessionId });
   }
 
   sendBoardChoice(

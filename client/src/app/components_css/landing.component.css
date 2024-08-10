@@ -158,3 +158,11 @@ input::placeholder,
 .join {
   user-select: none;
 }
+
+.reconnecting-text {
+  font-family: var(--robot-font);
+  font-size: 40px;
+  color: white;
+  text-align: center;
+  margin: 50px 0;
+}
