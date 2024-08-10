@@ -1,6 +1,6 @@
 runtime: python312
 
 env_variables:
-  BUCKET_NAME: "gen-lang-client-0263701804-firebase-adminsdk-rjr2c-e90c9bfb5a.json"
+  FIREBASE_PATH: "gen-lang-client-0263701804-firebase-adminsdk-rjr2c-e90c9bfb5a.json"
 
 entrypoint: uvicorn main:app --host 0.0.0.0 --port 8080
