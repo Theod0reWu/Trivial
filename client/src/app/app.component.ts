@@ -111,6 +111,11 @@ export class AppComponent {
 
   ngOnInit(): void {
     // handle reconnecting from a disconnect
+    if (environment.secureMetaTag)
+      this.meta.addTag({
+        'http-equiv': 'Content-Security-Policy',
+        content: 'upgrade-insecure-requests',
+      });
     let reconnector = new Subject();
     this.connectorService.reconnect(reconnector);
     reconnector.asObservable().subscribe({
@@ -124,11 +129,6 @@ export class AppComponent {
         }
       },
     });
-    if (environment.secureMetaTag)
-      this.meta.addTag({
-        'http-equiv': 'Content-Security-Policy',
-        content: 'upgrade-insecure-requests',
-      });
   }
 
   updateAndConnect(data: any): void {
