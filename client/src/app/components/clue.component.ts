@@ -65,6 +65,9 @@ export class ClueComponent implements OnChanges {
   @HostListener('document:keydown.space', ['$event']) handleSpaceKeyDown(
     event: KeyboardEvent
   ) {
+    if (this.banner != this.BannerType.Empty){
+      return;
+    }
     this.sendBuzzIn();
     if (this.buzzer)
       this.buzzer.nativeElement.style.backgroundColor = 'var(--red)';

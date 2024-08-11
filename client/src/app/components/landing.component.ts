@@ -77,7 +77,7 @@ export class LandingComponent {
         return;
       }
       this.buttonClicked = true;
-      
+
       this.apiService.validRoom(this.roomCode).subscribe({
         next: (value) => {
           if (value) {
@@ -85,7 +85,7 @@ export class LandingComponent {
             this.showPopup = false;
             this.hostGameEvent.emit({
               state: PageStates.Waiting,
-              roomId: this.roomCode,
+              roomId: this.roomCode.trim(),
               host: false,
               username: this.username,
             });
