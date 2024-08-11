@@ -1,10 +1,4 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  Inject,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { LandingComponent } from './components/landing.component';
 import { AboutComponent } from './components/about.component';
@@ -12,13 +6,15 @@ import { WaitingComponent } from './components/waiting.component';
 import { GameComponent } from './components/game.component';
 import { LoadingComponent } from './components/loading.component';
 import { ConnectorService } from './api/connector.service';
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import {
   MAT_DIALOG_DATA,
   MatDialog,
   MatDialogModule,
 } from '@angular/material/dialog';
 import { NgIf } from '@angular/common';
+import { Meta } from '@angular/platform-browser';
+import { environment } from '../environments/environment';
 
 export enum PageStates {
   Landing,
@@ -46,7 +42,8 @@ export enum PageStates {
 export class AppComponent {
   constructor(
     public dialog: MatDialog,
-    public connectorService: ConnectorService
+    public connectorService: ConnectorService,
+    private readonly meta: Meta
   ) {}
   @ViewChild(GameComponent) gameComponent: GameComponent;
   @ViewChild('bgOver') bgOverlay!: ElementRef;
@@ -127,6 +124,11 @@ export class AppComponent {
         }
       },
     });
+    if (environment.secureMetaTag)
+      this.meta.addTag({
+        'http-equiv': 'Content-Security-Policy',
+        content: 'upgrade-insecure-requests',
+      });
   }
 
   updateAndConnect(data: any): void {
