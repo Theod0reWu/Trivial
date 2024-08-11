@@ -196,3 +196,14 @@ a {
 h6 {
   font-family: var(--about-font);
 }
+
+.code {
+  font-size: 40px;
+  color: var(--snow);
+  transition: all 0.2s ease 0s;
+  cursor: pointer;
+}
+
+.code:hover {
+  color: var(--white-transparent-50);
+}
