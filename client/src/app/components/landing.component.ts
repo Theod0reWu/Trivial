@@ -46,7 +46,13 @@ export class LandingComponent {
   logoBackdropUrl = '/assets/img/question.gif';
   mainMusicUrl = '/assets/audio/trivial_music.mp3';
 
-  clickedJoinGame = false;
+  clickedJoinGame: boolean = false;
+
+  buttonClicked: boolean = false;
+
+  ngAfterViewInit() {
+    this.buttonClicked = false;
+  }
 
   onClickJoinGame() {
     this.clickedJoinGame = true;
@@ -60,13 +66,18 @@ export class LandingComponent {
     }, 3000);
   }
 
-  onClickJoin() {
+  onClickJoin(): void {
     clearTimeout(this.popupTimeout);
     if (!this.username.trim()) {
       this.showError('Please enter a username first!');
     } else if (!this.roomCode.trim()) {
       this.showError('Please enter a valid room code!');
     } else {
+      if (this.buttonClicked) {
+        return;
+      }
+      this.buttonClicked = true;
+      
       this.apiService.validRoom(this.roomCode).subscribe({
         next: (value) => {
           if (value) {
@@ -86,11 +97,16 @@ export class LandingComponent {
     }
   }
 
-  onClickHostGame() {
+  onClickHostGame(): void {
     clearTimeout(this.popupTimeout);
     if (!this.username.trim()) {
       this.showError('Please enter a username first!');
     } else {
+      if (this.buttonClicked) {
+        return;
+      }
+      this.buttonClicked = true;
+
       this.errorMessage = '';
       this.showPopup = false;
       this.apiService.createRoomId().subscribe({
