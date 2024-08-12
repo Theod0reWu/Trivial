@@ -7,6 +7,9 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class ApiService {
+  /* 
+    Service to handle all the REST API requests from the server
+  */
   private apiUrl = environment.backendURL;
 
   constructor(private http: HttpClient) {}
@@ -20,7 +23,6 @@ export class ApiService {
   }
 
   createSession(room_id: string, username: string): Observable<any> {
-    console.log("api create session", room_id, username);
     return this.http.get(
       `${this.apiUrl}/api/create_session?room_id=${room_id}&username=${username}`,
       {responseType: 'json'}

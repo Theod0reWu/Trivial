@@ -102,7 +102,7 @@ export class LandingComponent {
     if (!this.username.trim()) {
       this.showError('Please enter a username first!');
     } else {
-      if (this.buttonClicked) {
+      if (this.buttonClicked && !this.reconnecting) {
         return;
       }
       this.buttonClicked = true;
@@ -111,7 +111,6 @@ export class LandingComponent {
       this.showPopup = false;
       this.apiService.createRoomId().subscribe({
         next: (v) => {
-          console.log("create room id returns", v);
           this.hostGameEvent.emit({
             state: PageStates.Waiting,
             roomId: v.room_id,

@@ -7,6 +7,10 @@ import { environment } from '../../environments/environment';
   providedIn: 'root',
 })
 export class SocketService {
+  /*
+    Service to handle socketio connection
+  */
+
   private socket: Socket;
 
   initSocket(sessionId: string) {
@@ -25,7 +29,6 @@ export class SocketService {
 
   // Emit an event to join a room
   joinRoom(roomId: string, username: string, sessionId: string): void {
-    console.log("join room socket", roomId, username, sessionId);
     this.socket.emit('join_room', {
       room_id: roomId,
       username: username,

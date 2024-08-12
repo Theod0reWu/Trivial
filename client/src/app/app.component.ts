@@ -121,7 +121,6 @@ export class AppComponent {
     reconnector.asObservable().subscribe({
       next: (value: any) => {
         if (value['reconnect']) {
-          console.log("reconnecting", this.connectorService.roomId);
           this.updateAndConnect({
             host: this.connectorService.host,
             username: this.connectorService.username,
@@ -145,7 +144,6 @@ export class AppComponent {
     this.connectorService.setHost(data.host);
     this.connectorService.setUsername(data.username);
     this.connectorService.setRoom(data.roomId);
-    console.log("updateAndConnect", this.connectorService.roomId);
 
     // The roomid has been generated we can now connect with sockets.
     const callback = () => {

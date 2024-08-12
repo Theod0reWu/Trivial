@@ -19,8 +19,6 @@ export class ConnectorService {
   username: string = '';
   reconnecting: boolean = false;
 
-  hostChange$: Observable<any>;
-  playerChange$: Observable<any>;
   players: Player[] = [];
 
   private socketService: SocketService = new SocketService();
@@ -29,6 +27,9 @@ export class ConnectorService {
   gameStateChange$: Observable<any>;
   gameData: GameData = new GameData();
 
+  // observables for picking up socket responses
+  hostChange$: Observable<any>;
+  playerChange$: Observable<any>;
   pickingChange$: Observable<any>;
   clueChange$: Observable<any>;
   pausedChange$: Observable<any>;
@@ -100,6 +101,16 @@ export class ConnectorService {
   }
 
   setupSocketEvents(): void {
+    /*
+      Sets up subscriptions for when socket receives data that needs to update member vars.
+
+      modifies asynchronously:
+        this.sockerService
+        this.players
+        this.host
+        this.gameData
+    */
+
     // setup for when players join a room
     this.playerChange$ = this.socketService.onPlayerChange();
     this.playerChange$.subscribe({
@@ -210,7 +221,6 @@ export class ConnectorService {
       complete: () => {
         //setup socket with sessionId and roomId
         this.socketService.initSocket(this.sessionId);
-        console.log("connecting to room with", this.roomId, this.sessionId);
         this.socketService.joinRoom(this.roomId, this.username, this.sessionId);
         this.socketConnected = true;
         this.setupSocketEvents();
@@ -237,6 +247,17 @@ export class ConnectorService {
   }
 
   reconnect(reconnector: Subject<any>): void {
+    /*
+      Check if reconnecting possible
+
+      Modifies asynchronously:
+        this.reconnecting
+      possible updates:
+        this.sessionId
+        this.roomId
+        this.host
+        this.username
+    */
     this.apiService.getSession().subscribe({
       next: (result) => {
         this.reconnecting = result['reconnect'];
