@@ -199,7 +199,8 @@ async def send_picker_index(room_id: str, room_data: dict|None = None):
     if (not room_data):
         return
     players = [i["session_id"] for i in get_ordered_players(room_data["curr_connections"])]
-    await sio.emit("picker_index", players.index(game_manager.get_picker(room_id, room_data)), room=room_id)
+    picker_session_id = game_manager.get_picker(room_id, room_data)
+    await sio.emit("picker_index", players.index(picker_session_id), room=room_id)
 
 async def send_picker_sid(room_id: str, session_id: str, sid: str, room_data: dict|None = None):
     '''
@@ -354,6 +355,7 @@ async def to_waiting(sid, data):
 
 async def finish_clue(room_id: str, display_ans: bool = True):
     room_data = None
+    game_manager.set_game_state(room_id, GameState.BOARD)
     if (display_ans):
         answer, room_data = game_manager.get_correct_ans(room_id)
         await sio.emit("response", {"correct": True, "answer": answer, "end": True}, room=room_id);
@@ -365,7 +367,6 @@ async def finish_clue(room_id: str, display_ans: bool = True):
     else:
         await sio.emit("picked", game_manager.get_picked_clues(room_id, room_data)[0], room=room_id)
         await send_picker(room_id)
-        game_manager.set_game_state(room_id, GameState.BOARD)
         await send_game_state(room_id, GameState.BOARD.value)
 
 async def end_answering(room_id: str, session_id: str = None):
