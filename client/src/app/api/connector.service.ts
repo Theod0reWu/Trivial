@@ -196,7 +196,7 @@ export class ConnectorService {
 			Modifies:
 				this.sessionId
 		*/
-    if (this.roomId == '' || this.username == '' || this.socketConnected) {
+    if (this.roomId === '' || this.username === '' || this.socketConnected) {
       return false;
     }
     this.apiService.createSession(this.roomId, this.username).subscribe({
@@ -239,11 +239,13 @@ export class ConnectorService {
   reconnect(reconnector: Subject<any>): void {
     this.apiService.getSession().subscribe({
       next: (result) => {
-        this.sessionId = result['session_id'];
-        this.roomId = result['room_id'];
         this.reconnecting = result['reconnect'];
-        this.host = false;
-        this.username = result['username'];
+        if (this.reconnecting){
+          this.sessionId = result['session_id'];
+          this.roomId = result['room_id'];
+          this.host = false;
+          this.username = result['username'];
+        }
       },
       error: (err) => {},
       complete: () => {
