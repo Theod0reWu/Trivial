@@ -111,6 +111,7 @@ export class LandingComponent {
       this.showPopup = false;
       this.apiService.createRoomId().subscribe({
         next: (v) => {
+          console.log("create room id returns", v);
           this.hostGameEvent.emit({
             state: PageStates.Waiting,
             roomId: v.room_id,
@@ -118,7 +119,10 @@ export class LandingComponent {
             username: this.username,
           });
         },
-        error: (e) => console.error('Error creating room id:', e),
+        error: (e) => {
+          console.error('Error creating room id:', e);
+          this.buttonClicked = false;
+        }
       });
     }
   }

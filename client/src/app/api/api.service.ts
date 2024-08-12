@@ -20,6 +20,7 @@ export class ApiService {
   }
 
   createSession(room_id: string, username: string): Observable<any> {
+    console.log("api create session", room_id, username);
     return this.http.get(
       `${this.apiUrl}/api/create_session?room_id=${room_id}&username=${username}`,
       {responseType: 'json'}

@@ -210,6 +210,7 @@ export class ConnectorService {
       complete: () => {
         //setup socket with sessionId and roomId
         this.socketService.initSocket(this.sessionId);
+        console.log("connecting to room with", this.roomId, this.sessionId);
         this.socketService.joinRoom(this.roomId, this.username, this.sessionId);
         this.socketConnected = true;
         this.setupSocketEvents();
