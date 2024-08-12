@@ -7,6 +7,7 @@ import asyncio
 import multiprocessing
 import concurrent.futures
 from concurrent.futures import ProcessPoolExecutor
+import random
 
 from game_generation.game import Game, GameState
 from game_generation.gemini import get_similarity, verify_answer
@@ -107,11 +108,18 @@ class GameManager(object):
     def get_picker(self, room_id: str, room_data: dict|None = None) -> str:
         '''
             Returns the session_id of the picker
+
+            If picker is not in current connections, assigns the new picker
         '''
         if (room_data is None):
             room_ref = self.rooms.document(room_id)
             room_data = room_ref.get().to_dict()
-        return room_data["picker"]
+        picker_session_id = room_data["picker"]
+        if (picker_session_id not in room_data["curr_connections"]):
+            picker_session_id = random.choice(room_data["curr_connections"])
+            room_ref = self.rooms.document(room_id)
+            room_ref.update({"picker": picker_session_id})
+        return picker_session_id
 
     def pick(self, session_id: str, room_id:str, category_idx: str, clue_idx: str) -> str | None:
         '''
@@ -216,7 +224,11 @@ class GameManager(object):
         room_data = room_ref.get().to_dict()
 
         # ensure player is in the room and that the player hasn't answered yet
-        if (not session_id in room_data["curr_connections"] or session_id in room_data["answered"] or room_data["answering"] is not None):
+        if (not session_id in room_data["curr_connections"] or 
+            session_id in room_data["answered"] 
+            or room_data["answering"] is not None 
+            or room_data['state'] != GameState.CLUE.value
+            ):
             return False
         room_data["answered"].append(session_id)
         room_ref.update({"answered": room_data["answered"], "answering": session_id})
