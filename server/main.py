@@ -281,6 +281,13 @@ async def join_room(sid, data):
     room_id = data["room_id"]
     session_id = data['session_id']
     username = session_manager.get_username(session_id)
+    print("joining room sio event", room_id, session_id, sid)
+    
+    if (room_id is None):
+        print("failed to join room", room_id, session_id)
+        await sio.emit("join_room_status", {"status": False}, to=sid)
+        return
+
     room_manager.join_room(room_id, session_id)
     await sio.enter_room(sid, room_id)
 
@@ -290,7 +297,7 @@ async def join_room(sid, data):
     room_data = room_manager.get_room_by_id(room_id)
     if (room_data["state"] == GameState.PREGAME.value):
         await send_players(room_id)
-    await sio.emit("join_room_status", {"status": "success"}, room=room_id)
+    await sio.emit("join_room_status", {"status": True}, to=sid)
 
 @sio.event
 async def rejoin_room(sid, data):
