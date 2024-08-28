@@ -11,6 +11,7 @@ Trivial empowers users to engage in continuous learning through an immersive tri
 
 ![tutorial_clue](https://github.com/user-attachments/assets/42ae3ff0-0950-4730-b033-b3220c191635)
 
+For more information, check out our [demo video!](https://www.youtube.com/watch?v=JBVLZ8tRJ5s)
 
 ## Backend
 The backend for Trivial is a Python-based system built on the FastAPI framework, leveraging SocketIO for real-time communication, asyncio for asynchronous task management, and Firestore for flexible data storage. The FastAPI high-performance web framework handles RESTful API endpoints for various room-setup related operations, such as creating rooms and player sessions. SocketIO enables real-time bidirectional communication between the server and clients, ensuring seamless updates on game progress, timers, and player scores. 
@@ -27,6 +28,11 @@ The frontend for Trivial, is made with Angular. Leveraging Angular's component-b
 - [Wikipedia](https://pypi.org/project/wikipedia/) for fetching data from Wikipedia and adding context to clue generation to ensure factually correct clues.
 - [Gemini](https://cloud.google.com/vertex-ai/docs/generative-ai/model-reference/gemini) via [VertexAI](https://cloud.google.com/vertex-ai) for generating categories, category titles, clues and answers.
 - [Angular](https://angular.dev/) for frontend developement
+
+## Simplified Architecture Overview
+
+![image](https://github.com/user-attachments/assets/cdeb7547-4cf3-4052-a071-5ed883f98de7)
+
 
 ## Project Architecture Overview
 ![architecture drawio](https://github.com/user-attachments/assets/7c7cc33a-8686-4a6c-a57f-b6cf4b849e1e)
