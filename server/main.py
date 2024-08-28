@@ -213,23 +213,21 @@ async def send_picker_sid(room_id: str, session_id: str, sid: str, room_data: di
     players = [i["session_id"] for i in get_ordered_players(room_data["curr_connections"])]
     await sio.emit("picker_index", players.index(picker_session_id), to=sid)
 
-async def handle_leaving_room(room_id: str, session_id: str):
+async def handle_leaving_room(room_id: str, session_id: str, disconnect = True):
     '''
         Leaves the room in the database (handles things like the new host and new picker)
     '''
-    host, picker = room_manager.leave_room(room_id, session_id, session_manager)
+    host, picker = room_manager.leave_room(room_id, session_id, session_manager, disconnect)
     if (host):
         await sio.emit("host", to=host)
     if (picker):
         await send_picker(room_id, picker)
     room_data = room_manager.get_room_by_id(room_id)
     await send_players(room_id, room_data)
+    if (room_data is None or room_data["state"] in [GameState.DONE.value, GameState.PREGAME.value]):
+        return
     await send_player_cash(room_id, room_data)
-    try:
-        await send_picker_index(room_id, room_data)
-    except KeyError:
-        pass
-    # needs handle sending player cash and if someone leaves in the clue game state
+    await send_picker_index(room_id, room_data)
 
 async def send_timer(room_id: str, timer_name: str, timer_data: dict = None):
     if (not timer_data):
@@ -253,7 +251,7 @@ async def connect(sid, environ, auth):
 async def disconnect(sid):
     room = session_manager.get_room_by_sid(sid)
     if room:
-        await handle_leaving_room(room["room_id"], room["session_id"])
+        await handle_leaving_room(room["room_id"], room["session_id"], True)
     print('disconnect ', sid)
 
 @sio.event
@@ -271,6 +269,7 @@ async def reconnect(sid, data):
         await sio.emit("picked", game_manager.get_picked_clues(room_id), to=sid)
         await send_game_state(room_id, GameState.BOARD.value, sid)
         return
+    # return the player to the board if they disconnect during a clue
     # elif (room_data["state"] == GameState.CLUE.value):
     #     clue = GameManager.get_clue(room_data)
     #     duration = room_data[BUZZ_IN_TIMER_NAME]["end"] - room_data[BUZZ_IN_TIMER_NAME]["start"]
@@ -317,12 +316,14 @@ async def rejoin_room(sid, data):
 @sio.event
 async def leave_room(sid, data):
     '''
+        Removes the player from the room.
+
         Expects data to be a dict with keys "room_id" and "session_id"
     '''
     room_id = data['room_id']
     session_id = data['session_id']
 
-    await handle_leaving_room(room_id, session_id)
+    await handle_leaving_room(room_id, session_id, False)
 
     # remove session and remove from sio room
     session_manager.delete_session(session_id)

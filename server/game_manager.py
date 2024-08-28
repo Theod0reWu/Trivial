@@ -115,10 +115,10 @@ class GameManager(object):
             room_ref = self.rooms.document(room_id)
             room_data = room_ref.get().to_dict()
         picker_session_id = room_data["picker"]
-        if (picker_session_id not in room_data["curr_connections"]):
-            picker_session_id = random.choice(room_data["curr_connections"])
-            room_ref = self.rooms.document(room_id)
-            room_ref.update({"picker": picker_session_id})
+        # if (picker_session_id not in room_data["curr_connections"]):
+        #     picker_session_id = random.choice(room_data["curr_connections"])
+        #     room_ref = self.rooms.document(room_id)
+        #     room_ref.update({"picker": picker_session_id})
         return picker_session_id
 
     def pick(self, session_id: str, room_id:str, category_idx: str, clue_idx: str) -> str | None:

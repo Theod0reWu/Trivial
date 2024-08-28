@@ -50,18 +50,19 @@ class RoomManager:
     def create_room(self, room_id: str):
         room_ref = self.rooms.document(room_id)
         room = Room()
-        print("room creation", room)
         room_ref.set(room.to_dict())
+        return room.to_dict()
 
     def join_room(self, room_id: str, session_id: str):
+        if (room_id is None):
+            return
         room_ref = self.rooms.document(room_id)
         room = room_ref.get().to_dict()
         
         # room doesn't exist yet, create room
         if not room:
-            self.create_room(room_id)
-            print("new room", room_ref.get().to_dict())
-            room = Room().to_dict()
+            room = self.create_room(room_id)
+            room_ref = self.rooms.document(room_id)
 
             # the maker is the host
             room_ref.update({"host": session_id})
@@ -71,8 +72,12 @@ class RoomManager:
         if (session_id not in room["all_connections"]): room["all_connections"].append(session_id)
         room_ref.update({"curr_connections": room["curr_connections"], "all_connections": room["all_connections"]})
     
-    def leave_room(self, room_id: str, session_id: str, session_manager: SessionManager) -> str:
+    def leave_room(self, room_id: str, session_id: str, session_manager: SessionManager, disconnect = True) -> str:
         '''
+            leaves the room by removing the session_id from curr_connections
+    
+            if disconnect is false, also deletes the session_id from sessions
+
             returns sid of current or newly elected host and the session_id of a new picker (if one is needed)
             returns None is either can't be done
 
@@ -83,6 +88,11 @@ class RoomManager:
         if room:
             if (session_id in room["curr_connections"]):
                 room["curr_connections"].remove(session_id)
+
+            # remove session and 
+            if (not disconnect and session_id in room["all_connections"]):
+                room["all_connections"].remove(session_id)
+                session_manager.delete_session(session_id)
             if (not room["curr_connections"]):
                 session_manager.delete_session_by_room_id(room_id)
                 room_ref.delete()
