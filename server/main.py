@@ -225,7 +225,10 @@ async def handle_leaving_room(room_id: str, session_id: str):
     room_data = room_manager.get_room_by_id(room_id)
     await send_players(room_id, room_data)
     await send_player_cash(room_id, room_data)
-    await send_picker_index(room_id, room_data)
+    try:
+        await send_picker_index(room_id, room_data)
+    except KeyError:
+        pass
     # needs handle sending player cash and if someone leaves in the clue game state
 
 async def send_timer(room_id: str, timer_name: str, timer_data: dict = None):
