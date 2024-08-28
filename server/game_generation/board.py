@@ -10,7 +10,7 @@ from . import gemini
 from .prompt import CategoryPromptGenerator, AnswerPromptGenerator, CluePromptGenerator, CategoryAndClueGenerator, TopicGenerator
 from .boarditem import BoardItem
 from .gemini import (get_and_parse_categories, get_and_parse_answers, get_and_parse_clues, get_and_parse_catans, 
-	get_and_parse_ast, get_and_parse_ast_async)
+	get_and_parse_ast, get_and_parse_ast_async, get_similarity)
 
 import wikipedia
 from wikipedia.exceptions import DisambiguationError, PageError
@@ -87,7 +87,7 @@ class Board(object):
 				info += section_text + " "
 		return  info + page.summary
 
-	def get_wikipedia_info(self, answers, category):
+	def get_wikipedia_info(self, answers, category, alt_answers = []):
 		information = []
 		for i in range(len(answers)):
 			# search wikipedia for a relevant page (if the answer is not specific enough try it with the category)
@@ -136,7 +136,6 @@ class Board(object):
 			if (ans_output is None):
 				self.all_categories[i] = category_tree.get_random_topic(model, CATEGORY_LEVEL)
 				ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=num_to_get, category=self.all_categories[i]))
-			print("got answers:", len(ans_output))
 			answers.append(random.sample(ans_output, self.clues_per_category))
 		return answers
 
@@ -144,7 +143,8 @@ class Board(object):
 		ans_output = get_and_parse_ast(model, self.answer_json.generate_prompt(num=self.extra_ans, category=category))
 		if (ans_output is None):
 			return ans_output
-		return random.sample(ans_output, self.clues_per_category)
+		ans_idx = random.sample([i for i in range(len(ans_output))], self.clues_per_category)
+		return [ans_output[i] for i in ans_idx], [ans_output[i] for i in range(len(ans_output)) if i not in ans_idx]
 
 	def generate_clues(self, model, answers, information):
 		clue_prompt = self.clue_gen_json.generate_prompt(num = self.clues_per_category, answers = ", ".join(answers), information = "\n\n".join(information))
@@ -164,13 +164,13 @@ class Board(object):
 		category = self.get_a_category(model, category_tree, given_categories, column_at)
 
 		# next generate answers for the category
-		answers = self.generate_answers_single_category(model, category)
+		answers, alt_answers = self.generate_answers_single_category(model, category)
 		while (answers is None): # if category is bad generate a new category
 			category = self.get_a_category(model, category_tree)
-			answers = self.generate_answers_single_category(model, category)
+			answers, alt_answers = self.generate_answers_single_category(model, category)
 
 		# gather info from wikipedia
-		answers, information = self.get_wikipedia_info(answers, category)
+		answers, information = self.get_wikipedia_info(answers, category, alt_answers)
 
 		# generate the clues 
 		max_tries = 1
@@ -196,6 +196,8 @@ class Board(object):
 			category, answers, clues = self.generate_column(model, category_tree, given_categories, column_at)
 
 			title = get_and_parse_ast(model, self.title_json.generate_prompt(category=category, answers=", ".join(answers)))
+			if (title is None):
+				title = category
 			self.category_titles.append(title)
 
 			items = []
