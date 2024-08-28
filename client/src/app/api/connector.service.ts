@@ -115,6 +115,7 @@ export class ConnectorService {
     this.playerChange$ = this.socketService.onPlayerChange();
     this.playerChange$.subscribe({
       next: (result) => {
+        console.log("got players:", result);
         this.players = [];
         for (var player of result) {
           this.players.push({ username: player, score: 0 });
