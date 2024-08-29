@@ -1,4 +1,4 @@
-Below are {num:.0f} pieces of information each about one of the answers: {answers}.
+Below are {num:.0f} pieces of information each about one of the answers: {answers}. The answers are listed right before information associated with it.
 
 {information}
 
@@ -6,4 +6,4 @@ Use the information provided about each answer above to make {num:.0f} clues tha
 
 If quotations need to be used in the clue, place a backslash before them (e.g. \"content\").
 
-Your reply must be in the form of a list of strings. The list should have {num:.0f} entries with each entry in the list being the clue as a string.
+Your reply must be in the form of a list of strings. The list should have {num:.0f} entries with each entry in the list being the clue as a string. Remember to ensure the absence of any part of the answers ({answers}) in the clues. 

@@ -10,7 +10,7 @@ from . import gemini
 from .prompt import CategoryPromptGenerator, AnswerPromptGenerator, CluePromptGenerator, CategoryAndClueGenerator, TopicGenerator
 from .boarditem import BoardItem
 from .gemini import (get_and_parse_categories, get_and_parse_answers, get_and_parse_clues, get_and_parse_catans, 
-	get_and_parse_ast, get_and_parse_ast_async, get_similarity)
+	get_and_parse_ast, get_and_parse_ast_async, get_similarity, verify_answer)
 
 import wikipedia
 from wikipedia.exceptions import DisambiguationError, PageError
@@ -87,45 +87,50 @@ class Board(object):
 				info += section_text + " "
 		return  info + page.summary
 
+	def get_wikipedia_page(self, ans, category, alt_answers):
+		# search wikipedia for a relevant page (if the answer is not specific enough try it with the category)
+		num_search_results = 3
+		search = None
+		while (search is None):
+			try:
+				search = wikipedia.search(ans + " (" + category + ")", results = num_search_results)
+			except wikipedia.exceptions.WikipediaException as e:
+				print(e)
+		if (len(search) == 0):
+			search = wikipedia.search(ans, results = num_search_results)
+
+		backup_page, backup_ans = None, None
+		for e in range(num_search_results):
+			result = search[e]
+
+			# get the wikipedia page
+			page = None
+			try:
+				page = wikipedia.page(result, auto_suggest = False)
+				if (not verify_answer(ans, page.title, threshold = .93)):
+					if (len(alt_answers) > 0):
+						return self.get_wikipedia_page(alt_answers.pop(), category, alt_answers)
+					else:
+						ans = remove_parenthesis(page.title)
+			except wikipedia.exceptions.DisambiguationError as ex:
+				# currently the disambiguation error will just select the next best option from suggestions
+				# This is only done from the first result
+				if (e == 0):
+					backup_page = wikipedia.page(ex.options[0], auto_suggest = False)
+					backup_ans = remove_parenthesis(backup_page.title)
+				continue
+
+			#backup is chosen if none of the search results resulted in pages
+			if (page is not None):
+				return ans, page
+		return backup_ans, backup_page
+
 	def get_wikipedia_info(self, answers, category, alt_answers = []):
 		information = []
 		for i in range(len(answers)):
-			# search wikipedia for a relevant page (if the answer is not specific enough try it with the category)
-			num_search_results = 3
-			search = None
-			while (search is None):
-				try:
-					search = wikipedia.search(answers[i], results = num_search_results)
-				except wikipedia.exceptions.WikipediaException as e:
-					print(e)
-
-			if (len(search) == 0):
-				search = wikipedia.search(answers[i] + " " + category, results = num_search_results)
-			backup_page, backup_ans = None, None
-			for e in range(num_search_results):
-				result = search[e]
-
-				# get the wikipedia page
-				page = None
-				try:
-					page = wikipedia.page(result, auto_suggest = False)
-					# print("gemini:", answers[i], "wikipedia search:", result, "wikipedia page:", page.title)
-					answers[i] = remove_parenthesis(page.title)
-				except wikipedia.exceptions.DisambiguationError as e:
-					# currently the disambiguation error will just select the next best option from suggestions
-					# This is only done from the first result
-					if (i == 0):
-						backup_page = wikipedia.page(e.options[0], auto_suggest = False)
-						backup_ans = remove_parenthesis(backup_page.title)
-					continue
-
-				#backup is chosen if none of the search results resulted in pages
-				if (page is not None):
-					information.append("Answer: " + answers[i] + "\n Information: " + "\"" + Board.info_from_page(page) + "\"")
-					break
-			if (len(information) < i):
-				information.append("Answer: " + backup_ans + "\n Information: " + "\"" + Board.info_from_page(backup_page) + "\"")
-				answers[i] = backup_ans
+			answers[i], page = self.get_wikipedia_page(answers[i], category, alt_answers)
+			information.append("For the answer: " + answers[i] + "the associated information is: " + "\"" + Board.info_from_page(page) + "\"")
+			
 		return answers, information
 
 	def generate_answers(self, model, category_tree):
